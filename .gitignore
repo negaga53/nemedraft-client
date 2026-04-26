@@ -1,0 +1,48 @@
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# Environment — keep .env.client (defaults), ignore generated *.local
+.env
+.env.*.local
+!.env.client
+
+# Build outputs
+dist/
+build/
+out/
+*.egg-info/
+.cache/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+
+# Misc
+*.tmp
+*.temp
+
+# Scryfall bulk export (~500 MB, regenerated on demand by common.data.scryfall)
+data/scryfall/default_cards.json
+
+# Card name translation cache — populated on demand from the Scryfall API
+client/overlay/i18n/card_cache/

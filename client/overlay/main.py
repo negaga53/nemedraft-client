@@ -16,6 +16,7 @@ from PySide6.QtCore import QThread, QTimer, Signal
 from PySide6.QtWidgets import QApplication
 
 from client.overlay.api_client import NemeDraftClient
+from client.overlay.arena_memory import ArenaPlayerIdentity, get_arena_player_identity
 from client.overlay.auth_client import AuthClient
 from client.overlay.card_art import CardArtCache
 from client.overlay.card_mapper import ArenaCardMapper
@@ -34,7 +35,7 @@ from client.overlay.log_watcher import (
     PackEvent,
     PickEvent,
     ReplayDoneEvent,
-    extract_arena_player_id,
+    is_arena_running,
 )
 from client.overlay.ui.window import OverlayWindow
 
@@ -158,18 +159,28 @@ class _BootWorker(QThread):
 
             # 3. Auth + API client ------------------------------------------
             self.progress.emit("Connecting to server...")
-            arena_player_id = os.getenv("ARENA_PLAYER_ID", "") or ""
-            if arena_player_id:
-                logger.info("Arena player ID (from env): %s", arena_player_id)
+            arena_player_id = ""
+            arena_identity = get_arena_player_identity()
+            if arena_identity:
+                arena_player_id = arena_identity.player_id
+                logger.info(
+                    "Arena player ID from memory: %s (display=%s, persona=%s)",
+                    arena_player_id,
+                    arena_identity.display_name or "unknown",
+                    arena_identity.persona_id or "unknown",
+                )
+                save_arena_player_id(arena_player_id)
             else:
-                arena_player_id = extract_arena_player_id() or ""
+                arena_player_id = os.getenv("ARENA_PLAYER_ID", "") or ""
                 if arena_player_id:
-                    logger.info("Arena player ID: %s", arena_player_id)
-                    save_arena_player_id(arena_player_id)
+                    logger.warning(
+                        "Using cached Arena player ID because memory reader is unavailable: %s",
+                        arena_player_id,
+                    )
                 else:
                     logger.warning(
-                        "Arena player ID not found in Player.log or Player-prev.log "
-                        "— sign-in will be unavailable"
+                        "Arena player ID not found via MTGA memory reader "
+                        "- sign-in will be unavailable"
                     )
             auth_client = AuthClient(self._env, arena_player_id=arena_player_id)
             api_client = NemeDraftClient(self._env, auth_client)
@@ -268,6 +279,19 @@ class _SetDataWorker(QThread):
             self.finished_err.emit(str(exc))
 
 
+class _ArenaIdentityWorker(QThread):
+    """Reads Arena identity from memory without blocking the UI thread."""
+
+    finished_identity = Signal(object)  # ArenaPlayerIdentity | None
+
+    def run(self) -> None:  # noqa: D401
+        try:
+            self.finished_identity.emit(get_arena_player_identity())
+        except Exception:
+            logger.debug("Arena memory identity retry failed", exc_info=True)
+            self.finished_identity.emit(None)
+
+
 class OverlayApp:
     """Orchestrates all overlay components (thin client)."""
 
@@ -349,6 +373,14 @@ class OverlayApp:
         self._health_timer.start()
         self._login_worker: QThread | None = None
 
+        # If the overlay starts before Arena, keep trying once Arena appears.
+        self._arena_identity_worker: _ArenaIdentityWorker | None = None
+        self._arena_identity_timer = QTimer()
+        self._arena_identity_timer.setInterval(5_000)
+        self._arena_identity_timer.timeout.connect(self._retry_arena_identity)
+        if not self._has_arena_player_id:
+            self._arena_identity_timer.start()
+
         # Set initial server status
         self._poll_server_status()
 
@@ -358,6 +390,7 @@ class OverlayApp:
 
     def stop(self) -> None:
         self._retry_timer.stop()
+        self._arena_identity_timer.stop()
         self.watcher.stop()
         self.api_client.close()
         save_config(self.config)
@@ -370,6 +403,53 @@ class OverlayApp:
             return False
         session = self.auth_client.session
         return bool(session and session.is_vip)
+
+    def _retry_arena_identity(self) -> None:
+        """Retry the memory-backed player ID lookup after Arena starts."""
+        if self._has_arena_player_id:
+            self._arena_identity_timer.stop()
+            return
+        if self._arena_identity_worker is not None and self._arena_identity_worker.isRunning():
+            return
+        if not is_arena_running():
+            return
+
+        worker = _ArenaIdentityWorker()
+        worker.finished_identity.connect(self._on_arena_identity_retry_done)
+        worker.finished.connect(worker.deleteLater)
+        self._arena_identity_worker = worker
+        worker.start()
+
+    def _on_arena_identity_retry_done(self, identity: object) -> None:
+        """Apply an Arena identity discovered after startup.
+
+        Args:
+            identity: Worker result, expected to be ``ArenaPlayerIdentity``.
+
+        Returns:
+            None.
+        """
+        self._arena_identity_worker = None
+        if not isinstance(identity, ArenaPlayerIdentity):
+            return
+
+        player_id = identity.player_id.strip()
+        if not player_id:
+            return
+
+        logger.info(
+            "Arena player ID discovered after startup: %s (display=%s, persona=%s)",
+            player_id,
+            identity.display_name or "unknown",
+            identity.persona_id or "unknown",
+        )
+        self._has_arena_player_id = True
+        self._arena_identity_timer.stop()
+        save_arena_player_id(player_id)
+        self.auth_client.set_arena_player_id(player_id)
+        if self.auth_client.try_auto_login():
+            logger.info("Auto-login succeeded after Arena identity retry")
+        self._poll_server_status()
 
     # -- simulator detection -------------------------------------------------
 

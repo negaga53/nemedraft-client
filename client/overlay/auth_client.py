@@ -72,17 +72,24 @@ class AuthClient:
         # an arena player ID.  Without one the server cannot verify the
         # user so we must not pretend the session is valid.
         if env.saved_server_token and arena_player_id:
-            claims = _read_jwt_claims(env.saved_server_token)
-            self.session = ServerSession(
-                token=env.saved_server_token,
-                expires_at=int(claims.get("exp", 0)),
-                email=env.saved_user_email,
-                is_vip=claims.get("is_vip", False),
-            )
+            self._restore_saved_session()
             logger.info(
                 "Restored session from stored token (email=%s, is_vip=%s, expired=%s)",
                 self.session.email, self.session.is_vip, self.session.is_expired,
             )
+
+    def set_arena_player_id(self, arena_player_id: str) -> None:
+        """Set the Arena player ID after startup.
+
+        Args:
+            arena_player_id: Stable Arena account ID read from memory.
+
+        Returns:
+            None.
+        """
+        self._arena_player_id = arena_player_id
+        if self.session is None and self._env.saved_server_token and arena_player_id:
+            self._restore_saved_session()
 
     # ------------------------------------------------------------------
     # OAuth login (opens browser)
@@ -280,7 +287,7 @@ class AuthClient:
                 timeout=10,
             )
             if resp.status_code != 200:
-                logger.error("Supabase refresh failed: %d %s", resp.status_code, resp.text)
+                logger.error("Supabase refresh failed: %d %s", resp.status_code, resp.text[:100])
                 return None
             data = resp.json()
             new_access = data.get("access_token", "")
@@ -347,6 +354,20 @@ class AuthClient:
             server_token=self.session.token if self.session else "",
             refresh_token=self._supabase_refresh_token,
             email=self.session.email if self.session else "",
+        )
+
+    def _restore_saved_session(self) -> None:
+        """Restore a saved server token into ``self.session``.
+
+        Returns:
+            None.
+        """
+        claims = _read_jwt_claims(self._env.saved_server_token)
+        self.session = ServerSession(
+            token=self._env.saved_server_token,
+            expires_at=int(claims.get("exp", 0)),
+            email=self._env.saved_user_email,
+            is_vip=claims.get("is_vip", False),
         )
 
     @staticmethod

@@ -49,6 +49,7 @@ hiddenimports = [
     "client",
     "client.overlay",
     "client.overlay.main",
+    "client.overlay.arena_memory",
     "client.overlay.config",
     "client.overlay.env",
     "client.overlay.log_watcher",

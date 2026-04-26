@@ -105,7 +105,6 @@ a = Analysis(
         "common.data.synergy_graph",
         "client.overlay.prediction",
         "client.overlay.ocr",
-        "client.simulator",
         # Heavy third-party packages not needed by the client
         "torch",
         "torch_geometric",

@@ -1,12 +1,11 @@
 # NemeDraft Client
 
-Open-source overlay client and simulator for [NemeDraft](https://nemedraft.snoozeweb.net), an AI-assisted MTG Arena draft pick predictor trained on 17Lands trophy data.
+Open-source overlay client for [NemeDraft](https://nemedraft.snoozeweb.net), an AI-assisted MTG Arena draft pick predictor trained on 17Lands trophy data.
 
 This repo holds the client-side code that runs on user machines:
 
 - The overlay that watches Arena's log file and shows pick recommendations
-- A standalone simulator for testing predictions without launching Arena
-- Shared utilities used by both (data loading, signal calculation, deck-building heuristics)
+- Shared utilities used by the overlay (data loading, signal calculation, deck-building heuristics)
 
 The inference server lives on a remote server. The client does not run the model locally; it sends pack/pool state to the remote server and renders the response.
 

@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import json
 import logging
+import os
+import sys
 from pathlib import Path
 
 from PySide6.QtCore import QTimer, Qt, Signal
@@ -22,6 +25,39 @@ logger = logging.getLogger(__name__)
 
 # How often (ms) to poll for Arena process / log file / server health.
 _POLL_INTERVAL_MS = 3000
+
+# Path the server-side simulator writes its lock file to (relative to
+# the simulator's CWD, which in dev is the server repo root).
+_SIMULATOR_LOCK_PATH = Path("data/cache/simulator.lock")
+
+
+def _read_simulator_lock() -> dict | None:
+    """Read the draft simulator lock file and return its contents if valid.
+
+    Mirrors ``simulator.main.read_simulator_lock`` on the server side
+    so the overlay can detect the simulator without importing it.
+    """
+    try:
+        if not _SIMULATOR_LOCK_PATH.exists():
+            return None
+        data = json.loads(_SIMULATOR_LOCK_PATH.read_text(encoding="utf-8"))
+        pid = data.get("pid")
+        if pid is None:
+            return None
+        if sys.platform == "win32":
+            import ctypes
+            kernel32 = ctypes.windll.kernel32  # type: ignore[attr-defined]
+            handle = kernel32.OpenProcess(0x0400, False, pid)
+            if handle:
+                kernel32.CloseHandle(handle)
+                return data
+            return None
+        os.kill(pid, 0)
+        return data
+    except (ProcessLookupError, PermissionError):
+        return None
+    except Exception:
+        return None
 
 
 def _is_arena_running() -> bool:
@@ -398,13 +434,14 @@ class HomeTab(QWidget):
         self._update_draft_status()
 
     def _check_simulator(self) -> dict | None:
-        """Check whether the draft simulator is running via its lock file."""
-        try:
-            from client.simulator.main import read_simulator_lock
-        except ImportError:
-            return None
+        """Check whether the draft simulator is running via its lock file.
 
-        return read_simulator_lock()
+        The simulator (server-side ``simulator.main``) writes
+        ``data/cache/simulator.lock`` (relative to its CWD) when it
+        starts. The overlay tails that file independently — see
+        :class:`client.overlay.main.OverlayApp._on_simulator_detected`.
+        """
+        return _read_simulator_lock()
 
     def _update_login_visibility(self) -> None:
         """Show or hide the login section based on log + auth + player ID state."""

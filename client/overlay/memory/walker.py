@@ -44,14 +44,23 @@ def read_player_identity(session: MemorySession) -> dict[str, Any] | None:
     try:
         wrapper_controller = image.get_class("WrapperController")
         if wrapper_controller is None:
+            logger.debug("Identity walk: WrapperController class not in image cache")
             return None
         wrapper = _coerce_object(wrapper_controller.get_static("<Instance>k__BackingField"))
-        account = _follow(wrapper, ["<AccountClient>k__BackingField",
-                                    "<AccountInformation>k__BackingField"])
+        if wrapper is None:
+            logger.debug("Identity walk: WrapperController.Instance is null")
+            return None
+        account_client = _coerce_object(wrapper.get("<AccountClient>k__BackingField"))
+        if account_client is None:
+            logger.debug("Identity walk: WrapperController.AccountClient is null (sign-in pending?)")
+            return None
+        account = _coerce_object(account_client.get("<AccountInformation>k__BackingField"))
         if account is None:
+            logger.debug("Identity walk: AccountClient.AccountInformation is null (sign-in pending?)")
             return None
         player_id = _read_string_field(account, "PersonaID")
         if not player_id:
+            logger.debug("Identity walk: AccountInformation.PersonaID is empty")
             return None
         return {
             "playerId": player_id,

@@ -412,8 +412,13 @@ class OverlayApp:
         self._set_untrained = False
         # Current lobby context (e.g. "TMT_Quick_Draft"), empty when not in a lobby.
         self._in_lobby_context: str = ""
+        # Memory-side draft lobby presence — independent of `_in_lobby_context`
+        # which can be cleared by LogWatcher faster than memory polls.
+        self._memory_in_draft_lobby: bool = False
         # Whether we have a valid arena player ID for auth.
         self._has_arena_player_id = has_arena_player_id
+        # Consecutive failed identity reads on an attached memory session.
+        self._identity_failure_count = 0
         # Events queued while set data is loading.
         self._pending_events: list[DraftEvent] = []
 
@@ -493,6 +498,12 @@ class OverlayApp:
         session = self.auth_client.session
         return bool(session and session.is_vip)
 
+    # Number of consecutive failed identity reads on an attached session
+    # before forcing a re-attach. The cached image may be missing
+    # assemblies that loaded after our initial attach (Core loads before
+    # SharedClientCore where AccountInformation lives).
+    _IDENTITY_REATTACH_AFTER = 3
+
     def _retry_arena_identity(self) -> None:
         """Retry the memory-backed player ID lookup after Arena starts."""
         if self._has_arena_player_id:
@@ -520,10 +531,12 @@ class OverlayApp:
         """
         self._arena_identity_worker = None
         if not isinstance(identity, ArenaPlayerIdentity):
+            self._on_identity_read_failed()
             return
 
         player_id = identity.player_id.strip()
         if not player_id:
+            self._on_identity_read_failed()
             return
 
         logger.info(
@@ -532,12 +545,33 @@ class OverlayApp:
             identity.display_name or "unknown",
         )
         self._has_arena_player_id = True
+        self._identity_failure_count = 0
         self._arena_identity_timer.stop()
         save_arena_player_id(player_id)
         self.auth_client.set_arena_player_id(player_id)
         if self.auth_client.try_auto_login():
             logger.info("Auto-login succeeded after Arena identity retry")
         self._poll_server_status()
+
+    def _on_identity_read_failed(self) -> None:
+        """Handle a failed identity read — force a session re-attach after N tries.
+
+        The session may have been attached while MTGA was still loading
+        ``SharedClientCore`` (where AccountInformation lives). Detaching
+        forces the next ensure_attached to re-walk assemblies and pick up
+        anything that loaded since.
+        """
+        from client.overlay.memory.session import MemorySession
+
+        self._identity_failure_count += 1
+        if self._identity_failure_count >= self._IDENTITY_REATTACH_AFTER:
+            logger.info(
+                "Arena identity not found after %d attempts — "
+                "forcing memory session re-attach to refresh assemblies",
+                self._identity_failure_count,
+            )
+            MemorySession.instance().detach()
+            self._identity_failure_count = 0
 
     def _poll_arena_current_event(self) -> None:
         """Poll Arena memory for event lobby enter/exit state."""
@@ -565,14 +599,25 @@ class OverlayApp:
         if not isinstance(current_event, ArenaCurrentEvent):
             return
 
+        # Reading current event implies the memory session is attached. If
+        # we still don't have an Arena player ID, retry that walk now —
+        # AccountInformation may have only just populated post sign-in.
+        if not self._has_arena_player_id:
+            self._retry_arena_identity()
+
         if current_event.is_draft_lobby:
+            self._memory_in_draft_lobby = True
             context = current_event.internal_event_name
             if context != self._in_lobby_context and not self.state.draft_active:
                 logger.info("Draft lobby detected from memory: %s", context)
                 self._on_event(DraftLobbyEvent(context=context))
             return
 
-        if self._in_lobby_context and not self.state.draft_active:
+        # Memory says we are NOT in a draft event lobby. Detect leave when
+        # we previously saw one — independent of `_in_lobby_context` so we
+        # also catch queue exits after Event_Join (which clears that field).
+        if self._memory_in_draft_lobby:
+            self._memory_in_draft_lobby = False
             logger.info(
                 "Left draft lobby from memory: content=%s",
                 current_event.content_type or "unknown",
@@ -973,6 +1018,22 @@ class OverlayApp:
                     logger.info("Left draft lobby — clearing ready state")
                     home.set_lobby_ready(False)
                     home.set_unsupported_format(False)
+                    # Reset lingering preload status (yellow loading row,
+                    # untrained warning) so the home row returns to
+                    # "Waiting" when the draft never actually started.
+                    if not self.state.draft_active:
+                        home.set_draft_loading("")
+                        home.set_draft_untrained(False)
+                # If draft was flagged active (e.g. Event_Join) but no pack
+                # has arrived yet, the player backed out from the queue —
+                # reset the session so the UI returns to the home view.
+                if (
+                    self.state.draft_active
+                    and not self.state.current_pack
+                    and not self.state.pool
+                ):
+                    logger.info("Left lobby with no draft progress — ending draft session")
+                    self._on_event(DraftEndEvent())
                 return
             # Check for unsupported draft formats (e.g. PickTwo).
             from client.overlay.draft_state import extract_set_code, is_supported_draft_format
@@ -993,6 +1054,10 @@ class OverlayApp:
                 # If data is already loaded for this set, just show ready.
                 if self._loaded_set == code and self._set_data_ready:
                     logger.info("Set data already loaded for %s — lobby ready", code)
+                    # Re-apply the untrained warning from cached state —
+                    # leaving the lobby cleared the home-tab flag, so we
+                    # need to set it again on re-entry.
+                    home.set_draft_untrained(self._set_untrained)
                     home.set_lobby_ready(True)
                 else:
                     logger.info("Pre-loading set data for lobby: %s (context=%s)", code, event.context)

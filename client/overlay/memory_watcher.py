@@ -1,0 +1,206 @@
+"""Memory-driven draft event watcher.
+
+Mirrors :class:`client.overlay.log_watcher.LogWatcher`'s public interface
+(``add_callback``, ``start``, ``stop``, ``replaying``) so
+:meth:`OverlayApp._on_event` consumes events from either source
+transparently. Emits the SAME event dataclasses defined in
+:mod:`client.overlay.log_watcher` — never redefines them.
+
+The watcher polls :func:`client.overlay.memory.walker.read_draft_state` and
+diffs the snapshot against the previous tick. While ``read_draft_state``
+remains a stub returning ``None`` (pending the live-pod field-path
+investigation; see ``docs/draft-state-investigation.md``), the watcher
+runs harmlessly: it attaches when MTGA is up, polls quietly, and emits
+nothing.
+"""
+
+from __future__ import annotations
+
+import logging
+import threading
+import time
+from dataclasses import dataclass
+from typing import Any
+
+from client.overlay.log_watcher import (
+    DraftCompleteEvent,
+    DraftEndEvent,
+    DraftEvent,
+    DraftStartEvent,
+    EventCallback,
+    PackEvent,
+    PickEvent,
+)
+from client.overlay.memory.platform import is_memory_supported
+from client.overlay.memory.session import MemorySession
+from client.overlay.memory.walker import read_draft_state
+
+logger = logging.getLogger(__name__)
+
+POLL_INTERVAL_S = 0.25
+
+
+@dataclass(frozen=True)
+class _DraftSnapshot:
+    """Frozen snapshot of one ``read_draft_state`` poll cycle."""
+
+    is_active: bool
+    event_name: str
+    pack_number: int
+    pick_number: int
+    current_pack: tuple[int, ...]
+    picked_cards: tuple[int, ...]
+
+    @classmethod
+    def from_payload(cls, payload: dict[str, Any]) -> "_DraftSnapshot":
+        return cls(
+            is_active=bool(payload.get("is_active", False)),
+            event_name=str(payload.get("event_name", "") or ""),
+            pack_number=int(payload.get("pack_number", -1) or -1),
+            pick_number=int(payload.get("pick_number", -1) or -1),
+            current_pack=tuple(payload.get("current_pack") or ()),
+            picked_cards=tuple(payload.get("picked_cards") or ()),
+        )
+
+
+class MemoryWatcher:
+    """Polls Mono memory for draft state and emits draft events."""
+
+    def __init__(self, *, poll_interval: float = POLL_INTERVAL_S) -> None:
+        self._poll_interval = poll_interval
+        self._callbacks: list[EventCallback] = []
+        self._stop = threading.Event()
+        self._thread: threading.Thread | None = None
+        self._previous: _DraftSnapshot | None = None
+        # API parity with LogWatcher; memory has no notion of replay.
+        self.replaying: bool = False
+
+    # -------- public API (mirrors LogWatcher) ------------------------------
+
+    def add_callback(self, cb: EventCallback) -> None:
+        """Register a callback invoked on each emitted draft event."""
+        self._callbacks.append(cb)
+
+    def start(self) -> None:
+        """Start the polling thread if memory access is supported."""
+        if not is_memory_supported():
+            logger.info("Memory access unsupported on this platform — MemoryWatcher disabled")
+            return
+        if self._thread is not None and self._thread.is_alive():
+            return
+        self._stop.clear()
+        self._thread = threading.Thread(
+            target=self._run,
+            name="memory-watcher",
+            daemon=True,
+        )
+        self._thread.start()
+
+    def stop(self) -> None:
+        """Signal the polling thread to exit and wait briefly for it."""
+        self._stop.set()
+        thread = self._thread
+        if thread is not None and thread.is_alive():
+            thread.join(timeout=1.0)
+        self._thread = None
+
+    # -------- internals ----------------------------------------------------
+
+    def _run(self) -> None:
+        session = MemorySession.instance()
+        logger.info("MemoryWatcher started (poll=%.0f ms)", self._poll_interval * 1000)
+        while not self._stop.is_set():
+            try:
+                self._tick(session)
+            except Exception:
+                logger.warning("MemoryWatcher tick failed", exc_info=True)
+            self._stop.wait(self._poll_interval)
+        logger.info("MemoryWatcher stopped")
+
+    def _tick(self, session: MemorySession) -> None:
+        if not session.ensure_attached():
+            # MTGA not running yet (or not loaded). When it later attaches,
+            # the next tick will pick up state cleanly.
+            self._previous = None
+            return
+        payload = read_draft_state(session)
+        if payload is None:
+            # Either no live draft or the read_draft_state stub hasn't been
+            # filled in yet. Treat as "no draft active".
+            if self._previous is not None and self._previous.is_active:
+                self._emit(DraftEndEvent())
+            self._previous = None
+            return
+        current = _DraftSnapshot.from_payload(payload)
+        prev = self._previous
+        for event in _diff_snapshots(prev, current):
+            self._emit(event)
+        self._previous = current
+
+    def _emit(self, event: DraftEvent) -> None:
+        logger.debug("MemoryWatcher emit: %s", type(event).__name__)
+        for cb in list(self._callbacks):
+            try:
+                cb(event)
+            except Exception:
+                logger.exception("MemoryWatcher callback raised on %s", type(event).__name__)
+
+
+def _diff_snapshots(
+    prev: _DraftSnapshot | None, curr: _DraftSnapshot
+) -> list[DraftEvent]:
+    """Return the draft events implied by the prev → curr transition."""
+    events: list[DraftEvent] = []
+
+    # Draft-active transitions ---------------------------------------------
+    if curr.is_active and (prev is None or not prev.is_active):
+        events.append(DraftStartEvent(event_name=curr.event_name))
+    elif (prev is not None and prev.is_active) and not curr.is_active:
+        events.append(DraftEndEvent())
+        return events  # nothing else meaningful when leaving a draft
+
+    if not curr.is_active:
+        return events
+
+    pack_changed = (
+        prev is None
+        or prev.pack_number != curr.pack_number
+        or prev.pick_number != curr.pick_number
+        or prev.current_pack != curr.current_pack
+    )
+    if pack_changed and curr.current_pack:
+        events.append(
+            PackEvent(
+                card_grpids=list(curr.current_pack),
+                pack_number=curr.pack_number,
+                pick_number=curr.pick_number,
+                event_name=curr.event_name,
+                picked_grpids=list(curr.picked_cards),
+            )
+        )
+
+    # Pick detection: a card was added to the picked list since the last tick.
+    if prev is not None and len(curr.picked_cards) > len(prev.picked_cards):
+        new_picks = curr.picked_cards[len(prev.picked_cards):]
+        events.append(
+            PickEvent(
+                card_grpids=list(new_picks),
+                pack_number=prev.pack_number,
+                pick_number=prev.pick_number,
+            )
+        )
+
+    # Draft completion is signalled when current_pack empties while still
+    # nominally "active" — the pod has handed out the last pick. This is a
+    # heuristic; the live walker may set is_active=False directly instead.
+    if (
+        prev is not None
+        and prev.is_active
+        and curr.is_active
+        and prev.current_pack
+        and not curr.current_pack
+        and curr.pack_number >= 2  # last pack
+    ):
+        events.append(DraftCompleteEvent())
+
+    return events

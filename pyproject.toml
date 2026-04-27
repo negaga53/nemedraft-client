@@ -3,7 +3,7 @@ name = "nemedraft-client"
 version = "0.1.0"
 description = "MTG Arena draft pick assistant — overlay client"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 license = { text = "MIT" }
 dependencies = [
     "numpy>=1.26",
@@ -22,6 +22,8 @@ dev = [
 client = [
     "PySide6>=6.6",
     "pyinstaller>=6.0",
+    "pymem>=1.13 ; sys_platform == 'win32'",
+    "pefile>=2024.8 ; sys_platform == 'win32'",
 ]
 
 [project.scripts]

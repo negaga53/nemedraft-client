@@ -16,7 +16,12 @@ from PySide6.QtCore import QThread, QTimer, Signal
 from PySide6.QtWidgets import QApplication
 
 from client.overlay.api_client import NemeDraftClient
-from client.overlay.arena_memory import ArenaPlayerIdentity, get_arena_player_identity
+from client.overlay.arena_memory import (
+    ArenaCurrentEvent,
+    ArenaPlayerIdentity,
+    get_arena_current_event,
+    get_arena_player_identity,
+)
 from client.overlay.auth_client import AuthClient
 from client.overlay.card_art import CardArtCache
 from client.overlay.card_mapper import ArenaCardMapper
@@ -37,6 +42,8 @@ from client.overlay.log_watcher import (
     ReplayDoneEvent,
     is_arena_running,
 )
+from client.overlay.memory.platform import is_memory_supported
+from client.overlay.memory_watcher import MemoryWatcher
 from client.overlay.ui.window import OverlayWindow
 
 logger = logging.getLogger("overlay")
@@ -109,6 +116,7 @@ class _BootResult:
     api_client: NemeDraftClient
     art_cache: CardArtCache
     watcher: LogWatcher
+    memory_watcher: "MemoryWatcher | None"
     server_supported_sets: list[str]
     has_arena_player_id: bool
 
@@ -164,10 +172,9 @@ class _BootWorker(QThread):
             if arena_identity:
                 arena_player_id = arena_identity.player_id
                 logger.info(
-                    "Arena player ID from memory: %s (display=%s, persona=%s)",
+                    "Arena player ID from memory: %s (display=%s)",
                     arena_player_id,
                     arena_identity.display_name or "unknown",
-                    arena_identity.persona_id or "unknown",
                 )
                 save_arena_player_id(arena_player_id)
             else:
@@ -209,6 +216,7 @@ class _BootWorker(QThread):
             art_cache = CardArtCache(enabled=self._config.overlay.show_art)
             log_path = Path(args.log_file) if args.log_file else None
             watcher = LogWatcher(log_path=log_path)
+            memory_watcher = MemoryWatcher() if is_memory_supported() else None
 
             self.finished_ok.emit(_BootResult(
                 mapper=mapper,
@@ -216,6 +224,7 @@ class _BootWorker(QThread):
                 api_client=api_client,
                 art_cache=art_cache,
                 watcher=watcher,
+                memory_watcher=memory_watcher,
                 server_supported_sets=server_supported_sets,
                 has_arena_player_id=bool(arena_player_id),
             ))
@@ -292,6 +301,65 @@ class _ArenaIdentityWorker(QThread):
             self.finished_identity.emit(None)
 
 
+class _ArenaCurrentEventWorker(QThread):
+    """Reads Arena current event state without blocking the UI thread."""
+
+    finished_event = Signal(object)  # ArenaCurrentEvent | None
+
+    def run(self) -> None:  # noqa: D401
+        try:
+            self.finished_event.emit(get_arena_current_event())
+        except Exception:
+            logger.debug("Arena current event memory poll failed", exc_info=True)
+            self.finished_event.emit(None)
+
+
+_DEDUPE_WINDOW_S = 2.0
+
+
+def _event_signature(event: DraftEvent) -> tuple | None:
+    """Build a stable identity for cross-source duplicate detection.
+
+    Returns ``None`` for events that are inherently unique to one source
+    (``ReplayDoneEvent`` and ``LogRotatedEvent`` only LogWatcher emits) —
+    those bypass dedupe.
+    """
+    if isinstance(event, PackEvent):
+        return ("pack", event.pack_number, event.pick_number,
+                tuple(event.card_grpids))
+    if isinstance(event, PickEvent):
+        return ("pick", event.pack_number, event.pick_number,
+                tuple(event.card_grpids))
+    if isinstance(event, DraftStartEvent):
+        return ("start", event.event_name)
+    if isinstance(event, DraftLobbyEvent):
+        return ("lobby", event.context)
+    if isinstance(event, DraftEndEvent):
+        return ("end",)
+    if isinstance(event, DraftCompleteEvent):
+        return ("complete",)
+    return None
+
+
+def _should_drop_duplicate(
+    event: DraftEvent, recent: dict[tuple, float]
+) -> bool:
+    sig = _event_signature(event)
+    if sig is None:
+        return False
+    now = time.monotonic()
+    cutoff = now - _DEDUPE_WINDOW_S
+    # Opportunistic GC of stale entries.
+    if len(recent) > 16:
+        for k in [k for k, t in recent.items() if t < cutoff]:
+            recent.pop(k, None)
+    last = recent.get(sig)
+    if last is not None and last >= cutoff:
+        return True
+    recent[sig] = now
+    return False
+
+
 class OverlayApp:
     """Orchestrates all overlay components (thin client)."""
 
@@ -314,16 +382,21 @@ class OverlayApp:
         scryfall_dir: Path | None = None,
         cache_dir: Path | None = None,
         has_arena_player_id: bool = False,
+        memory_watcher: MemoryWatcher | None = None,
     ) -> None:
         self.mapper = mapper
         self.api_client = api_client
         self.auth_client = auth_client
         self.watcher = watcher
+        self.memory_watcher = memory_watcher
         self.window = window
         self.art_cache = art_cache
         self.config = config
         self.scryfall_cards: dict = {}
         self.state = DraftState()
+        # Dedupe map: events fired by both LogWatcher and MemoryWatcher
+        # within a 2s window — first one wins, rest are dropped.
+        self._recent_event_signatures: dict[tuple, float] = {}
         from client.overlay.env import bundle_root, _project_root
         self._scryfall_dir = scryfall_dir or (bundle_root() / "data" / "scryfall")
         self._cache_dir = cache_dir or (_project_root() / "data" / "cache")
@@ -352,6 +425,8 @@ class OverlayApp:
         self._retry_start: float = 0.0
 
         self.watcher.add_callback(self._on_event)
+        if self.memory_watcher is not None:
+            self.memory_watcher.add_callback(self._on_event)
         self.window.settings_tab.settings_changed.connect(self._on_settings_changed)
         self.window.settings_tab.opacity_preview.connect(self.window.setWindowOpacity)
         self.window.settings_tab.language_changed.connect(self._on_language_changed)
@@ -381,17 +456,31 @@ class OverlayApp:
         if not self._has_arena_player_id:
             self._arena_identity_timer.start()
 
+        self._arena_current_event_worker: _ArenaCurrentEventWorker | None = None
+        self._arena_current_event_timer = QTimer()
+        self._arena_current_event_timer.setInterval(5_000)
+        self._arena_current_event_timer.timeout.connect(self._poll_arena_current_event)
+        self._arena_current_event_timer.start()
+
         # Set initial server status
         self._poll_server_status()
 
     def start(self) -> None:
         self.watcher.start()
+        if self.memory_watcher is not None:
+            try:
+                self.memory_watcher.start()
+            except Exception:
+                logger.exception("MemoryWatcher failed to start; continuing log-only")
         self.window.show()
 
     def stop(self) -> None:
         self._retry_timer.stop()
         self._arena_identity_timer.stop()
+        self._arena_current_event_timer.stop()
         self.watcher.stop()
+        if self.memory_watcher is not None:
+            self.memory_watcher.stop()
         self.api_client.close()
         save_config(self.config)
 
@@ -438,10 +527,9 @@ class OverlayApp:
             return
 
         logger.info(
-            "Arena player ID discovered after startup: %s (display=%s, persona=%s)",
+            "Arena player ID discovered after startup: %s (display=%s)",
             player_id,
             identity.display_name or "unknown",
-            identity.persona_id or "unknown",
         )
         self._has_arena_player_id = True
         self._arena_identity_timer.stop()
@@ -450,6 +538,46 @@ class OverlayApp:
         if self.auth_client.try_auto_login():
             logger.info("Auto-login succeeded after Arena identity retry")
         self._poll_server_status()
+
+    def _poll_arena_current_event(self) -> None:
+        """Poll Arena memory for event lobby enter/exit state."""
+        if self._arena_current_event_worker is not None and self._arena_current_event_worker.isRunning():
+            return
+        if not is_arena_running():
+            return
+
+        worker = _ArenaCurrentEventWorker()
+        worker.finished_event.connect(self._on_arena_current_event_done)
+        worker.finished.connect(worker.deleteLater)
+        self._arena_current_event_worker = worker
+        worker.start()
+
+    def _on_arena_current_event_done(self, current_event: object) -> None:
+        """Apply current event memory state.
+
+        Args:
+            current_event: Worker result, expected to be ``ArenaCurrentEvent``.
+
+        Returns:
+            None.
+        """
+        self._arena_current_event_worker = None
+        if not isinstance(current_event, ArenaCurrentEvent):
+            return
+
+        if current_event.is_draft_lobby:
+            context = current_event.internal_event_name
+            if context != self._in_lobby_context and not self.state.draft_active:
+                logger.info("Draft lobby detected from memory: %s", context)
+                self._on_event(DraftLobbyEvent(context=context))
+            return
+
+        if self._in_lobby_context and not self.state.draft_active:
+            logger.info(
+                "Left draft lobby from memory: content=%s",
+                current_event.content_type or "unknown",
+            )
+            self._on_event(DraftLobbyEvent(context=""))
 
     # -- simulator detection -------------------------------------------------
 
@@ -731,7 +859,16 @@ class OverlayApp:
     # -- event handling (from LogWatcher) ------------------------------------
 
     def _on_event(self, event: DraftEvent) -> None:
-        """Handle a draft event from the log watcher (runs on watcher thread)."""
+        """Handle a draft event from a watcher (log or memory).
+
+        With both LogWatcher and MemoryWatcher active, identical events can
+        arrive twice within ~250 ms. Drop the duplicate using a stable
+        signature with a 2 s window — first source wins.
+        """
+        if _should_drop_duplicate(event, self._recent_event_signatures):
+            logger.debug("Dropping duplicate event %s", type(event).__name__)
+            return
+
         replaying = self.watcher.replaying
 
         if isinstance(event, LogRotatedEvent):
@@ -1382,6 +1519,7 @@ def main() -> None:
             scryfall_dir=Path(args.scryfall_dir),
             cache_dir=_project_root() / "data" / "cache",
             has_arena_player_id=result.has_arena_player_id,
+            memory_watcher=result.memory_watcher,
         )
         overlay_holder[0] = overlay
         window.show_model_ready()

@@ -61,6 +61,15 @@ QT_QPA_PLATFORM=offscreen pytest tests/
 
 No raw game data is uploaded; only pack contents, pool contents, and pick number for the active draft.
 
+## Arena memory reading
+
+On Windows, the overlay reads Arena account identity and event lobby state directly from MTG Arena's process memory using `pymem` (read-only `OpenProcess` + `ReadProcessMemory`, no DLL injection). This replaces the previous external `mtga-tracker-daemon` sidecar.
+
+- Account identity (player ID, display name, persona ID) for automatic login.
+- Current event landing state including the internal event name, such as `PremierDraft_SOS_20260421`, so the overlay detects entering or exiting draft lobbies without relying on `Player.log`.
+
+`pymem` and `pefile` are installed automatically with `pip install -e ".[client]"` on Windows. On macOS / Linux the overlay falls back to log parsing for these signals.
+
 ## License
 
 MIT. See [LICENSE](LICENSE).

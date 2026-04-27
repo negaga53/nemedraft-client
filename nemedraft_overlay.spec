@@ -50,6 +50,16 @@ hiddenimports = [
     "client.overlay",
     "client.overlay.main",
     "client.overlay.arena_memory",
+    "client.overlay.memory_watcher",
+    "client.overlay.memory",
+    "client.overlay.memory.platform",
+    "client.overlay.memory.exceptions",
+    "client.overlay.memory.offsets",
+    "client.overlay.memory.reader",
+    "client.overlay.memory.pe",
+    "client.overlay.memory.mono",
+    "client.overlay.memory.walker",
+    "client.overlay.memory.session",
     "client.overlay.config",
     "client.overlay.env",
     "client.overlay.log_watcher",
@@ -81,6 +91,18 @@ hiddenimports = [
     "common.inference.deck_builder",
     "common.inference.signals",
 ]
+
+# pymem / pefile are imported lazily inside client.overlay.memory.platform,
+# so PyInstaller's static analyzer cannot see them. They are Windows-only
+# (Arena memory access). On macOS/Linux the overlay falls back to log
+# parsing and these imports are skipped.
+if sys.platform == "win32":
+    hiddenimports.extend([
+        "pymem",
+        "pymem.process",
+        "pymem.exception",
+        "pefile",
+    ])
 
 a = Analysis(
     [str(ROOT / "scripts" / "run_overlay.py")],

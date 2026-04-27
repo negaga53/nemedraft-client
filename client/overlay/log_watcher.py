@@ -305,6 +305,38 @@ def _extract_payload(blob: Any, decoder: json.JSONDecoder) -> Any:
     return blob
 
 
+def _first_string(blob: dict[str, Any], *keys: str) -> str:
+    """Return the first non-empty string value for *keys*.
+
+    Args:
+        blob: Parsed JSON object.
+        keys: Candidate key names in priority order.
+
+    Returns:
+        The first stripped string value, or an empty string.
+    """
+    for key in keys:
+        value = blob.get(key)
+        if value is not None:
+            text = str(value).strip()
+            if text:
+                return text
+    return ""
+
+
+def _is_draft_lobby_context(context: str) -> bool:
+    """Return whether a scene context looks like a draft/sealed event.
+
+    Args:
+        context: Arena scene or event context string.
+
+    Returns:
+        ``True`` for draft or sealed event landing contexts.
+    """
+    lowered = context.lower()
+    return any(keyword in lowered for keyword in ("draft", "sealed"))
+
+
 # ---------------------------------------------------------------------------
 # LogWatcher
 # ---------------------------------------------------------------------------
@@ -477,15 +509,21 @@ class LogWatcher:
     def _dispatch(self, blob: dict[str, Any], full_log: str) -> None:
         """Route a parsed JSON blob to the appropriate handler."""
         # Scene change — detect leaving the draft screen or entering/leaving lobby.
-        if "Client.SceneChange" in full_log and "fromSceneName" in blob:
-            from_scene = blob.get("fromSceneName")
-            to_scene = blob.get("toSceneName")
+        if "SceneChange" in full_log:
+            from_scene = _first_string(
+                blob, "fromSceneName", "FromSceneName", "fromScene", "from",
+            )
+            to_scene = _first_string(
+                blob, "toSceneName", "ToSceneName", "toScene", "to", "sceneName", "SceneName",
+            )
             if from_scene == "Draft" and to_scene != "Draft":
                 logger.info("Left draft screen \u2192 %s", to_scene)
                 self._emit(DraftEndEvent())
             elif to_scene == "EventLanding":
-                ctx = blob.get("context", "")
-                if any(kw in ctx.lower() for kw in ("draft", "sealed")):
+                ctx = _first_string(
+                    blob, "context", "Context", "eventName", "EventName", "eventId", "EventId",
+                )
+                if _is_draft_lobby_context(ctx):
                     logger.info("Draft lobby detected: context=%s", ctx)
                     self._emit(DraftLobbyEvent(context=ctx))
             elif from_scene == "EventLanding" and to_scene != "Draft":

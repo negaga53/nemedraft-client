@@ -19,10 +19,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: windows-latest
+          - os: [self-hosted, Windows, X64]
             artifact: NemeDraft.exe
             asset_name: NemeDraft-Windows-x64
-          - os: ubuntu-22.04
+          - os: [self-hosted, Linux, X64]
             artifact: NemeDraft
             asset_name: NemeDraft-Linux-x64
           - os: macos-14
@@ -40,8 +40,8 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install system dependencies (Linux)
-        if: runner.os == 'Linux'
+      - name: Install system dependencies (Linux, github-hosted only)
+        if: runner.os == 'Linux' && runner.environment == 'github-hosted'
         run: |
           sudo apt-get update
           sudo apt-get install -y \

@@ -1,0 +1,40 @@
+name: Workflow Trigger Guard
+
+on:
+  push:
+    paths:
+      - ".github/workflows/**"
+  pull_request:
+    paths:
+      - ".github/workflows/**"
+
+permissions:
+  contents: read
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Forbid pull_request triggers in workflows
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          violations=()
+          for f in .github/workflows/*.yml .github/workflows/*.yaml; do
+            [ "$(basename "$f")" = "workflow-guard.yml" ] && continue
+            if grep -nE '^[[:space:]]*(pull_request|pull_request_target)[[:space:]]*:' "$f" >/dev/null; then
+              violations+=("$f")
+            fi
+          done
+          if [ ${#violations[@]} -gt 0 ]; then
+            echo "::error::pull_request and pull_request_target triggers are forbidden: this repo runs self-hosted runners on a public repo, and these triggers would let fork PRs execute code on the host."
+            for f in "${violations[@]}"; do
+              echo "::error file=$f::Forbidden trigger detected"
+              grep -nE '^[[:space:]]*(pull_request|pull_request_target)[[:space:]]*:' "$f" || true
+            done
+            exit 1
+          fi
+          echo "OK: no forbidden triggers found."

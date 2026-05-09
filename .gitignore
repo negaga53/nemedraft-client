@@ -46,3 +46,6 @@ data/scryfall/default_cards.json
 
 # Card name translation cache — populated on demand from the Scryfall API
 client/overlay/i18n/card_cache/
+data/cache/draft_state.json
+data/cache/pick_history.json
+data/card_art_cache/

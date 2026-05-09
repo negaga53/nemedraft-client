@@ -818,11 +818,7 @@ class OverlayApp:
             set_code, len(result.scryfall_cards), result.mappings_added,
         )
 
-        # Replay any events that arrived while data was loading.
-        pending = list(self._pending_events)
-        self._pending_events.clear()
-        for event in pending:
-            self._on_event(event)
+        self._flush_pending_events()
 
     def _on_set_data_error(self, msg: str) -> None:
         """Handle set data loading failure."""
@@ -831,9 +827,21 @@ class OverlayApp:
         home.set_draft_loading(f"Data load error: {msg}")
         # Allow draft to proceed anyway — predictions may partially work.
         self._set_data_ready = True
+        self._flush_pending_events()
+
+    def _flush_pending_events(self) -> None:
+        """Re-dispatch events deferred while set data was loading.
+
+        Drops each event's signature from the dedupe dict before re-dispatch,
+        so the cross-watcher duplicate filter does not suppress the replay
+        when set data loads inside the dedupe window.
+        """
         pending = list(self._pending_events)
         self._pending_events.clear()
         for event in pending:
+            sig = _event_signature(event)
+            if sig is not None:
+                self._recent_event_signatures.pop(sig, None)
             self._on_event(event)
 
     def _on_login_google(self) -> None:

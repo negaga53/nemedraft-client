@@ -68,7 +68,6 @@ class OverlayWindow(QWidget):
     signals_ready = Signal(object)         # SignalResult | None
     deck_suggestions_ready = Signal(dict, list, dict)  # dict[str, DeckSuggestion], list[str], scryfall_cards
     pick_history_ready = Signal(object)    # dict[(int,int), PickHistoryEntry]
-    set_load_requested = Signal(str)       # set_code — marshal from watcher thread to main
     draft_complete_signal = Signal()       # switch to deck tab on UI thread
 
     def __init__(

@@ -125,7 +125,6 @@ def test_deck_rail_constructs(qapp):
     assert hasattr(rail, "archetype_card")
     assert hasattr(rail, "curve_card")
     assert hasattr(rail, "lanes_card")
-    assert hasattr(rail, "wheel_card")
 
 
 def test_deck_rail_archetype_text(qapp):

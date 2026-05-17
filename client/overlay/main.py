@@ -12,7 +12,9 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
-from PySide6.QtCore import QThread, QTimer, Signal
+from typing import Callable
+
+from PySide6.QtCore import QObject, QThread, QTimer, Signal, Slot
 from PySide6.QtWidgets import QApplication
 
 from client.overlay.api_client import NemeDraftClient
@@ -360,6 +362,55 @@ def _should_drop_duplicate(
     return False
 
 
+class _UiMarshaler(QObject):
+    """Marshal watcher-thread callbacks onto the Qt main thread.
+
+    LogWatcher and MemoryWatcher run on plain ``threading.Thread``s and
+    invoke registered callbacks inline. Mutating Qt widgets off the GUI
+    thread is undefined behaviour — symptom is "Could not parse stylesheet
+    of QLabel" warnings escalating to a silent C++ segfault (observed on
+    leave-then-rejoin where both watchers race to deliver lobby events).
+
+    The marshaler lives on whichever thread created it (the main thread in
+    ``OverlayApp.__init__``). Cross-thread ``emit`` is queued by Qt, so the
+    ``_dispatch_*`` slots always run on the GUI thread.
+
+    The bool argument on ``event_received`` is the watcher's ``replaying``
+    flag captured AT EMIT TIME. Reading it at dispatch time gives stale
+    values: the watcher flips to live mode just before emitting
+    ReplayDoneEvent, so queued replay events would be treated as live and
+    ``show_draft_started()`` would fire while the user is on home.
+    """
+
+    event_received = Signal(object, bool)   # DraftEvent, replaying
+    set_load_requested = Signal(str)         # set_code — from ensure-set-data
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._on_event_handler: Callable[[DraftEvent, bool], None] | None = None
+        self._on_set_load_handler: Callable[[str], None] | None = None
+        self.event_received.connect(self._dispatch_event)
+        self.set_load_requested.connect(self._dispatch_set_load)
+
+    def bind(
+        self,
+        on_event: Callable[[DraftEvent, bool], None],
+        on_set_load: Callable[[str], None],
+    ) -> None:
+        self._on_event_handler = on_event
+        self._on_set_load_handler = on_set_load
+
+    @Slot(object, bool)
+    def _dispatch_event(self, event: object, replaying: bool) -> None:
+        if self._on_event_handler is not None and isinstance(event, DraftEvent):
+            self._on_event_handler(event, replaying)
+
+    @Slot(str)
+    def _dispatch_set_load(self, set_code: str) -> None:
+        if self._on_set_load_handler is not None:
+            self._on_set_load_handler(set_code)
+
+
 class OverlayApp:
     """Orchestrates all overlay components (thin client)."""
 
@@ -408,6 +459,11 @@ class OverlayApp:
         self._loaded_set: str = ""
         self._set_data_ready = False
         self._set_data_worker: _SetDataWorker | None = None
+        # Workers still running. self._set_data_worker only points at the
+        # latest one; without this set, replacing the pointer drops the
+        # Python ref while QThread.run is still active and Python GCs it →
+        # "QThread: Destroyed while thread is still running".
+        self._inflight_set_workers: set[_SetDataWorker] = set()
         # Whether the current set is untrained (no model support).
         self._set_untrained = False
         # Current lobby context (e.g. "TMT_Quick_Draft"), empty when not in a lobby.
@@ -420,7 +476,10 @@ class OverlayApp:
         # Consecutive failed identity reads on an attached memory session.
         self._identity_failure_count = 0
         # Events queued while set data is loading.
-        self._pending_events: list[DraftEvent] = []
+        # (event, replaying_at_emit_time). Snapshot lets _flush_pending_events
+        # re-dispatch with the original replaying flag — otherwise the queued
+        # events get treated as live after the watcher flips out of replay.
+        self._pending_events: list[tuple[DraftEvent, bool]] = []
 
         # Server retry state.
         self._retry_timer = QTimer()
@@ -429,13 +488,21 @@ class OverlayApp:
         self._retry_attempt = 0
         self._retry_start: float = 0.0
 
-        self.watcher.add_callback(self._on_event)
+        # Marshal watcher-thread callbacks onto the Qt main thread.
+        # See _UiMarshaler — registering _on_event directly on the watchers
+        # mutates Qt widgets off the GUI thread and racey-crashes.
+        self._marshaler = _UiMarshaler()
+        self._marshaler.bind(
+            on_event=self._on_event,
+            on_set_load=self._ensure_set_data_on_main,
+        )
+
+        self.watcher.add_callback(self._emit_log_event)
         if self.memory_watcher is not None:
-            self.memory_watcher.add_callback(self._on_event)
+            self.memory_watcher.add_callback(self._emit_memory_event)
         self.window.settings_tab.settings_changed.connect(self._on_settings_changed)
         self.window.settings_tab.opacity_preview.connect(self.window.setWindowOpacity)
         self.window.settings_tab.language_changed.connect(self._on_language_changed)
-        self.window.set_load_requested.connect(self._ensure_set_data_on_main)
         self.window.pack_tab.set_scryfall(self.scryfall_cards)
         self.window.pack_tab.set_art_cache(self.art_cache)
 
@@ -610,7 +677,7 @@ class OverlayApp:
             context = current_event.internal_event_name
             if context != self._in_lobby_context and not self.state.draft_active:
                 logger.info("Draft lobby detected from memory: %s", context)
-                self._on_event(DraftLobbyEvent(context=context))
+                self._on_event(DraftLobbyEvent(context=context), False)
             return
 
         # Memory says we are NOT in a draft event lobby. Detect leave when
@@ -622,7 +689,7 @@ class OverlayApp:
                 "Left draft lobby from memory: content=%s",
                 current_event.content_type or "unknown",
             )
-            self._on_event(DraftLobbyEvent(context=""))
+            self._on_event(DraftLobbyEvent(context=""), False)
 
     # -- simulator detection -------------------------------------------------
 
@@ -669,7 +736,7 @@ class OverlayApp:
         # always_replay=True skips the is_arena_running() gate so the
         # Event_Join + first pack already in the file are replayed.
         self.watcher = LogWatcher(log_path=sim_log, always_replay=True)
-        self.watcher.add_callback(self._on_event)
+        self.watcher.add_callback(self._emit_log_event)
         self.watcher.start()
 
     # -- server / auth polling -----------------------------------------------
@@ -725,16 +792,16 @@ class OverlayApp:
     def _ensure_set_data(self, set_code: str) -> None:
         """Request loading of set-specific data, safe to call from any thread.
 
-        If called from a background thread the request is marshalled to
-        the Qt main thread via the window's ``set_load_requested`` signal.
+        Off-thread calls are marshalled to the Qt main thread via
+        ``_UiMarshaler.set_load_requested`` (queued signal → slot on the
+        QObject living on the main thread).
         """
         if not set_code:
             return
 
-        from PySide6.QtWidgets import QApplication
         app = QApplication.instance()
         if app is not None and QThread.currentThread() is not app.thread():
-            self.window.set_load_requested.emit(set_code)
+            self._marshaler.set_load_requested.emit(set_code)
             return
 
         self._ensure_set_data_on_main(set_code)
@@ -775,6 +842,8 @@ class OverlayApp:
         worker.progress.connect(self._on_set_data_progress)
         worker.finished_ok.connect(self._on_set_data_ready)
         worker.finished_err.connect(self._on_set_data_error)
+        worker.finished.connect(lambda w=worker: self._inflight_set_workers.discard(w))
+        self._inflight_set_workers.add(worker)
         self._set_data_worker = worker
         worker.start()
 
@@ -838,11 +907,11 @@ class OverlayApp:
         """
         pending = list(self._pending_events)
         self._pending_events.clear()
-        for event in pending:
+        for event, replaying in pending:
             sig = _event_signature(event)
             if sig is not None:
                 self._recent_event_signatures.pop(sig, None)
-            self._on_event(event)
+            self._on_event(event, replaying)
 
     def _on_login_google(self) -> None:
         """Handle Google login button click (runs OAuth in background thread)."""
@@ -911,18 +980,46 @@ class OverlayApp:
 
     # -- event handling (from LogWatcher) ------------------------------------
 
-    def _on_event(self, event: DraftEvent) -> None:
+    def _emit_log_event(self, event: DraftEvent) -> None:
+        """Marshal a log-watcher event with a snapshot of the replaying flag.
+
+        Called from the LogWatcher's background thread. The marshaler queues
+        the event on the Qt main thread for handling — by the time the slot
+        runs, ``self.watcher.replaying`` may have flipped to False, so we
+        snapshot it here at emit time.
+        """
+        self._marshaler.event_received.emit(event, self.watcher.replaying)
+
+    def _emit_memory_event(self, event: DraftEvent) -> None:
+        """Marshal a memory-watcher event (memory polling has no replay)."""
+        self._marshaler.event_received.emit(event, False)
+
+    def _on_event(self, event: DraftEvent, replaying: bool | None = None) -> None:
         """Handle a draft event from a watcher (log or memory).
 
         With both LogWatcher and MemoryWatcher active, identical events can
         arrive twice within ~250 ms. Drop the duplicate using a stable
         signature with a 2 s window — first source wins.
+
+        ``replaying`` is the snapshot captured at emit time when the event
+        was queued by ``_UiMarshaler``. For direct (synchronous) calls from
+        within this method or from main-thread slots, pass it explicitly or
+        leave None to read the watcher's current flag.
         """
-        if _should_drop_duplicate(event, self._recent_event_signatures):
+        if replaying is None:
+            replaying = self.watcher.replaying
+
+        # Cross-watcher dedup is for the live LogWatcher+MemoryWatcher race.
+        # During replay only LogWatcher runs, and the synthetic DraftEnd
+        # emitted by the lobby-leave-cleanup path (see DraftLobbyEvent
+        # handler) records ("end",) in the dict, which then silently drops
+        # every real DraftEnd that follows within 2 s — leaving the overlay
+        # in the pick view after replay.
+        if not replaying and _should_drop_duplicate(
+            event, self._recent_event_signatures,
+        ):
             logger.debug("Dropping duplicate event %s", type(event).__name__)
             return
-
-        replaying = self.watcher.replaying
 
         if isinstance(event, LogRotatedEvent):
             logger.info("Log rotated — resetting draft state, showing home")
@@ -945,6 +1042,18 @@ class OverlayApp:
                     self.window.show_draft_ended()
             self.state.draft_active = False
             self.state.current_pack.clear()
+            # Drop any queued events from the ended draft. Otherwise a
+            # PackEvent queued while set data was loading can resurrect
+            # the draft via the auto-start branch in the PackEvent handler
+            # once _flush_pending_events fires.
+            self._pending_events.clear()
+            # SceneChange Draft→Home only emits DraftEndEvent (the log
+            # watcher's if/elif structure means no DraftLobbyEvent("")
+            # follows). Without clearing here, _in_lobby_context survives
+            # past the end of the draft, and ReplayDoneEvent /
+            # _on_set_data_ready then treat the user as still in the lobby
+            # and flip the home Draft row to "Ready" while they're on home.
+            self._in_lobby_context = ""
             return
 
         if isinstance(event, DraftCompleteEvent):
@@ -958,6 +1067,9 @@ class OverlayApp:
             return
 
         if isinstance(event, ReplayDoneEvent):
+            # Drop the dedup signatures accumulated during replay so that
+            # live LogWatcher+MemoryWatcher events start with a clean slate.
+            self._recent_event_signatures.clear()
             if self.state.draft_active:
                 # Start loading set data if not yet loaded.
                 if self.state.set_code:
@@ -1041,7 +1153,7 @@ class OverlayApp:
                     and not self.state.pool
                 ):
                     logger.info("Left lobby with no draft progress — ending draft session")
-                    self._on_event(DraftEndEvent())
+                    self._on_event(DraftEndEvent(), replaying)
                 return
             # Check for unsupported draft formats (e.g. PickTwo).
             from client.overlay.draft_state import extract_set_code, is_supported_draft_format
@@ -1131,7 +1243,7 @@ class OverlayApp:
                     if code:
                         self._ensure_set_data(code)
 
-                self._pending_events.append(event)
+                self._pending_events.append((event, replaying))
                 logger.info(
                     "Queued PackEvent (P%dP%d) — waiting for set data",
                     event.pack_number + 1, event.pick_number + 1,
@@ -1184,7 +1296,7 @@ class OverlayApp:
         elif isinstance(event, PickEvent):
             # Queue pick events while set data is loading.
             if not self._set_data_ready:
-                self._pending_events.append(event)
+                self._pending_events.append((event, replaying))
                 return
             if event.card_grpids:
                 names = self.mapper.grpids_to_names(event.card_grpids)

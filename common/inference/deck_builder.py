@@ -24,6 +24,10 @@ TARGET_LANDS = 17
 MIN_CREATURES = 9
 MIN_NONCREATURES = 6
 
+# Splash policy: at most this many cards in a 3rd colour, and only when
+# the pool already contains a fixing source for that splash colour.
+MAX_SPLASH_CARDS = 2
+
 
 @dataclass
 class DeckSuggestion:
@@ -137,6 +141,105 @@ def _basics_for(colors: list[str], counts: list[int], budget: int) -> list[str]:
     return lands[:budget]
 
 
+def _has_splash_fixing(
+    splash_color: str,
+    nonbasic_lands: list[str],
+    scryfall_cards: dict[str, ScryfallCard],
+) -> bool:
+    """Return *True* iff the pool's nonbasic lands fix mana for *splash_color*.
+
+    Recognised sources:
+    - Universal fixers: any land whose oracle text says
+      ``"add one mana of any"`` or ``"search your library for a basic"``.
+    - Lands whose color identity contains the splash colour
+      (single- or multi-colour duals that produce the splash colour).
+    """
+    for name in nonbasic_lands:
+        sc = scryfall_cards.get(name)
+        if not sc:
+            continue
+        text = sc.oracle_text.lower()
+        if "add one mana of any" in text:
+            return True
+        if "search your library for a basic" in text:
+            return True
+        if splash_color in set(sc.color_identity):
+            return True
+    return False
+
+
+def _select_splashes(
+    deck_colors: list[str],
+    main_deck: list[str],
+    pool_names: list[str],
+    scryfall_cards: dict[str, ScryfallCard],
+    nonbasic_lands: list[str],
+    card_map: dict[str, CardRatings] | None,
+    set_metrics: SetMetrics | None,
+    archetype_key: str,
+    splashable_colors: list[str],
+    max_splash: int = MAX_SPLASH_CARDS,
+) -> list[tuple[str, ScryfallCard, str, float]]:
+    """Pick up to *max_splash* cards from a 3rd colour that beat the weakest main-deck slots.
+
+    A splash candidate must:
+    - Have colour identity ⊆ deck_colors ∪ {splash_color}
+    - Have at least one pip in *splash_color* (no free splashes)
+    - Be in the pool but not already in main_deck
+    - Have a fixing source for *splash_color* present in *nonbasic_lands*
+
+    Candidates are ranked by :func:`_card_power`; only those strictly stronger
+    than the weakest main-deck card they would displace are returned.
+    Returns ``[]`` when no candidates qualify or no 17Lands data is available.
+    """
+    if not splashable_colors or not card_map or not set_metrics:
+        return []
+
+    # Power of each main_deck card, ascending — used for displacement check.
+    main_powers = sorted(
+        _card_power(n, card_map, set_metrics, archetype_key, 22)
+        for n in main_deck
+    )
+
+    seen: set[str] = set(main_deck)
+    candidates: list[tuple[str, ScryfallCard, str, float]] = []
+    for splash_color in splashable_colors:
+        if not _has_splash_fixing(splash_color, nonbasic_lands, scryfall_cards):
+            continue
+        for name in pool_names:
+            if name in seen:
+                continue
+            sc = scryfall_cards.get(name)
+            if not sc:
+                continue
+            tl = sc.type_line.lower()
+            if "land" in tl and "creature" not in tl:
+                continue
+            ci = set(sc.color_identity)
+            allowed = set(deck_colors) | {splash_color}
+            if not ci.issubset(allowed):
+                continue
+            if splash_color not in ci:
+                continue  # not actually using the splash colour
+            power = _card_power(name, card_map, set_metrics, archetype_key, 22)
+            candidates.append((name, sc, splash_color, power))
+            seen.add(name)
+
+    candidates.sort(key=lambda x: x[3], reverse=True)
+
+    selected: list[tuple[str, ScryfallCard, str, float]] = []
+    for cand in candidates:
+        if len(selected) >= max_splash:
+            break
+        # The (len(selected)+1)-th weakest is the one displaced if we accept.
+        if len(selected) < len(main_powers):
+            if cand[3] > main_powers[len(selected)]:
+                selected.append(cand)
+        else:
+            selected.append(cand)
+    return selected
+
+
 def _holistic_score(
     deck_names: list[str],
     card_map: dict[str, CardRatings] | None,
@@ -164,7 +267,15 @@ def _holistic_score(
     avg_wr = statistics.mean(wrs)
     mean, std = set_metrics.get_metrics("All Decks", "gihwr")
     z = (avg_wr - mean) / std if std > 0 else 0.0
-    return max(0.0, min(100.0, 75.0 + z * 12.0))
+    base = max(0.0, min(100.0, 75.0 + z * 12.0))
+
+    # Playability penalty: an archetype that can only field 17 castable
+    # spells is unplayable even when those spells are individually strong
+    # (the remaining 23 slots get filled with lands). Scale by the share
+    # of TARGET_SPELLS actually present so a complete-but-mediocre deck
+    # outranks an incomplete-but-strong one.
+    completeness = min(1.0, len(deck_names) / TARGET_SPELLS)
+    return base * completeness
 
 
 def suggest_decks(
@@ -200,12 +311,64 @@ def suggest_decks(
     if len(top) < 2:
         top = list(CARD_COLORS[:2])
 
-    # Generate pairs from top colours.
-    pairs: list[tuple[str, str]] = []
-    for i in range(len(top)):
-        for j in range(i + 1, len(top)):
-            pairs.append((top[i], top[j]))
+    def _make_pairs(colors: list[str]) -> list[tuple[str, str]]:
+        return [
+            (colors[i], colors[j])
+            for i in range(len(colors))
+            for j in range(i + 1, len(colors))
+        ]
 
+    pairs = _make_pairs(top)
+
+    # _try_pairs() runs the build loop with a given pair list + min-spells
+    # threshold. Returns whatever archetypes produced a deck. Called twice
+    # so that a fragmented pool (no top-3 pair has enough castable cards)
+    # still gets *some* recommendation via the all-5-colour fallback below.
+    results: dict[str, DeckSuggestion] = {}
+    pairs_to_try = pairs
+    min_spells_threshold = 10  # was 15 — completeness penalty handles thin decks
+    fallback_attempted = False
+    while True:
+        results = _build_for_pairs(
+            pool_names=pool_names,
+            scryfall_cards=scryfall_cards,
+            card_map=card_map,
+            set_metrics=set_metrics,
+            pairs=pairs_to_try,
+            top_colors=top,
+            min_spells_threshold=min_spells_threshold,
+        )
+        if results or fallback_attempted:
+            break
+        # No archetype passed the threshold — try every 2-colour pair with
+        # a relaxed threshold so the user always gets *some* recommendation,
+        # even on a 5-colour pool.
+        pairs_to_try = _make_pairs(list(CARD_COLORS))
+        min_spells_threshold = 0
+        fallback_attempted = True
+    ordered = dict(sorted(results.items(), key=lambda kv: kv[1].score, reverse=True))
+    # Filter out archetypes scoring far below the top option — the UI lists
+    # every suggestion in a dropdown, and a deck 20+ points behind the
+    # leader is noise (typically a weird 4-splash build into a colour pair
+    # the pool doesn't actually support). We always keep at least the
+    # top suggestion so the dropdown is never empty.
+    if not ordered:
+        return ordered
+    top_score = next(iter(ordered.values())).score
+    return {k: v for k, v in ordered.items() if v.score >= top_score - 20.0}
+
+
+def _build_for_pairs(
+    *,
+    pool_names: list[str],
+    scryfall_cards: dict[str, ScryfallCard],
+    card_map: dict[str, CardRatings] | None,
+    set_metrics: SetMetrics | None,
+    pairs: list[tuple[str, str]],
+    top_colors: list[str],
+    min_spells_threshold: int,
+) -> dict[str, DeckSuggestion]:
+    """Inner build loop, factored out so we can retry with a wider pair set."""
     results: dict[str, DeckSuggestion] = {}
     for c1, c2 in pairs:
         order = "WUBRG"
@@ -236,9 +399,9 @@ def suggest_decks(
             main_deck_cmc.append(functional_cmc(sc.cmc, sc.oracle_text))
             main_deck_cards.append(sc)
 
-        if len(main_deck) < TARGET_SPELLS:
-            if len(main_deck) < 15:
-                continue  # too few playables to form any reasonable deck
+        if len(main_deck) < min_spells_threshold:
+            continue  # too few playables — skip; completeness penalty
+            # already discourages thin archetypes that *do* pass
 
         # Collect useful nonbasic lands from pool.
         # Rules (matching 17Lands reference):
@@ -272,13 +435,78 @@ def suggest_decks(
                 # All of the land's colors fit the deck.
                 nonbasic_lands.append(name)
 
+        # Try splashing up to MAX_SPLASH_CARDS from a 3rd colour if the pool
+        # has fixing for it and the splash beats a weaker main-deck card.
+        # Splash is only attempted on full-or-near-full main decks — adding
+        # a 3rd colour to a thin pile would make the mana base unworkable.
+        # Thin decks (below the 18-spell mark) lean harder on splashes —
+        # they have more empty slots to fill and the player likely has no
+        # better option than reaching into a 3rd colour. Healthy decks
+        # cap at the standard MAX_SPLASH_CARDS so a strong 2-colour build
+        # doesn't get diluted by marginal splashes.
+        splashable_colors = [c for c in top_colors if c not in deck_colors]
+        # In the all-5-colours fallback we splash from any colour so a
+        # 5-colour pool always gets *some* coherent build.
+        if len(splashable_colors) == 0 and len(top_colors) <= 2:
+            splashable_colors = [c for c in CARD_COLORS if c not in deck_colors]
+        # Tiered splash cap: very thin pools genuinely need more splashes to
+        # reach a playable spell count, even at the cost of a strained mana
+        # base — better than 25 lands and no recommendation worth taking.
+        if len(main_deck) < 14:
+            deck_max_splash = 6
+        elif len(main_deck) < 18:
+            deck_max_splash = 4
+        else:
+            deck_max_splash = MAX_SPLASH_CARDS
+        splashes = _select_splashes(
+            deck_colors=deck_colors,
+            main_deck=main_deck,
+            pool_names=pool_names,
+            scryfall_cards=scryfall_cards,
+            nonbasic_lands=nonbasic_lands,
+            card_map=card_map,
+            set_metrics=set_metrics,
+            archetype_key=key,
+            splashable_colors=splashable_colors,
+            max_splash=deck_max_splash,
+        ) if len(main_deck) >= 10 else []
+
+        splash_colors: list[str] = []
+        if splashes:
+            # Displace the weakest main_deck cards to make room.
+            powered = [
+                (n, sc, mcmc, _card_power(n, card_map, set_metrics, key, 22))
+                for n, sc, mcmc in zip(main_deck, main_deck_cards, main_deck_cmc)
+            ]
+            powered.sort(key=lambda x: x[3], reverse=True)  # strongest first
+            keep_count = min(len(powered), TARGET_SPELLS - len(splashes))
+            keep = powered[:keep_count]
+            main_deck = [x[0] for x in keep]
+            main_deck_cards = [x[1] for x in keep]
+            main_deck_cmc = [x[2] for x in keep]
+            for splash_name, splash_sc, splash_color, _ in splashes:
+                main_deck.append(splash_name)
+                main_deck_cards.append(splash_sc)
+                main_deck_cmc.append(functional_cmc(splash_sc.cmc, splash_sc.oracle_text))
+            splash_colors = sorted({s[2] for s in splashes})
+
         # Cap nonbasic lands to TARGET_LANDS so we don't exceed 40 cards.
         target_lands = 40 - len(main_deck)
         if len(nonbasic_lands) > target_lands:
             nonbasic_lands = nonbasic_lands[:target_lands]
 
         fixing_count = len(nonbasic_lands)
-        lands = _karsten_mana_base(main_deck_cards, deck_colors, fixing_count, target_lands)
+        mana_base_colors = list(deck_colors) + splash_colors
+        lands = _karsten_mana_base(
+            main_deck_cards, mana_base_colors, fixing_count, target_lands,
+        )
+        # Guarantee at least one basic per splash colour even if karsten's
+        # pip allocation rounds to zero — without it, the splash card is
+        # uncastable when the universal fixer hasn't been drawn.
+        for splash_color in splash_colors:
+            splash_basic = _BASIC_NAMES.get(splash_color, "Plains")
+            if splash_basic not in lands and lands:
+                lands[-1] = splash_basic
         total_lands = len(nonbasic_lands) + len(lands)
         # Safety: ensure exactly target_lands total by trimming basics.
         if total_lands > target_lands:
@@ -308,5 +536,4 @@ def suggest_decks(
             avg_cmc=round(avg, 2),
         )
 
-    # Sort by score descending.
-    return dict(sorted(results.items(), key=lambda kv: kv[1].score, reverse=True))
+    return results

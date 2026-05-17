@@ -143,7 +143,11 @@ class NemeDraftClient:
 
     def fetch_user_info(self) -> UserInfo | None:
         """Call ``GET /api/me`` and return the user's profile info."""
-        data = self._authed_request("GET", "/api/me", timeout=5)
+        # Outer timeout must exceed the server's upstream Supabase
+        # timeout (5s, see server/routes/user_info.py) plus network
+        # overhead — otherwise the client times out before the server
+        # can return its 502 on a slow Supabase call.
+        data = self._authed_request("GET", "/api/me", timeout=10)
         if data is None:
             return None
         return UserInfo(

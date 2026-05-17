@@ -53,11 +53,15 @@ class _DraftSnapshot:
 
     @classmethod
     def from_payload(cls, payload: dict[str, Any]) -> "_DraftSnapshot":
+        pack_raw = payload.get("pack_number")
+        pick_raw = payload.get("pick_number")
         return cls(
             is_active=bool(payload.get("is_active", False)),
             event_name=str(payload.get("event_name", "") or ""),
-            pack_number=int(payload.get("pack_number", -1) or -1),
-            pick_number=int(payload.get("pick_number", -1) or -1),
+            # ``a or -1`` collapses a legitimate 0 (pack 1 pick 1) to -1,
+            # which then mismatches LogWatcher's 0/0 and defeats dedup.
+            pack_number=int(pack_raw) if pack_raw is not None else -1,
+            pick_number=int(pick_raw) if pick_raw is not None else -1,
             current_pack=tuple(payload.get("current_pack") or ()),
             picked_cards=tuple(payload.get("picked_cards") or ()),
         )

@@ -10,17 +10,20 @@ loading, the user is signed out, etc.) — callers should treat ``None`` as
 from __future__ import annotations
 
 import logging
+import struct
 import time
 from typing import Any
 
 from .exceptions import MonoFieldMissing
 from .mono import AssemblyImage, ClassDefinition, ObjectInstance
+from .reader import ProcessReader
 from .session import MemorySession
 
 logger = logging.getLogger(__name__)
 
 
 _EVENT_PAGE_TYPE = "EventPage.EventPageContentController"
+_DRAFT_CONTENT_TYPE = "Wotc.Mtga.Wrapper.Draft.DraftContentController"
 
 
 def read_player_identity(session: MemorySession) -> dict[str, Any] | None:
@@ -143,34 +146,82 @@ def read_current_event(session: MemorySession) -> dict[str, Any] | None:
 def read_draft_state(session: MemorySession) -> dict[str, Any] | None:
     """Read live draft pack/pick state from process memory.
 
-    **STUB — pending live-pod investigation.**
+    Chain (verified against MTGA build 2026.58.20.12269 on a live
+    QuickDraft pod; same field names apply for HumanDraftPod via the
+    shared ``IDraftPod`` interface):
 
-    The mtga-tracker-daemon does not expose this data, so the field paths
-    are not yet known. They must be discovered by walking ``WrapperController``
-    / ``PAPA`` / ``EventPageContentController.PlayerEvent.CourseData``
-    against a live draft pod (pack 1 pick 1) using
-    ``scripts/diag_draft_state.py``. See ``docs/draft-state-investigation.md``
-    for the procedure.
+    .. code-block:: text
 
-    Once the field paths are filled in, the return shape should be:
+        WrapperController.<Instance>k__BackingField
+            .<SceneLoader>k__BackingField
+            .<CurrentNavContent>k__BackingField        # DraftContentController iff in draft
+            ._limitedEvent                              # Wotc.Mtga.Events.LimitedPlayerEvent
+            .<DraftPod>k__BackingField                  # BotDraftPod | HumanDraftPod
+              .<InternalEventName>k__BackingField : str
+              ._currentPack                       : I4
+              ._currentPick                       : I4
+              ._currentPackCards                  : List<int>
+              .<PickedCards>k__BackingField       : List<int>?
 
-    .. code-block:: python
-
-        {
-            "is_active": bool,           # in a live draft right now
-            "event_name": str,           # e.g. "PremierDraft_SOS_20260421"
-            "pack_number": int,          # 0-indexed
-            "pick_number": int,          # 0-indexed
-            "current_pack": list[int],   # Arena grpIds presented this pick
-            "picked_cards": list[int],   # Arena grpIds picked so far this draft
-        }
-
-    Returns ``None`` when not in a draft (or while the field paths remain
-    unknown). :class:`client.overlay.memory_watcher.MemoryWatcher` treats
-    ``None`` as "no live draft" and emits no events.
+    Returns ``None`` when not in a draft (CurrentNavContent type mismatches,
+    or the draft pod / event chain has not populated yet). MemoryWatcher
+    treats ``None`` as "no live draft" and emits a ``DraftEndEvent`` if it
+    previously saw an active draft.
     """
-    _ = session  # unused until investigation completes
-    return None
+    image = session.image
+    if image is None:
+        return None
+    try:
+        wrapper_controller = image.get_class("WrapperController")
+        if wrapper_controller is None:
+            return None
+        wrapper = _coerce_object(wrapper_controller.get_static("<Instance>k__BackingField"))
+        current = _follow(wrapper, [
+            "<SceneLoader>k__BackingField",
+            "<CurrentNavContent>k__BackingField",
+        ])
+        if current is None:
+            return None
+        klass = current.runtime_class()
+        if klass is None or klass.full_name != _DRAFT_CONTENT_TYPE:
+            return None
+
+        draft_pod = _follow(current, [
+            "_limitedEvent",
+            "<DraftPod>k__BackingField",
+        ])
+        if draft_pod is None:
+            return None
+
+        event_name = (
+            _read_string_field(draft_pod, "<InternalEventName>k__BackingField")
+            or ""
+        )
+        pack_number = _read_int_field(draft_pod, "_currentPack")
+        pick_number = _read_int_field(draft_pod, "_currentPick")
+
+        reader = image.reader
+        current_pack = _read_list_int32(
+            reader, _coerce_object(draft_pod.get("_currentPackCards")),
+        )
+        picked_cards = _read_list_int32(
+            reader, _coerce_object(draft_pod.get("<PickedCards>k__BackingField")),
+        )
+
+        return {
+            "is_active": True,
+            "event_name": event_name,
+            "pack_number": pack_number,
+            "pick_number": pick_number,
+            "current_pack": current_pack,
+            "picked_cards": picked_cards,
+        }
+    except MonoFieldMissing as exc:
+        logger.debug("Draft state walk: %s", exc)
+        return None
+    except Exception:
+        logger.warning("Unexpected error reading Arena draft state", exc_info=True)
+        return None
 
 
 # -------- helpers ----------------------------------------------------------
@@ -200,3 +251,55 @@ def _read_string_field(obj: ObjectInstance, name: str) -> str:
 def _read_int_field(obj: ObjectInstance, name: str) -> int:
     value = obj.get(name)
     return value if isinstance(value, int) else 0
+
+
+def _read_list_int32(
+    reader: ProcessReader | None,
+    list_obj: ObjectInstance | None,
+    *,
+    max_elements: int = 256,
+) -> list[int]:
+    """Read a Mono ``List<int>`` (or ``List<uint>``) and return its elements.
+
+    Mono ``System.Collections.Generic.List`1`` layout (x64):
+
+    * MonoObject header: 2 pointers
+    * ``_items``: pointer to backing ``int[]`` (offset ``2 * size_of_ptr``)
+    * ``_size``: int32 logical count (offset ``3 * size_of_ptr``)
+
+    The backing array follows the standard MonoArray layout — its own
+    length sits at ``+3 * size_of_ptr`` and the data starts at
+    ``+4 * size_of_ptr``. ``_size`` may be smaller than the array's
+    capacity, so we clamp.
+
+    Returns ``[]`` whenever the list pointer is NULL, the size is out of
+    range, or any memory read fails.
+    """
+    if reader is None or list_obj is None or not list_obj.address:
+        return []
+    sp = reader.size_of_ptr
+    try:
+        items_ptr = reader.read_ptr(list_obj.address + sp * 2)
+        size = reader.read_int32(list_obj.address + sp * 3)
+    except Exception:
+        return []
+    if items_ptr == 0 or size <= 0:
+        return []
+    if size > max_elements:
+        logger.debug("List<int> size=%d exceeds max %d, ignoring", size, max_elements)
+        return []
+    try:
+        arr_length = reader.read_int32(items_ptr + sp * 3)
+    except Exception:
+        return []
+    n = min(size, max(arr_length, 0))
+    if n <= 0:
+        return []
+    try:
+        data = reader.read_bytes(items_ptr + sp * 4, 4 * n)
+    except Exception:
+        return []
+    try:
+        return list(struct.unpack(f"<{n}i", data))
+    except struct.error:
+        return []

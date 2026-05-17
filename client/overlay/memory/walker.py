@@ -24,6 +24,8 @@ logger = logging.getLogger(__name__)
 
 _EVENT_PAGE_TYPE = "EventPage.EventPageContentController"
 _DRAFT_CONTENT_TYPE = "Wotc.Mtga.Wrapper.Draft.DraftContentController"
+_DECK_BUILDER_TYPE = "WrapperDeckBuilder"
+_LIMITED_PLAYER_EVENT_TYPE = "Wotc.Mtga.Events.LimitedPlayerEvent"
 
 
 def read_player_identity(session: MemorySession) -> dict[str, Any] | None:
@@ -221,6 +223,105 @@ def read_draft_state(session: MemorySession) -> dict[str, Any] | None:
         return None
     except Exception:
         logger.warning("Unexpected error reading Arena draft state", exc_info=True)
+        return None
+
+
+def read_deck_pool(session: MemorySession) -> dict[str, Any] | None:
+    """Read the card pool of a draft event currently in the deck-builder.
+
+    Used to repopulate the overlay's deck tab when the user re-opens MTGA
+    after a draft has completed — the draft's CourseData.CardPool stays
+    alive in EventManager.EventContexts as long as the event hasn't been
+    finalised (deck submitted), even across game restarts.
+
+    Walks ``EventManager.EventContexts`` looking for a
+    ``LimitedPlayerEvent`` whose ``CourseData.CardPool`` is non-empty.
+    Picks the largest such pool when several remain (e.g. the player
+    abandoned one draft mid-build and started another).
+
+    Returns ``None`` when:
+
+    * ``CurrentNavContent`` isn't ``WrapperDeckBuilder`` — the user
+      isn't in the deck-builder view, no pool to surface.
+    * No draft event has a populated pool.
+
+    Returns:
+        ``{"event_name": str, "card_pool": list[int]}`` on success.
+    """
+    image = session.image
+    if image is None:
+        return None
+    try:
+        wrapper_controller = image.get_class("WrapperController")
+        if wrapper_controller is None:
+            return None
+        wrapper = _coerce_object(wrapper_controller.get_static("<Instance>k__BackingField"))
+        current = _follow(wrapper, [
+            "<SceneLoader>k__BackingField",
+            "<CurrentNavContent>k__BackingField",
+        ])
+        if current is None:
+            return None
+        klass = current.runtime_class()
+        if klass is None or klass.full_name != _DECK_BUILDER_TYPE:
+            return None
+
+        em = _coerce_object(wrapper.get("<EventManager>k__BackingField"))
+        if em is None:
+            return None
+        ctx_list = _coerce_object(em.get("<EventContexts>k__BackingField"))
+        if ctx_list is None:
+            return None
+
+        reader = image.reader
+        sp = reader.size_of_ptr
+        items_ptr = reader.read_ptr(ctx_list.address + sp * 2)
+        size = reader.read_int32(ctx_list.address + sp * 3)
+        if items_ptr == 0 or size <= 0 or size > 256:
+            return None
+
+        best_pool: list[int] = []
+        best_event = ""
+        for i in range(size):
+            try:
+                ptr = reader.read_ptr(items_ptr + sp * 4 + i * sp)
+            except Exception:
+                continue
+            if ptr == 0:
+                continue
+            ctx = ObjectInstance(image, ptr)
+            pe = _coerce_object(ctx.get("PlayerEvent"))
+            if pe is None:
+                continue
+            pek = pe.runtime_class()
+            if pek is None or pek.full_name != _LIMITED_PLAYER_EVENT_TYPE:
+                continue
+            cd = _coerce_object(pe.get("<CourseData>k__BackingField"))
+            if cd is None:
+                continue
+            pool_obj = _coerce_object(cd.get("CardPool"))
+            if pool_obj is None:
+                continue
+            pool = _read_list_int32(reader, pool_obj, max_elements=200)
+            if len(pool) > len(best_pool):
+                best_pool = pool
+                event_info = _coerce_object(pe.get("_eventInfo"))
+                if event_info is not None:
+                    best_event = (
+                        _read_string_field(event_info, "InternalEventName")
+                        or ""
+                    )
+        if not best_pool:
+            return None
+        return {
+            "event_name": best_event,
+            "card_pool": best_pool,
+        }
+    except MonoFieldMissing as exc:
+        logger.debug("Deck pool walk: %s", exc)
+        return None
+    except Exception:
+        logger.warning("Unexpected error reading deck pool", exc_info=True)
         return None
 
 

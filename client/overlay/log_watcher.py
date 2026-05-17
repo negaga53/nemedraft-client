@@ -274,9 +274,24 @@ class DraftLobbyEvent:
     context: str
 
 
+@dataclass
+class DeckPoolDetectedEvent:
+    """Emitted when MTGA's deck-builder is showing a draft event pool.
+
+    Fires once per transition into the deck-builder for a draft event —
+    typically after the player has re-opened MTGA into a draft they
+    completed earlier and the overlay's on-disk cache is empty or stale.
+    Memory is authoritative here because the log from the prior session
+    has rotated to Player-prev.log by the time this fires.
+    """
+    card_grpids: list[int]
+    event_name: str = ""
+
+
 DraftEvent = (
     DraftStartEvent | PackEvent | PickEvent | ReplayDoneEvent
     | LogRotatedEvent | DraftEndEvent | DraftCompleteEvent | DraftLobbyEvent
+    | DeckPoolDetectedEvent
 )
 
 EventCallback = Callable[[DraftEvent], Any]

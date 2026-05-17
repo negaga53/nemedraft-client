@@ -23,6 +23,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from client.overlay.log_watcher import (
+    DeckPoolDetectedEvent,
     DraftCompleteEvent,
     DraftEndEvent,
     DraftEvent,
@@ -33,7 +34,7 @@ from client.overlay.log_watcher import (
 )
 from client.overlay.memory.platform import is_memory_supported
 from client.overlay.memory.session import MemorySession
-from client.overlay.memory.walker import read_draft_state
+from client.overlay.memory.walker import read_deck_pool, read_draft_state
 
 logger = logging.getLogger(__name__)
 
@@ -76,6 +77,11 @@ class MemoryWatcher:
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
         self._previous: _DraftSnapshot | None = None
+        # ``(event_name, tuple(grpids))`` for the last deck pool we
+        # emitted. The fingerprint suppresses re-fires while the player
+        # idles in the deck-builder; a *different* draft (e.g. they
+        # finished another one) will fingerprint differently and emit.
+        self._previous_deck_pool: tuple[str, tuple[int, ...]] | None = None
         # API parity with LogWatcher; memory has no notion of replay.
         self.replaying: bool = False
 
@@ -126,20 +132,47 @@ class MemoryWatcher:
             # MTGA not running yet (or not loaded). When it later attaches,
             # the next tick will pick up state cleanly.
             self._previous = None
+            self._previous_deck_pool = None
             return
         payload = read_draft_state(session)
         if payload is None:
-            # Either no live draft or the read_draft_state stub hasn't been
-            # filled in yet. Treat as "no draft active".
+            # No live draft view. Two sub-cases — the user is in the
+            # deck-builder for a finished draft (emit DeckPoolDetectedEvent
+            # once) or somewhere else entirely (emit DraftEnd if we were
+            # previously active, then idle).
             if self._previous is not None and self._previous.is_active:
                 self._emit(DraftEndEvent())
             self._previous = None
+            self._maybe_emit_deck_pool(session)
             return
+        # Active draft view — clear the deck-pool fingerprint so re-entry
+        # into the deck-builder after another draft re-fires the event.
+        self._previous_deck_pool = None
         current = _DraftSnapshot.from_payload(payload)
         prev = self._previous
         for event in _diff_snapshots(prev, current):
             self._emit(event)
         self._previous = current
+
+    def _maybe_emit_deck_pool(self, session: MemorySession) -> None:
+        """Emit a DeckPoolDetectedEvent on first sight of a draft pool."""
+        deck = read_deck_pool(session)
+        if deck is None:
+            self._previous_deck_pool = None
+            return
+        event_name = str(deck.get("event_name", "") or "")
+        pool = tuple(int(g) for g in deck.get("card_pool") or ())
+        if not pool:
+            self._previous_deck_pool = None
+            return
+        fingerprint = (event_name, pool)
+        if fingerprint == self._previous_deck_pool:
+            return
+        self._previous_deck_pool = fingerprint
+        self._emit(DeckPoolDetectedEvent(
+            card_grpids=list(pool),
+            event_name=event_name,
+        ))
 
     def _emit(self, event: DraftEvent) -> None:
         logger.debug("MemoryWatcher emit: %s", type(event).__name__)

@@ -32,6 +32,7 @@ from client.overlay.draft_state import DraftState, PickHistoryEntry, extract_dra
 from client.overlay.env import ClientEnv, load_client_env, save_arena_player_id
 from client.overlay.i18n import Translator, tr
 from client.overlay.log_watcher import (
+    DeckPoolDetectedEvent,
     DraftCompleteEvent,
     DraftEndEvent,
     DraftEvent,
@@ -1061,6 +1062,52 @@ class OverlayApp:
             self._draft_completed = True
             self.state.draft_active = False
             self.state.current_pack.clear()
+            if self.config.features.deck_builder_enabled:
+                self._update_deck_suggestions()
+            self.window.show_draft_complete()
+            return
+
+        if isinstance(event, DeckPoolDetectedEvent):
+            # MTGA's deck-builder is showing a finished draft. Used when
+            # the player re-opens the game after a restart (Player.log
+            # rotated, on-disk cache empty / stale) — memory still holds
+            # the CourseData.CardPool so the deck tab can be repopulated.
+            if self.state.draft_active or self.state.pool:
+                # Either we're still mid-draft (shouldn't happen if memory
+                # reads the deck-builder content controller — guard
+                # anyway) or the pool is already populated from this
+                # session's pick events.
+                logger.debug(
+                    "Ignoring DeckPoolDetectedEvent — pool already known "
+                    "(active=%s size=%d)",
+                    self.state.draft_active, len(self.state.pool),
+                )
+                return
+            names = self.mapper.grpids_to_names(event.card_grpids)
+            if not names:
+                logger.warning(
+                    "DeckPoolDetectedEvent: no grpIds mapped to names "
+                    "(event=%s, ids=%d)", event.event_name, len(event.card_grpids),
+                )
+                return
+            logger.info(
+                "DeckPoolDetectedEvent: restoring pool of %d cards from "
+                "memory (event=%s)", len(names), event.event_name,
+            )
+            # Synthesize a minimal draft start so the rest of the overlay
+            # plumbing (set_code, draft_completed flag, deck tab) lights
+            # up consistently with the normal post-draft flow.
+            if event.event_name and not self.state.set_code:
+                self.state.on_draft_start(event.event_name)
+            self.state.pool = names
+            self.state.draft_active = False
+            self._draft_completed = True
+            # Ensure set data is loaded so deck suggestions can resolve
+            # card metadata. Memory-restored pools land before any other
+            # draft trigger, so this is often the first set-load request.
+            if self.state.set_code:
+                self._ensure_set_data(self.state.set_code)
+            self.state.save_state(self._cache_dir)
             if self.config.features.deck_builder_enabled:
                 self._update_deck_suggestions()
             self.window.show_draft_complete()

@@ -7,15 +7,22 @@ from typing import Any
 
 import pytest
 
+from unittest.mock import patch
+
 from client.overlay.log_watcher import (
+    DeckPoolDetectedEvent,
     DraftCompleteEvent,
     DraftEndEvent,
     DraftStartEvent,
     PackEvent,
     PickEvent,
 )
-from client.overlay.memory_watcher import _DraftSnapshot, _diff_snapshots
-from client.overlay.memory.walker import read_draft_state
+from client.overlay.memory_watcher import (
+    MemoryWatcher,
+    _DraftSnapshot,
+    _diff_snapshots,
+)
+from client.overlay.memory.walker import read_draft_state, read_deck_pool
 
 
 @dataclass
@@ -23,10 +30,106 @@ class _StubSession:
     """Minimal session stand-in — only ``image`` attribute is read."""
     image: Any = None
 
+    def ensure_attached(self) -> bool:  # noqa: D401 — matches MemorySession API
+        return True
+
 
 def test_read_draft_state_none_when_image_unavailable():
     """No memory image attached → returns None (caller treats as not in draft)."""
     assert read_draft_state(_StubSession()) is None
+
+
+def test_read_deck_pool_none_when_image_unavailable():
+    """Same null guard as read_draft_state."""
+    assert read_deck_pool(_StubSession()) is None
+
+
+def test_memory_watcher_emits_deck_pool_event_on_first_detection():
+    """When read_draft_state is None but read_deck_pool returns a pool,
+    the watcher emits a single DeckPoolDetectedEvent and stops firing on
+    subsequent ticks while the pool stays the same."""
+    mw = MemoryWatcher()
+    events: list = []
+    mw.add_callback(lambda e: events.append(e))
+
+    session = _StubSession()
+
+    deck_payload = {"event_name": "QuickDraft_EOE_20260511",
+                    "card_pool": [96808, 96827, 96778]}
+
+    with patch("client.overlay.memory_watcher.read_draft_state", return_value=None), \
+         patch("client.overlay.memory_watcher.read_deck_pool",
+               return_value=deck_payload):
+        # The watcher's _tick takes a session argument; pass a stub.
+        mw._tick(session)
+        mw._tick(session)
+        mw._tick(session)
+
+    deck_events = [e for e in events if isinstance(e, DeckPoolDetectedEvent)]
+    assert len(deck_events) == 1
+    assert deck_events[0].card_grpids == [96808, 96827, 96778]
+    assert deck_events[0].event_name == "QuickDraft_EOE_20260511"
+
+
+def test_memory_watcher_re_emits_deck_pool_when_pool_changes():
+    """A different draft (new fingerprint) re-emits after we leave the
+    deck-builder back into a draft view and return."""
+    mw = MemoryWatcher()
+    events: list = []
+    mw.add_callback(lambda e: events.append(e))
+    session = _StubSession()
+
+    first = {"event_name": "QuickDraft_EOE_20260511", "card_pool": [1, 2, 3]}
+    second = {"event_name": "PremierDraft_SOS_20260601", "card_pool": [4, 5, 6]}
+
+    with patch("client.overlay.memory_watcher.read_draft_state", return_value=None):
+        with patch("client.overlay.memory_watcher.read_deck_pool",
+                   return_value=first):
+            mw._tick(session)
+            mw._tick(session)
+        with patch("client.overlay.memory_watcher.read_deck_pool",
+                   return_value=second):
+            mw._tick(session)
+
+    deck_events = [e for e in events if isinstance(e, DeckPoolDetectedEvent)]
+    assert len(deck_events) == 2
+    assert deck_events[0].event_name == "QuickDraft_EOE_20260511"
+    assert deck_events[1].event_name == "PremierDraft_SOS_20260601"
+
+
+def test_memory_watcher_does_not_emit_deck_pool_during_active_draft():
+    """While a draft is active (read_draft_state returns data), the
+    deck-pool path is skipped and the fingerprint is reset so the
+    transition into deck-builder afterwards still fires."""
+    mw = MemoryWatcher()
+    events: list = []
+    mw.add_callback(lambda e: events.append(e))
+    session = _StubSession()
+
+    active_draft = {
+        "is_active": True, "event_name": "QuickDraft_EOE_20260511",
+        "pack_number": 0, "pick_number": 0,
+        "current_pack": [96667], "picked_cards": [],
+    }
+    deck_payload = {"event_name": "QuickDraft_EOE_20260511",
+                    "card_pool": [96808, 96827]}
+
+    # Tick during active draft — no deck-pool emission.
+    with patch("client.overlay.memory_watcher.read_draft_state",
+               return_value=active_draft), \
+         patch("client.overlay.memory_watcher.read_deck_pool",
+               return_value=deck_payload):
+        mw._tick(session)
+    # Transition to deck-builder — read_draft_state returns None now.
+    with patch("client.overlay.memory_watcher.read_draft_state",
+               return_value=None), \
+         patch("client.overlay.memory_watcher.read_deck_pool",
+               return_value=deck_payload):
+        mw._tick(session)
+
+    deck_events = [e for e in events if isinstance(e, DeckPoolDetectedEvent)]
+    assert len(deck_events) == 1
+    assert deck_events[0].card_grpids == [96808, 96827]
 
 
 def _snapshot(**kw: Any) -> _DraftSnapshot:

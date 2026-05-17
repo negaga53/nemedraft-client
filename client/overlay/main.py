@@ -28,7 +28,7 @@ from client.overlay.auth_client import AuthClient
 from client.overlay.card_art import CardArtCache
 from client.overlay.card_mapper import ArenaCardMapper
 from client.overlay.config import OverlayConfig, load_config, save_config, LOG_FILE
-from client.overlay.draft_state import DraftState, PickHistoryEntry
+from client.overlay.draft_state import DraftState, PickHistoryEntry, extract_draft_format
 from client.overlay.env import ClientEnv, load_client_env, save_arena_player_id
 from client.overlay.i18n import Translator, tr
 from client.overlay.log_watcher import (
@@ -1365,6 +1365,17 @@ class OverlayApp:
         self._retry_start = time.monotonic()
         self._attempt_prediction()
 
+    def _draft_format(self) -> str:
+        """Return the 17Lands format the player is currently drafting.
+
+        Derived from ``state.event_name`` (e.g. ``"QuickDraft_EOE_..."``
+        → ``"QuickDraft"``, ``"BotDraft_..."`` → ``"QuickDraft"``). Empty
+        string when no draft event is active or the prefix doesn't map to
+        a known 17Lands format; the server then falls back to its
+        manager-default format.
+        """
+        return extract_draft_format(self.state.event_name) or ""
+
     def _attempt_prediction(self) -> None:
         """Single prediction attempt — schedules retry on failure."""
         try:
@@ -1374,6 +1385,7 @@ class OverlayApp:
                 set_code=self.state.set_code,
                 pack_number=self.state.pack_number,
                 pick_number=self.state.pick_number,
+                draft_format=self._draft_format(),
             )
             if not results:
                 logger.warning(
@@ -1503,7 +1515,10 @@ class OverlayApp:
                 for entry in self.state.seen_cards
             ]
 
-            scores = self.api_client.compute_signals(seen_items, self.state.set_code)
+            scores = self.api_client.compute_signals(
+                seen_items, self.state.set_code,
+                draft_format=self._draft_format(),
+            )
             if scores:
                 from common.inference.signals import SignalResult
                 result = SignalResult(scores=scores)
@@ -1520,6 +1535,7 @@ class OverlayApp:
             raw = self.api_client.deck_suggestions(
                 pool_cards=self.state.pool,
                 set_code=self.state.set_code,
+                draft_format=self._draft_format(),
             )
             if not raw:
                 return

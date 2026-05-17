@@ -63,15 +63,19 @@ class NemeDraftClient:
         set_code: str,
         pack_number: int = 0,
         pick_number: int = 0,
+        *,
+        draft_format: str = "",
     ) -> list[Pick]:
         """Call ``POST /api/predict`` and return ranked picks."""
-        body = {
+        body: dict = {
             "pack_cards": pack_cards,
             "pool_cards": pool_cards,
             "set_code": set_code,
             "pack_number": pack_number,
             "pick_number": pick_number,
         }
+        if draft_format:
+            body["draft_format"] = draft_format
         data = self._authed_request("POST", "/api/predict", json=body, timeout=5)
         if data is None:
             return []
@@ -98,18 +102,13 @@ class NemeDraftClient:
         self,
         seen_cards: list[dict],
         set_code: str,
+        *,
+        draft_format: str = "",
     ) -> dict[str, float] | None:
-        """Call ``POST /api/signals`` and return colour scores.
-
-        Args:
-            seen_cards: List of dicts with card_name, colors, gihwr, ata,
-                pack_number, pick_number.
-            set_code: Active set code.
-
-        Returns:
-            Dict mapping colour letter to signal score, or None on failure.
-        """
-        body = {"seen_cards": seen_cards, "set_code": set_code}
+        """Call ``POST /api/signals`` and return colour scores."""
+        body: dict = {"seen_cards": seen_cards, "set_code": set_code}
+        if draft_format:
+            body["draft_format"] = draft_format
         data = self._authed_request("POST", "/api/signals", json=body, timeout=3)
         if data is None:
             return None
@@ -119,13 +118,13 @@ class NemeDraftClient:
         self,
         pool_cards: list[str],
         set_code: str,
+        *,
+        draft_format: str = "",
     ) -> dict | None:
-        """Call ``POST /api/deck-suggestions`` and return archetype suggestions.
-
-        Returns:
-            Dict mapping archetype key to suggestion data, or None on failure.
-        """
-        body = {"pool_cards": pool_cards, "set_code": set_code}
+        """Call ``POST /api/deck-suggestions`` and return archetype suggestions."""
+        body: dict = {"pool_cards": pool_cards, "set_code": set_code}
+        if draft_format:
+            body["draft_format"] = draft_format
         data = self._authed_request("POST", "/api/deck-suggestions", json=body, timeout=5)
         if data is None:
             return None

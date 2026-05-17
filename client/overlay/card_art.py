@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import logging
+import threading
+import time
 from pathlib import Path
 
 import httpx
@@ -13,6 +15,12 @@ logger = logging.getLogger(__name__)
 # Scryfall image API base — art_crop is 626×457, "small" is 146×204.
 # We use "small" for the overlay thumbnails (lightweight, fast).
 _SCRYFALL_IMAGE_BASE = "https://api.scryfall.com/cards/named"
+
+# Scryfall asks for 50–100 ms between requests. We pace at 100 ms and
+# share the timer across all CardArtCache instances so the simulator's
+# rapid back-to-back predictions (which spin up a fresh cache per call)
+# can't double-fire and trip the rate limiter.
+_MIN_REQUEST_INTERVAL = 0.10
 
 # Persistent on-disk cache directory
 from client.overlay.env import _project_root
@@ -30,6 +38,11 @@ class CardArtCache:
         enabled: When *False* no network requests or file I/O happen and
             ``get`` always returns *None*.
     """
+
+    # Class-level throttle state: shared across instances so concurrent
+    # caches (e.g. one created per simulator prediction) cooperate.
+    _fetch_lock: threading.Lock = threading.Lock()
+    _last_request_time: float = 0.0
 
     def __init__(
         self,
@@ -77,6 +90,24 @@ class CardArtCache:
         self._mem[card_name] = fetched
         return fetched
 
+    def get_cached(self, card_name: str) -> Path | None:
+        """Non-blocking variant of :meth:`get` — never hits the network.
+
+        Returns the cached path if the image is already on disk or in the
+        in-process cache, or ``None`` otherwise. Use this when you need to
+        render a UI immediately and a background prefetcher will fill in
+        missing art later.
+        """
+        if not self._enabled:
+            return None
+        if card_name in self._mem:
+            return self._mem[card_name]
+        path = self._path_for(card_name)
+        if path.exists():
+            self._mem[card_name] = path
+            return path
+        return None
+
     def prefetch(self, names: list[str]) -> None:
         """Best-effort batch prefetch (miss only = network)."""
         for name in names:
@@ -109,18 +140,38 @@ class CardArtCache:
     def _fetch(self, card_name: str, dest: Path) -> Path | None:
         # Split double-faced card names to use the front face
         query_name = card_name.split(" // ")[0]
-        try:
-            with httpx.Client(timeout=10, follow_redirects=True) as client:
-                resp = client.get(
-                    _SCRYFALL_IMAGE_BASE,
-                    params={"exact": query_name, "format": "image", "version": "small"},
-                )
-                if resp.status_code != 200:
-                    logger.debug("Scryfall image %d for %r", resp.status_code, card_name)
-                    return None
-                dest.write_bytes(resp.content)
-            logger.debug("Cached art for %s → %s", card_name, dest)
-            return dest
-        except Exception:
-            logger.debug("Failed to fetch art for %s", card_name, exc_info=True)
-            return None
+        with CardArtCache._fetch_lock:
+            # Another instance may have written the file while we
+            # waited on the lock — re-check before issuing a request.
+            if dest.exists():
+                return dest
+            wait = _MIN_REQUEST_INTERVAL - (
+                time.monotonic() - CardArtCache._last_request_time
+            )
+            if wait > 0:
+                time.sleep(wait)
+            try:
+                with httpx.Client(timeout=10, follow_redirects=True) as client:
+                    resp = client.get(
+                        _SCRYFALL_IMAGE_BASE,
+                        params={
+                            "exact": query_name,
+                            "format": "image",
+                            "version": "small",
+                        },
+                    )
+                    if resp.status_code != 200:
+                        logger.debug(
+                            "Scryfall image %d for %r",
+                            resp.status_code,
+                            card_name,
+                        )
+                        return None
+                    dest.write_bytes(resp.content)
+                logger.debug("Cached art for %s → %s", card_name, dest)
+                return dest
+            except Exception:
+                logger.debug("Failed to fetch art for %s", card_name, exc_info=True)
+                return None
+            finally:
+                CardArtCache._last_request_time = time.monotonic()

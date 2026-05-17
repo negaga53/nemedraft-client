@@ -69,6 +69,7 @@ class OverlayWindow(QWidget):
     deck_suggestions_ready = Signal(dict, list, dict)  # dict[str, DeckSuggestion], list[str], scryfall_cards
     pick_history_ready = Signal(object)    # dict[(int,int), PickHistoryEntry]
     draft_complete_signal = Signal()       # switch to deck tab on UI thread
+    card_art_ready = Signal(str, object)   # card_name, Path | None — per-card art arrival
 
     def __init__(
         self,
@@ -112,6 +113,7 @@ class OverlayWindow(QWidget):
         self.deck_suggestions_ready.connect(self._on_deck_suggestions)
         self.pick_history_ready.connect(self._on_pick_history)
         self.draft_complete_signal.connect(self._on_draft_complete)
+        self.card_art_ready.connect(self._on_card_art_ready)
         self._show_status(tr("waiting_for_draft"))
 
         # Drag support — always enabled (frameless window).
@@ -467,6 +469,21 @@ class OverlayWindow(QWidget):
     def sync_pick_history(self, history: dict) -> None:
         """Thread-safe: push pick history to the pack tab."""
         self.pick_history_ready.emit(history)
+
+    def update_card_art(self, card_name: str, path) -> None:
+        """Thread-safe: push art for a single card to the pack tab.
+
+        Per-card updates are name-keyed and idempotent, so a worker that
+        finishes after the pack has advanced can still safely deliver
+        art for any card still on screen (most P1Px cards persist across
+        the pack).
+        """
+        self.card_art_ready.emit(card_name, path)
+
+    @Slot(str, object)
+    def _on_card_art_ready(self, card_name: str, path) -> None:
+        """Apply per-card art on the UI thread."""
+        self.pack_tab.update_card_art(card_name, path)
 
     @Slot(object)
     def _on_pick_history(self, history: dict) -> None:

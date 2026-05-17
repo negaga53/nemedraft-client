@@ -539,6 +539,29 @@ class PackTab(QWidget):
         """Store a reference to the :class:`CardArtCache` for on-demand art."""
         self._art_cache = art_cache
 
+    def update_card_art(self, card_name: str, path: Path | None) -> None:
+        """Apply newly fetched art to any visible row for *card_name*.
+
+        Called from the per-card prefetch path so thumbnails appear as
+        images arrive without rebuilding the whole row layout. The
+        ``_art_paths`` cache is updated unconditionally so subsequent
+        ``_render_picks`` calls (pack navigation, fresh pack) pick up
+        the path even when no row currently shows the card.
+        """
+        self._art_paths[card_name] = path
+        if path is None:
+            return
+        for i in range(self._card_layout.count() - 1):
+            item = self._card_layout.itemAt(i)
+            if item is None:
+                continue
+            w = item.widget()
+            if (
+                isinstance(w, CardRow)
+                and getattr(w, "_card_name", None) == card_name
+            ):
+                w.set_art(path)
+
     def set_scryfall(self, scryfall_cards: dict[str, ScryfallCard]) -> None:
         """Store Scryfall lookup for deck stat computation."""
         self._scryfall: dict[str, ScryfallCard] = scryfall_cards

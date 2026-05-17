@@ -170,6 +170,8 @@ class CardRow(QFrame):
         from client.overlay.ui.styles import card_row_bg, medal_color
         from client.overlay.i18n import card_name
 
+        # Stored so the pack tab can find this row when art lands later.
+        self._card_name = pick.card
         self._art_path = art_path
         # Desaturate the thumbnail visually on wheeled rows, but still render it.
         self._apply_art(art_path, dimmed=dimmed)
@@ -258,6 +260,16 @@ class CardRow(QFrame):
             self.setToolTip(" · ".join(tip_parts))
         else:
             self.setToolTip("")
+
+    def set_art(self, art_path: Path | None) -> None:
+        """Swap the row's thumbnail without rebuilding the whole row.
+
+        Used by the per-card art prefetch path so cards can pop in as
+        their images arrive without tearing down stats labels, tooltips,
+        or hover state.
+        """
+        self._art_path = art_path
+        self._apply_art(art_path)
 
     def _apply_art(self, art_path: Path | None, *, dimmed: bool = False) -> None:
         """Load and crop card art to the row art size, or show a neutral placeholder.

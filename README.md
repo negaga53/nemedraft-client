@@ -1,6 +1,6 @@
 # NemeDraft Client
 
-Open-source overlay client for [NemeDraft](https://nemedraft.snoozeweb.net), an AI-assisted MTG Arena draft pick predictor trained on 17Lands trophy data.
+Open-source overlay client for NemeDraft, an AI-assisted MTG Arena draft pick predictor trained on 17Lands trophy data.
 
 This repo holds the client-side code that runs on user machines:
 
@@ -11,7 +11,7 @@ The inference server lives on a remote server. The client does not run the model
 
 ## Model performance
 
-The model is a ~5.3M-parameter neural net trained on 17Lands trophy-deck data across six recent Standard sets. It learns to rank the cards in a pack by how a strong drafter would pick, given the cards already in the pool.
+The model is a ~5.3M-parameter neural net trained on 17Lands trophy-deck data across seven recent Standard sets. It learns to rank the cards in a pack by how a strong drafter would pick, given the cards already in the pool.
 
 Two numbers below: Top-1 is how often the model's first suggestion matches the human's actual pick. Top-3 is how often the human's pick is anywhere in the model's top three.
 
@@ -19,14 +19,15 @@ Held-out trophy results (picks the model never saw during training):
 
 | Set | Top-1 |
 |-----|-------|
-| TMT | 73.3% |
-| ECL | 70.4% |
-| EOE | 70.2% |
-| FDN | 68.7% |
-| FIN | 66.0% |
-| TLA | 64.8% |
+| FDN | 71.2% |
+| TMT | 70.9% |
+| ECL | 70.2% |
+| EOE | 69.9% |
+| TLA | 68.6% |
+| FIN | 65.7% |
+| SOS | 64.9% |
 
-Aggregate: 67.9% Top-1, 94.1% Top-3 across 117K test picks. These results can be considered state-of-the-art when comparing to any public version of this problem.
+Aggregate: 68.9% Top-1, 94.5% Top-3 across 128K test picks. These results can be considered state-of-the-art when comparing to any public version of this problem.
 
 The architecture and training code are not in this repo.
 
@@ -60,15 +61,6 @@ QT_QPA_PLATFORM=offscreen pytest tests/
 ## Server / privacy
 
 No raw game data is uploaded; only pack contents, pool contents, and pick number for the active draft.
-
-## Arena memory reading
-
-On Windows, the overlay reads Arena account identity and event lobby state directly from MTG Arena's process memory using `pymem` (read-only `OpenProcess` + `ReadProcessMemory`, no DLL injection). This replaces the previous external `mtga-tracker-daemon` sidecar.
-
-- Account identity (player ID, display name, persona ID) for automatic login.
-- Current event landing state including the internal event name, such as `PremierDraft_SOS_20260421`, so the overlay detects entering or exiting draft lobbies without relying on `Player.log`.
-
-`pymem` and `pefile` are installed automatically with `pip install -e ".[client]"` on Windows. On macOS / Linux the overlay falls back to log parsing for these signals.
 
 ## License
 

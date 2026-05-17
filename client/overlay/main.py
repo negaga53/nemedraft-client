@@ -993,6 +993,27 @@ class OverlayApp:
         self.state.draft_active = False
         self._draft_completed = True
         self.state.save_state(self._cache_dir)
+
+        # Push set context + art paths + pool analysis to the deck tab so
+        # it renders with full card previews. The normal post-draft flow
+        # accumulates these via PackEvent / prediction-response handlers;
+        # the memory-restore path has none of those signals, so we
+        # synthesise them here from the cached set data we just loaded.
+        if self.state.set_code:
+            self.window._draft_set_code = self.state.set_code
+            self.window.load_card_translations_async(self.state.set_code)
+
+        if self.art_cache.enabled:
+            art_paths = {name: self.art_cache.get(name) for name in self.state.pool}
+            self.window.deck_tab.set_art_paths(art_paths)
+
+        try:
+            from common.inference.pool_analyzer import analyze_pool
+            pool_analysis = analyze_pool(self.state.pool, self.scryfall_cards)
+            self.window.update_pool_analysis(pool_analysis)
+        except Exception:
+            logger.exception("Pool analysis failed during deck-pool restore")
+
         if self.config.features.deck_builder_enabled:
             self._update_deck_suggestions()
         self.window.show_draft_complete()

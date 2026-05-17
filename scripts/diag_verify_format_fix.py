@@ -66,20 +66,22 @@ def main() -> int:
             cmap = mgr.get_card_map(set_code, draft_format=fmt)
             _summarise(cmap, f"  {set_code}/{fmt}")
 
-    # And the spot-check against the original P1P1 pack.
-    cmap_qd = mgr.get_card_map("EOE", draft_format="QuickDraft")
-    if cmap_qd:
-        pack = ["Dark Endurance", "Gene Pollinator", "Wurmwall Sweeper",
-                "Flight-Deck Coordinator", "Nanoform Sentinel", "Rig for War",
-                "Cryogen Relic", "Sunstar Expansionist", "Kavaron Harrier",
-                "All-Fates Scroll", "Dubious Delicacy", "Blast Zone",
-                "Evendo, Waking Haven"]
-        print("\nP1P1 pack lookup via EOE/QuickDraft:")
-        for name in pack:
-            cr = cmap_qd.get(name)
-            ad = cr.deck_colors.get("All Decks", {}) if cr else {}
-            print(f"  {name!r:42s} gihwr={ad.get('gihwr', 0.0):.3f} "
-                  f"ata={ad.get('ata', 0.0):.2f}")
+    # And the spot-check against the original P1P1 pack, comparing
+    # direct QD lookup with the fallback ladder.
+    pack = ["Dark Endurance", "Gene Pollinator", "Wurmwall Sweeper",
+            "Flight-Deck Coordinator", "Nanoform Sentinel", "Rig for War",
+            "Cryogen Relic", "Sunstar Expansionist", "Kavaron Harrier",
+            "All-Fates Scroll", "Dubious Delicacy", "Blast Zone",
+            "Evendo, Waking Haven"]
+    print("\nP1P1 pack lookup via fallback ladder [QuickDraft, PremierDraft]:")
+    for name in pack:
+        stats, source = mgr.lookup_stats(
+            "EOE", name, formats=["QuickDraft", "PremierDraft"],
+        )
+        gihwr = stats.get("gihwr", 0.0)
+        ata = stats.get("ata", 0.0)
+        src_tag = f"({source})" if source else "(no data)"
+        print(f"  {name!r:42s} gihwr={gihwr:.3f} ata={ata:.2f} {src_tag}")
     return 0
 
 

@@ -1433,6 +1433,7 @@ class OverlayApp:
                         "type_line": p.type_line,
                         "is_elite": p.is_elite,
                         "stats_loaded": p.stats_loaded,
+                        "stats_format": p.stats_format,
                     }
                     for p in results
                 ],

@@ -156,6 +156,56 @@ class SetDataManager:
         with self._lock:
             return (set_code, fmt) in self._sets
 
+    def lookup_stats(
+        self,
+        set_code: str,
+        card_name: str,
+        *,
+        formats: list[str],
+        archetype: str = "All Decks",
+    ) -> tuple[dict[str, float], str]:
+        """Find usable 17Lands stats for *card_name*, trying *formats* in order.
+
+        The fallback ladder is **gihwr-driven**: the first format whose
+        bundle has ``gihwr > 0`` for *card_name* wins. When no format
+        has a usable gihwr, the first format whose bundle has *any*
+        signal (``ata > 0``) is returned as a last-resort estimate so
+        the player still sees an ATA — same source format, no
+        cross-format mixing.
+
+        Args:
+            set_code: Three-letter set code.
+            card_name: Exact name as keyed in the 17Lands ``card_ratings``
+                response.
+            formats: Format names to try, highest priority first
+                (e.g. ``["QuickDraft", "PremierDraft"]`` when the player
+                is on QuickDraft but PD has fuller data for some cards).
+            archetype: 17Lands archetype slice — almost always
+                ``"All Decks"``.
+
+        Returns:
+            ``(stats_dict, source_format)`` where ``source_format`` names
+            the format that supplied the data, or ``({}, "")`` when no
+            format had any signal for *card_name*.
+        """
+        ata_only: tuple[dict[str, float], str] | None = None
+        for fmt in formats:
+            with self._lock:
+                bundle = self._sets.get((set_code, fmt))
+            if not bundle:
+                continue
+            cr = bundle.card_map.get(card_name)
+            if not cr:
+                continue
+            stats = cr.deck_colors.get(archetype, {})
+            if stats.get("gihwr", 0.0) > 0.0:
+                return stats, fmt
+            if ata_only is None and stats.get("ata", 0.0) > 0.0:
+                ata_only = (stats, fmt)
+        if ata_only is not None:
+            return ata_only
+        return {}, ""
+
     def refresh_all(self) -> None:
         """Force a re-fetch of every cached *(set, format)* pair.
 

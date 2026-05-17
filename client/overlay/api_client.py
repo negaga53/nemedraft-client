@@ -29,6 +29,10 @@ class Pick:
     type_line: str = ""
     is_elite: bool = False
     stats_loaded: bool = True
+    # Empty when no usable 17Lands data was found. Set to the format
+    # whose bundle supplied gihwr/ata — may differ from the requested
+    # format when the fallback ladder kicked in.
+    stats_format: str = ""
 
 
 @dataclass
@@ -95,6 +99,7 @@ class NemeDraftClient:
                 type_line=p.get("type_line", ""),
                 is_elite=p.get("is_elite", False),
                 stats_loaded=p.get("stats_loaded", True),
+                stats_format=p.get("stats_format", ""),
             ))
         return picks
 

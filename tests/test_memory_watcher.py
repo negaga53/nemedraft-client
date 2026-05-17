@@ -92,3 +92,110 @@ def test_diff_emits_draft_complete_when_last_pack_empties():
                      picked_cards=(99,))
     events = _diff_snapshots(prev, curr)
     assert any(isinstance(e, DraftCompleteEvent) for e in events)
+
+
+# ---------------------------------------------------------------------------
+# SetDataManager.lookup_stats fallback ladder
+# ---------------------------------------------------------------------------
+
+class _StubBundle:
+    """Minimal stand-in for ``_SetBundle`` — only ``card_map`` is read."""
+
+    def __init__(self, card_map):
+        self.card_map = card_map
+
+
+class _StubCardRatings:
+    def __init__(self, stats):
+        self.deck_colors = {"All Decks": stats}
+
+
+def _make_mgr_with_bundles(bundles):
+    """Build a SetDataManager and inject pre-fabricated bundles."""
+    from unittest.mock import patch
+    from common.data.set_data_manager import SetDataManager
+
+    # Patch __init__'s file-read so we don't need a card_id_map.
+    with patch.object(SetDataManager, "__init__", lambda self: None):
+        mgr = SetDataManager()  # type: ignore[call-arg]
+    mgr._lock = __import__("threading").Lock()
+    mgr._sets = bundles
+    mgr._default_draft_format = "PremierDraft"
+    return mgr
+
+
+def test_lookup_stats_returns_primary_when_gihwr_present():
+    mgr = _make_mgr_with_bundles({
+        ("EOE", "QuickDraft"): _StubBundle({
+            "Foo": _StubCardRatings({"gihwr": 0.55, "ata": 4.0, "iwd": 0.01}),
+        }),
+        ("EOE", "PremierDraft"): _StubBundle({
+            "Foo": _StubCardRatings({"gihwr": 0.62, "ata": 3.0, "iwd": 0.05}),
+        }),
+    })
+    stats, source = mgr.lookup_stats(
+        "EOE", "Foo", formats=["QuickDraft", "PremierDraft"],
+    )
+    assert source == "QuickDraft"
+    assert stats["gihwr"] == 0.55  # primary wins, no fallback
+
+
+def test_lookup_stats_falls_back_when_primary_has_no_gihwr():
+    mgr = _make_mgr_with_bundles({
+        ("EOE", "QuickDraft"): _StubBundle({
+            "Foo": _StubCardRatings({"gihwr": 0.0, "ata": 0.0, "iwd": 0.0}),
+        }),
+        ("EOE", "PremierDraft"): _StubBundle({
+            "Foo": _StubCardRatings({"gihwr": 0.62, "ata": 3.0, "iwd": 0.05}),
+        }),
+    })
+    stats, source = mgr.lookup_stats(
+        "EOE", "Foo", formats=["QuickDraft", "PremierDraft"],
+    )
+    assert source == "PremierDraft"
+    assert stats["gihwr"] == 0.62
+
+
+def test_lookup_stats_returns_ata_only_when_no_gihwr_anywhere():
+    """Card with ATA but no GIHWR in primary stays in primary — no
+    cross-format mixing of ATA values."""
+    mgr = _make_mgr_with_bundles({
+        ("EOE", "QuickDraft"): _StubBundle({
+            "Foo": _StubCardRatings({"gihwr": 0.0, "ata": 11.08, "iwd": 0.0}),
+        }),
+        ("EOE", "PremierDraft"): _StubBundle({
+            "Foo": _StubCardRatings({"gihwr": 0.0, "ata": 0.0, "iwd": 0.0}),
+        }),
+    })
+    stats, source = mgr.lookup_stats(
+        "EOE", "Foo", formats=["QuickDraft", "PremierDraft"],
+    )
+    assert source == "QuickDraft"
+    assert stats["gihwr"] == 0.0
+    assert stats["ata"] == 11.08
+
+
+def test_lookup_stats_returns_empty_when_card_missing_everywhere():
+    mgr = _make_mgr_with_bundles({
+        ("EOE", "QuickDraft"): _StubBundle({}),
+        ("EOE", "PremierDraft"): _StubBundle({}),
+    })
+    stats, source = mgr.lookup_stats(
+        "EOE", "Foo", formats=["QuickDraft", "PremierDraft"],
+    )
+    assert stats == {}
+    assert source == ""
+
+
+def test_lookup_stats_skips_format_with_no_bundle():
+    mgr = _make_mgr_with_bundles({
+        ("EOE", "PremierDraft"): _StubBundle({
+            "Foo": _StubCardRatings({"gihwr": 0.6, "ata": 3.0}),
+        }),
+    })
+    # QuickDraft bundle not loaded — should skip silently to PremierDraft.
+    stats, source = mgr.lookup_stats(
+        "EOE", "Foo", formats=["QuickDraft", "PremierDraft"],
+    )
+    assert source == "PremierDraft"
+    assert stats["gihwr"] == 0.6

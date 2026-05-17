@@ -250,6 +250,11 @@ class CardRow(QFrame):
                 tip_parts.append(f"ATA: {pick.ata:.1f}")
             if pick.iwd != 0:
                 tip_parts.append(f"IWD: {pick.iwd:+.1f}pp")
+            # Surface the source format when stats came from the fallback
+            # bundle, so the player knows the numbers aren't from the
+            # format they're actually drafting.
+            if pick.stats_format:
+                tip_parts.append(f"src: {pick.stats_format}")
             self.setToolTip(" · ".join(tip_parts))
         else:
             self.setToolTip("")

@@ -394,6 +394,7 @@ class PackTab(QWidget):
                 type_line=d.get("type_line", ""),
                 is_elite=d.get("is_elite", False),
                 stats_loaded=d.get("stats_loaded", True),
+                stats_format=d.get("stats_format", ""),
             ))
 
         self._render_picks(picks, highlight_card=entry.picked_card)

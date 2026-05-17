@@ -481,6 +481,11 @@ class OverlayApp:
         # re-dispatch with the original replaying flag — otherwise the queued
         # events get treated as live after the watcher flips out of replay.
         self._pending_events: list[tuple[DraftEvent, bool]] = []
+        # Deferred DeckPoolDetectedEvent — survives DraftEnd's
+        # _pending_events.clear() because it represents the *current*
+        # MTGA deck-builder state, not a queued log-replay event we want
+        # to drop. Applied on the next _on_set_data_ready.
+        self._deferred_deck_pool: DeckPoolDetectedEvent | None = None
 
         # Server retry state.
         self._retry_timer = QTimer()
@@ -914,6 +919,84 @@ class OverlayApp:
                 self._recent_event_signatures.pop(sig, None)
             self._on_event(event, replaying)
 
+        # A DeckPoolDetectedEvent that arrived before set data was ready
+        # is stashed separately because DraftEnd's _pending_events.clear()
+        # would otherwise drop it (the log replay's DraftEnd lands before
+        # _on_set_data_ready and discards the queue). Apply it here now
+        # that the mapper has the grpId→name mappings to resolve the pool.
+        # ``getattr`` shields the path tested via OverlayApp.__new__ —
+        # those tests skip __init__ and don't set this attribute.
+        deferred = getattr(self, "_deferred_deck_pool", None)
+        if deferred is not None:
+            self._deferred_deck_pool = None
+            if not self.state.pool:
+                self._apply_deck_pool(deferred)
+
+    def _handle_deck_pool_detected(self, event: DeckPoolDetectedEvent) -> None:
+        """Dispatch a memory-detected deck pool, deferring until ready.
+
+        When set data hasn't loaded yet the mapper has no grpId→name
+        entries for the active set and an immediate ``grpids_to_names``
+        call would spam "Unknown Arena grpId" warnings and bail with
+        empty names — losing the only signal we have for restoring the
+        pool. Stash the event in ``_deferred_deck_pool`` and apply it
+        once ``_on_set_data_ready`` fires.
+        """
+        if self.state.draft_active or self.state.pool:
+            logger.debug(
+                "Ignoring DeckPoolDetectedEvent — pool already known "
+                "(active=%s size=%d)",
+                self.state.draft_active, len(self.state.pool),
+            )
+            return
+
+        # Kick off (or pre-kick) set data load using the event name when
+        # nothing else has triggered it yet — typical at overlay startup
+        # straight into the deck-builder.
+        if event.event_name and not self._loaded_set:
+            from client.overlay.draft_state import extract_set_code
+            code = extract_set_code(event.event_name)
+            if code:
+                self._ensure_set_data(code)
+
+        if not self._set_data_ready:
+            self._deferred_deck_pool = event
+            logger.info(
+                "Deferred DeckPoolDetectedEvent (event=%s, ids=%d) — "
+                "waiting for set data",
+                event.event_name, len(event.card_grpids),
+            )
+            return
+
+        self._apply_deck_pool(event)
+
+    def _apply_deck_pool(self, event: DeckPoolDetectedEvent) -> None:
+        """Restore ``state.pool`` from a memory-detected deck pool.
+
+        Pre-condition: ``_set_data_ready`` is True so the mapper can
+        resolve grpIds → names without spamming warnings.
+        """
+        names = self.mapper.grpids_to_names(event.card_grpids)
+        if not names:
+            logger.warning(
+                "DeckPoolDetectedEvent: no grpIds mapped to names "
+                "(event=%s, ids=%d)", event.event_name, len(event.card_grpids),
+            )
+            return
+        logger.info(
+            "DeckPoolDetectedEvent: restoring pool of %d cards from "
+            "memory (event=%s)", len(names), event.event_name,
+        )
+        if event.event_name and not self.state.set_code:
+            self.state.on_draft_start(event.event_name)
+        self.state.pool = names
+        self.state.draft_active = False
+        self._draft_completed = True
+        self.state.save_state(self._cache_dir)
+        if self.config.features.deck_builder_enabled:
+            self._update_deck_suggestions()
+        self.window.show_draft_complete()
+
     def _on_login_google(self) -> None:
         """Handle Google login button click (runs OAuth in background thread)."""
         self._do_login("google")
@@ -1068,49 +1151,7 @@ class OverlayApp:
             return
 
         if isinstance(event, DeckPoolDetectedEvent):
-            # MTGA's deck-builder is showing a finished draft. Used when
-            # the player re-opens the game after a restart (Player.log
-            # rotated, on-disk cache empty / stale) — memory still holds
-            # the CourseData.CardPool so the deck tab can be repopulated.
-            if self.state.draft_active or self.state.pool:
-                # Either we're still mid-draft (shouldn't happen if memory
-                # reads the deck-builder content controller — guard
-                # anyway) or the pool is already populated from this
-                # session's pick events.
-                logger.debug(
-                    "Ignoring DeckPoolDetectedEvent — pool already known "
-                    "(active=%s size=%d)",
-                    self.state.draft_active, len(self.state.pool),
-                )
-                return
-            names = self.mapper.grpids_to_names(event.card_grpids)
-            if not names:
-                logger.warning(
-                    "DeckPoolDetectedEvent: no grpIds mapped to names "
-                    "(event=%s, ids=%d)", event.event_name, len(event.card_grpids),
-                )
-                return
-            logger.info(
-                "DeckPoolDetectedEvent: restoring pool of %d cards from "
-                "memory (event=%s)", len(names), event.event_name,
-            )
-            # Synthesize a minimal draft start so the rest of the overlay
-            # plumbing (set_code, draft_completed flag, deck tab) lights
-            # up consistently with the normal post-draft flow.
-            if event.event_name and not self.state.set_code:
-                self.state.on_draft_start(event.event_name)
-            self.state.pool = names
-            self.state.draft_active = False
-            self._draft_completed = True
-            # Ensure set data is loaded so deck suggestions can resolve
-            # card metadata. Memory-restored pools land before any other
-            # draft trigger, so this is often the first set-load request.
-            if self.state.set_code:
-                self._ensure_set_data(self.state.set_code)
-            self.state.save_state(self._cache_dir)
-            if self.config.features.deck_builder_enabled:
-                self._update_deck_suggestions()
-            self.window.show_draft_complete()
+            self._handle_deck_pool_detected(event)
             return
 
         if isinstance(event, ReplayDoneEvent):

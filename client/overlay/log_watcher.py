@@ -42,6 +42,12 @@ def _candidate_log_paths() -> list[str]:
             )
     elif _sys.platform == "darwin":
         # macOS: Wine / CrossOver / Game Porting Toolkit / native (if ever)
+        # Unity's default Player.log location on macOS — most third-party
+        # MTGA tools cite this path for native/GPTK installs.
+        candidates.append(
+            str(home / "Library" / "Logs"
+                / "Wizards Of The Coast" / "MTGA" / CURRENT_LOG)
+        )
         candidates.append(
             str(home / "Library" / "Application Support"
                 / "com.wizards.mtga" / CURRENT_LOG)

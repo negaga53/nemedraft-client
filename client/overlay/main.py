@@ -527,6 +527,15 @@ class OverlayApp:
         self._health_timer.start()
         self._login_worker: QThread | None = None
 
+        # Ref-keeper for arena memory-poll workers. Same rationale as
+        # _inflight_set_workers above: the per-poll single-slot pointer can
+        # be cleared by the _on_..._done slot while the worker's run() is
+        # still finishing on macOS, dropping the last Python ref and
+        # triggering ~QThread on a still-running thread (qFatal → abort).
+        # Discard only when the QThread's own `finished` signal fires —
+        # that fires after run() has fully returned.
+        self._inflight_arena_workers: set[QThread] = set()
+
         # If the overlay starts before Arena, keep trying once Arena appears.
         self._arena_identity_worker: _ArenaIdentityWorker | None = None
         self._arena_identity_timer = QTimer()
@@ -590,7 +599,9 @@ class OverlayApp:
 
         worker = _ArenaIdentityWorker()
         worker.finished_identity.connect(self._on_arena_identity_retry_done)
+        worker.finished.connect(lambda w=worker: self._inflight_arena_workers.discard(w))
         worker.finished.connect(worker.deleteLater)
+        self._inflight_arena_workers.add(worker)
         self._arena_identity_worker = worker
         worker.start()
 
@@ -656,7 +667,9 @@ class OverlayApp:
 
         worker = _ArenaCurrentEventWorker()
         worker.finished_event.connect(self._on_arena_current_event_done)
+        worker.finished.connect(lambda w=worker: self._inflight_arena_workers.discard(w))
         worker.finished.connect(worker.deleteLater)
+        self._inflight_arena_workers.add(worker)
         self._arena_current_event_worker = worker
         worker.start()
 

@@ -103,6 +103,10 @@ class AuthClient:
         """Initiate Microsoft OAuth via Supabase — opens the system browser."""
         return self._oauth_login("azure")
 
+    def login_discord(self) -> ServerSession | None:
+        """Initiate Discord OAuth via Supabase — opens the system browser."""
+        return self._oauth_login("discord")
+
     def _oauth_login(self, provider: str) -> ServerSession | None:
         """Run the full OAuth flow for *provider*.
 
@@ -130,6 +134,12 @@ class AuthClient:
         # a valid email address from Microsoft Entra ID.
         if provider == "azure":
             auth_url += "&scopes=email"
+
+        # Discord's default scope via Supabase is 'identify' only — the
+        # 'email' scope must be requested explicitly to populate the
+        # email claim that the overlay UI and /api/login both rely on.
+        if provider == "discord":
+            auth_url += "&scopes=identify+email"
 
         # Holder for the result from the callback handler
         result: dict = {}

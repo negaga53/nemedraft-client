@@ -148,14 +148,15 @@ class HomeTab(QWidget):
     - Whether the Arena Player.log exists (log file check).
     - Whether the NemeDraft server is reachable and the user is authenticated.
 
-    Emits :attr:`login_google_requested` / :attr:`login_microsoft_requested`
-    when the user clicks a sign-in button, and :attr:`logout_requested` when
-    they click "Log out".  The parent app should connect these to the
-    :class:`overlay.auth_client.AuthClient`.
+    Emits :attr:`login_google_requested` / :attr:`login_microsoft_requested` /
+    :attr:`login_discord_requested` when the user clicks a sign-in button, and
+    :attr:`logout_requested` when they click "Log out".  The parent app should
+    connect these to the :class:`overlay.auth_client.AuthClient`.
     """
 
     login_google_requested = Signal()
     login_microsoft_requested = Signal()
+    login_discord_requested = Signal()
     logout_requested = Signal()
     simulator_detected = Signal(str)
 
@@ -230,6 +231,12 @@ class HomeTab(QWidget):
         self._microsoft_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._microsoft_btn.clicked.connect(self.login_microsoft_requested.emit)
         login_layout.addWidget(self._microsoft_btn)
+
+        self._discord_btn = QPushButton("  " + tr("home_login_discord"))
+        self._discord_btn.setStyleSheet(_BTN_STYLE % ("#5865F2", "#4752C4"))
+        self._discord_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._discord_btn.clicked.connect(self.login_discord_requested.emit)
+        login_layout.addWidget(self._discord_btn)
 
         self._login_error = QLabel("")
         self._login_error.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -378,6 +385,7 @@ class HomeTab(QWidget):
         """Enable or disable login buttons (e.g. while login is in progress)."""
         self._google_btn.setEnabled(enabled)
         self._microsoft_btn.setEnabled(enabled)
+        self._discord_btn.setEnabled(enabled)
 
     def retranslate(self) -> None:
         """Refresh all labels after a language change."""
@@ -387,6 +395,7 @@ class HomeTab(QWidget):
         self._login_prompt.setText(tr("home_login_prompt"))
         self._google_btn.setText("  " + tr("home_login_google"))
         self._microsoft_btn.setText("  " + tr("home_login_microsoft"))
+        self._discord_btn.setText("  " + tr("home_login_discord"))
         self._logout_btn.setText(tr("home_logout_btn"))
         self._arena_row.retranslate()
         self._log_row.retranslate()

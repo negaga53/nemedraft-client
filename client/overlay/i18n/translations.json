@@ -41,6 +41,7 @@
     "home_login_prompt": "Sign in to continue",
     "home_login_google": "Sign in with Google",
     "home_login_microsoft": "Sign in with Microsoft",
+    "home_login_discord": "Sign in with Discord",
     "home_logout_btn": "Log out",
 
     "col_rank": "#",
@@ -157,6 +158,7 @@
     "home_login_prompt": "Connectez-vous pour continuer",
     "home_login_google": "Se connecter avec Google",
     "home_login_microsoft": "Se connecter avec Microsoft",
+    "home_login_discord": "Se connecter avec Discord",
     "home_logout_btn": "Se déconnecter",
 
     "col_rank": "#",
@@ -273,6 +275,7 @@
     "home_login_prompt": "Inicia sesión para continuar",
     "home_login_google": "Iniciar sesión con Google",
     "home_login_microsoft": "Iniciar sesión con Microsoft",
+    "home_login_discord": "Iniciar sesión con Discord",
     "home_logout_btn": "Cerrar sesión",
 
     "col_rank": "#",
@@ -389,6 +392,7 @@
     "home_login_prompt": "Melde dich an, um fortzufahren",
     "home_login_google": "Mit Google anmelden",
     "home_login_microsoft": "Mit Microsoft anmelden",
+    "home_login_discord": "Mit Discord anmelden",
     "home_logout_btn": "Abmelden",
 
     "col_rank": "#",
@@ -505,6 +509,7 @@
     "home_login_prompt": "Inicie sessão para continuar",
     "home_login_google": "Entrar com Google",
     "home_login_microsoft": "Entrar com Microsoft",
+    "home_login_discord": "Entrar com Discord",
     "home_logout_btn": "Sair",
 
     "col_rank": "#",
@@ -621,6 +626,7 @@
     "home_login_prompt": "Accedi per continuare",
     "home_login_google": "Accedi con Google",
     "home_login_microsoft": "Accedi con Microsoft",
+    "home_login_discord": "Accedi con Discord",
     "home_logout_btn": "Esci",
 
     "col_rank": "#",
@@ -737,6 +743,7 @@
     "home_login_prompt": "続行するにはサインインしてください",
     "home_login_google": "Google でサインイン",
     "home_login_microsoft": "Microsoft でサインイン",
+    "home_login_discord": "Discord でサインイン",
     "home_logout_btn": "ログアウト",
 
     "col_rank": "#",
@@ -852,6 +859,7 @@
     "home_login_prompt": "계속하려면 로그인하세요",
     "home_login_google": "Google로 로그인",
     "home_login_microsoft": "Microsoft로 로그인",
+    "home_login_discord": "Discord로 로그인",
     "home_logout_btn": "로그아웃",
 
     "col_rank": "#",
@@ -967,6 +975,7 @@
     "home_login_prompt": "请登录以继续",
     "home_login_google": "使用 Google 登录",
     "home_login_microsoft": "使用 Microsoft 登录",
+    "home_login_discord": "使用 Discord 登录",
     "home_logout_btn": "退出登录",
 
     "col_rank": "#",

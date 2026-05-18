@@ -516,6 +516,7 @@ class OverlayApp:
         home = self.window.pack_tab.home_widget
         home.login_google_requested.connect(self._on_login_google)
         home.login_microsoft_requested.connect(self._on_login_microsoft)
+        home.login_discord_requested.connect(self._on_login_discord)
         home.logout_requested.connect(self._on_logout)
         home.simulator_detected.connect(self._on_simulator_detected)
 
@@ -1026,6 +1027,10 @@ class OverlayApp:
         """Handle Microsoft login button click."""
         self._do_login("microsoft")
 
+    def _on_login_discord(self) -> None:
+        """Handle Discord login button click."""
+        self._do_login("discord")
+
     def _do_login(self, provider: str) -> None:
         """Run OAuth in a background thread to avoid blocking the UI."""
         # Cancel any in-flight login first
@@ -1049,6 +1054,8 @@ class OverlayApp:
                 try:
                     if self._provider == "google":
                         session = self._auth.login_google()
+                    elif self._provider == "discord":
+                        session = self._auth.login_discord()
                     else:
                         session = self._auth.login_microsoft()
                     self.finished.emit(session)

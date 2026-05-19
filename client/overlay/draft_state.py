@@ -149,6 +149,10 @@ class DraftState:
     _prev_pack_number: int = -1
     _prev_pick_number: int = -1
 
+    # Card the player most recently picked. Consumed by the next /api/predict
+    # call so the server can backfill draft-history rows with the actual pick.
+    last_pick: str | None = None
+
     def on_draft_start(self, event_name: str) -> None:
         """Called when the player joins a draft event."""
         same_event = event_name == self.event_name and event_name
@@ -208,6 +212,7 @@ class DraftState:
         # Remove from current pack if present
         if card_name in self.current_pack:
             self.current_pack.remove(card_name)
+        self.last_pick = card_name
         logger.info(
             "Picked: %s (pool size: %d)", card_name, len(self.pool)
         )
@@ -221,6 +226,7 @@ class DraftState:
         self.current_pack.clear()
         self.pool.clear()
         self.seen_cards.clear()
+        self.last_pick = None
         self._prev_pack.clear()
         self._prev_pack_number = -1
         self._prev_pick_number = -1

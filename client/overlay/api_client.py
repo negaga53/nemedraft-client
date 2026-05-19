@@ -69,8 +69,14 @@ class NemeDraftClient:
         pick_number: int = 0,
         *,
         draft_format: str = "",
+        last_pick: str | None = None,
     ) -> list[Pick]:
-        """Call ``POST /api/predict`` and return ranked picks."""
+        """Call ``POST /api/predict`` and return ranked picks.
+
+        ``last_pick`` is the card the player chose from the *previous*
+        pack/pick (or ``None`` at P1P1 / after a fresh login). The server
+        uses it to backfill draft-history rows with the actual pick.
+        """
         body: dict = {
             "pack_cards": pack_cards,
             "pool_cards": pool_cards,
@@ -80,6 +86,8 @@ class NemeDraftClient:
         }
         if draft_format:
             body["draft_format"] = draft_format
+        if last_pick is not None:
+            body["last_pick"] = last_pick
         data = self._authed_request("POST", "/api/predict", json=body, timeout=5)
         if data is None:
             return []

@@ -1561,6 +1561,7 @@ class OverlayApp:
                 pack_number=self.state.pack_number,
                 pick_number=self.state.pick_number,
                 draft_format=self._draft_format(),
+                last_pick=self.state.last_pick,
             )
             if not results:
                 logger.warning(

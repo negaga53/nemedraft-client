@@ -814,11 +814,25 @@ class OverlayApp:
         if authed and reachable and self.auth_client.session is not None:
             info = self.api_client.fetch_user_info()
             if info is not None and info.is_vip != self.auth_client.session.is_vip:
+                old_is_vip = self.auth_client.session.is_vip
+                # /api/me reflects the live DB value, but the JWT in
+                # session.token has is_vip baked in at login time —
+                # /api/predict trusts the JWT claim, so a mid-session
+                # VIP promotion (or revocation) leaves the gate stale
+                # until the JWT is re-issued. Refresh now so the next
+                # predict call sees the new claim.
+                refreshed = self.auth_client.refresh()
+                if refreshed is None:
+                    # No refresh token, or Supabase/server unreachable:
+                    # mirror the value locally so the home tab UI is
+                    # accurate, but the JWT stays stale and predict will
+                    # keep being rejected until the user signs in again.
+                    self.auth_client.session.is_vip = info.is_vip
                 logger.info(
-                    "VIP status changed: %s -> %s",
-                    self.auth_client.session.is_vip, info.is_vip,
+                    "VIP status changed: %s -> %s (jwt refresh: %s)",
+                    old_is_vip, self.auth_client.session.is_vip,
+                    "ok" if refreshed else "failed",
                 )
-                self.auth_client.session.is_vip = info.is_vip
 
         email = self.auth_client.user_email
         is_vip = (

@@ -48,6 +48,17 @@ def _candidate_log_paths() -> list[str]:
             str(home / "Library" / "Logs"
                 / "Wizards Of The Coast" / "MTGA" / CURRENT_LOG)
         )
+        # Wizards' macOS support docs and Epic/native installs place the
+        # log under the app-support bundle with a duplicated Logs/Logs
+        # segment.
+        candidates.append(
+            str(home / "Library" / "Application Support"
+                / "com.wizards.mtga" / "Logs" / "Logs" / CURRENT_LOG)
+        )
+        candidates.append(
+            str(home / "Library" / "Application Support"
+                / "com.wizards.mtga" / "Logs" / CURRENT_LOG)
+        )
         candidates.append(
             str(home / "Library" / "Application Support"
                 / "com.wizards.mtga" / CURRENT_LOG)

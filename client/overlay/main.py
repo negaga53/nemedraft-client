@@ -43,6 +43,7 @@ from client.overlay.log_watcher import (
     PackEvent,
     PickEvent,
     ReplayDoneEvent,
+    extract_arena_player_id,
     is_arena_running,
 )
 from client.overlay.memory.platform import is_memory_supported
@@ -124,6 +125,34 @@ class _BootResult:
     has_arena_player_id: bool
 
 
+@dataclass(frozen=True)
+class _ArenaIdentityResolution:
+    """Arena player identity resolved from memory or Player.log."""
+
+    player_id: str
+    source: str
+    display_name: str = ""
+
+
+def _resolve_arena_identity() -> _ArenaIdentityResolution | None:
+    """Resolve the Arena player ID from the best available local source."""
+    arena_identity = get_arena_player_identity()
+    if arena_identity is not None:
+        player_id = arena_identity.player_id.strip()
+        if player_id:
+            return _ArenaIdentityResolution(
+                player_id=player_id,
+                source="memory",
+                display_name=arena_identity.display_name.strip(),
+            )
+
+    log_player_id = (extract_arena_player_id() or "").strip()
+    if log_player_id:
+        return _ArenaIdentityResolution(player_id=log_player_id, source="log")
+
+    return None
+
+
 class _BootWorker(QThread):
     """Loads minimal resources off the UI thread.
 
@@ -171,14 +200,17 @@ class _BootWorker(QThread):
             # 3. Auth + API client ------------------------------------------
             self.progress.emit("Connecting to server...")
             arena_player_id = ""
-            arena_identity = get_arena_player_identity()
+            arena_identity = _resolve_arena_identity()
             if arena_identity:
                 arena_player_id = arena_identity.player_id
-                logger.info(
-                    "Arena player ID from memory: %s (display=%s)",
-                    arena_player_id,
-                    arena_identity.display_name or "unknown",
-                )
+                if arena_identity.source == "memory":
+                    logger.info(
+                        "Arena player ID from memory: %s (display=%s)",
+                        arena_player_id,
+                        arena_identity.display_name or "unknown",
+                    )
+                else:
+                    logger.info("Arena player ID from Player.log: %s", arena_player_id)
                 save_arena_player_id(arena_player_id)
             else:
                 arena_player_id = os.getenv("ARENA_PLAYER_ID", "") or ""
@@ -189,7 +221,7 @@ class _BootWorker(QThread):
                     )
                 else:
                     logger.warning(
-                        "Arena player ID not found via MTGA memory reader "
+                        "Arena player ID not found via MTGA memory or Player.log "
                         "- sign-in will be unavailable"
                     )
             auth_client = AuthClient(self._env, arena_player_id=arena_player_id)
@@ -292,13 +324,13 @@ class _SetDataWorker(QThread):
 
 
 class _ArenaIdentityWorker(QThread):
-    """Reads Arena identity from memory without blocking the UI thread."""
+    """Reads Arena identity from local sources without blocking the UI thread."""
 
     finished_identity = Signal(object)  # ArenaPlayerIdentity | None
 
     def run(self) -> None:  # noqa: D401
         try:
-            self.finished_identity.emit(get_arena_player_identity())
+            self.finished_identity.emit(_resolve_arena_identity())
         except Exception:
             logger.debug("Arena memory identity retry failed", exc_info=True)
             self.finished_identity.emit(None)
@@ -588,7 +620,7 @@ class OverlayApp:
     _IDENTITY_REATTACH_AFTER = 3
 
     def _retry_arena_identity(self) -> None:
-        """Retry the memory-backed player ID lookup after Arena starts."""
+        """Retry the Arena player ID lookup after Arena starts."""
         if self._has_arena_player_id:
             self._arena_identity_timer.stop()
             return
@@ -615,25 +647,25 @@ class OverlayApp:
             None.
         """
         self._arena_identity_worker = None
-        if not isinstance(identity, ArenaPlayerIdentity):
-            self._on_identity_read_failed()
-            return
-
-        player_id = identity.player_id.strip()
-        if not player_id:
+        if not isinstance(identity, _ArenaIdentityResolution):
             self._on_identity_read_failed()
             return
 
         logger.info(
-            "Arena player ID discovered after startup: %s (display=%s)",
-            player_id,
-            identity.display_name or "unknown",
+            "Arena player ID discovered after startup from %s: %s%s",
+            identity.source,
+            identity.player_id,
+            (
+                f" (display={identity.display_name or 'unknown'})"
+                if identity.source == "memory"
+                else ""
+            ),
         )
         self._has_arena_player_id = True
         self._identity_failure_count = 0
         self._arena_identity_timer.stop()
-        save_arena_player_id(player_id)
-        self.auth_client.set_arena_player_id(player_id)
+        save_arena_player_id(identity.player_id)
+        self.auth_client.set_arena_player_id(identity.player_id)
         if self.auth_client.try_auto_login():
             logger.info("Auto-login succeeded after Arena identity retry")
         self._poll_server_status()

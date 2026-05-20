@@ -183,6 +183,14 @@ class MemoryWatcher:
                 logger.exception("MemoryWatcher callback raised on %s", type(event).__name__)
 
 
+_MAX_PACK = 2  # 3-pack draft, 0-indexed
+_MAX_PICK = 14  # 15-card pack, 0-indexed
+
+
+def _is_valid_position(snap: _DraftSnapshot) -> bool:
+    return 0 <= snap.pack_number <= _MAX_PACK and 0 <= snap.pick_number <= _MAX_PICK
+
+
 def _diff_snapshots(
     prev: _DraftSnapshot | None, curr: _DraftSnapshot
 ) -> list[DraftEvent]:
@@ -197,6 +205,20 @@ def _diff_snapshots(
         return events  # nothing else meaningful when leaving a draft
 
     if not curr.is_active:
+        return events
+
+    # Drop phantom frames where Arena reports pack/pick outside the 3-pack,
+    # 15-card envelope. These appear at draft boundaries (e.g. memory shows
+    # `_currentPack=3` transiently when the draft completes) and otherwise
+    # pollute the DB with rows like Pack 4. If this triggers frequently
+    # for a real draft, the upstream memory walker likely needs to
+    # normalise the indexing (Arena's `_currentPack`/`_currentPick` may
+    # be 1-indexed in some game versions).
+    if not _is_valid_position(curr):
+        logger.debug(
+            "MemoryWatcher: dropping phantom frame pack=%d pick=%d",
+            curr.pack_number, curr.pick_number,
+        )
         return events
 
     pack_changed = (

@@ -426,7 +426,25 @@ class LogWatcher:
 
     # -- internals -----------------------------------------------------------
 
+    _MAX_PACK = 2  # 3-pack draft, 0-indexed
+    _MAX_PICK = 14  # 15-card pack, 0-indexed
+
     def _emit(self, event: DraftEvent) -> None:
+        # Phantom-frame filter for PackEvent/PickEvent. Arena log paths
+        # disagree on indexing at draft boundaries (bot draft `PackNumber`
+        # is 0-indexed; human draft `SelfPack` sometimes emits values
+        # beyond the 3-pack envelope at draft end). Drop frames outside
+        # the valid range so downstream consumers (DraftLogger,
+        # OverlayPredictor) don't record bogus "Pack 4" rows.
+        pack = getattr(event, "pack_number", None)
+        pick = getattr(event, "pick_number", None)
+        if isinstance(pack, int) and isinstance(pick, int):
+            if not (0 <= pack <= self._MAX_PACK and 0 <= pick <= self._MAX_PICK):
+                logger.debug(
+                    "LogWatcher: dropping out-of-range %s pack=%d pick=%d",
+                    type(event).__name__, pack, pick,
+                )
+                return
         for cb in self._callbacks:
             try:
                 cb(event)

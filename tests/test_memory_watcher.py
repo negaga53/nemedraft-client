@@ -197,6 +197,30 @@ def test_diff_emits_draft_complete_when_last_pack_empties():
     assert any(isinstance(e, DraftCompleteEvent) for e in events)
 
 
+def test_diff_drops_phantom_pack_above_two():
+    """Pack indices in a 3-pack draft are 0..2. Frames with pack_number=3
+    (or higher) are phantom — they pollute the DB with "Pack 4" rows.
+    The diff should suppress events from these frames."""
+    prev = _snapshot(pack_number=2, pick_number=10)
+    curr = _snapshot(pack_number=3, pick_number=0, current_pack=(1, 2, 3))
+    assert _diff_snapshots(prev, curr) == []
+
+
+def test_diff_drops_phantom_pick_above_fourteen():
+    """A 15-card pack has pick_numbers 0..14. Anything past 14 is phantom."""
+    prev = _snapshot(pack_number=1, pick_number=14)
+    curr = _snapshot(pack_number=1, pick_number=15, current_pack=(1,))
+    assert _diff_snapshots(prev, curr) == []
+
+
+def test_diff_drops_negative_position():
+    """Negative pack/pick = read failure (e.g. memory walk returned -1).
+    Don't emit events from sentinel positions."""
+    prev = _snapshot(pack_number=0, pick_number=0)
+    curr = _snapshot(pack_number=-1, pick_number=0, current_pack=(1, 2, 3))
+    assert _diff_snapshots(prev, curr) == []
+
+
 # ---------------------------------------------------------------------------
 # SetDataManager.lookup_stats fallback ladder
 # ---------------------------------------------------------------------------

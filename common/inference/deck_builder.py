@@ -28,6 +28,11 @@ MIN_NONCREATURES = 6
 # the pool already contains a fixing source for that splash colour.
 MAX_SPLASH_CARDS = 2
 
+# Alternative archetypes with fewer playables than this are dropped from
+# the dropdown — they fill out as 35+ lands and are noise next to a real
+# build. The top suggestion is kept regardless so the UI is never empty.
+_PLAYABLE_FLOOR = 14
+
 
 @dataclass
 class DeckSuggestion:
@@ -355,7 +360,20 @@ def suggest_decks(
     if not ordered:
         return ordered
     top_score = next(iter(ordered.values())).score
-    return {k: v for k, v in ordered.items() if v.score >= top_score - 20.0}
+    score_filtered = {k: v for k, v in ordered.items() if v.score >= top_score - 20.0}
+    # Secondary filter: a deck with fewer than _PLAYABLE_FLOOR spells in
+    # main_deck is mostly lands (target_lands = 40 - len(main_deck)) and
+    # qualitatively unplayable, even when its avg-spell-quality scores
+    # decently. Drop such alternatives so the dropdown only shows
+    # buildable options. We keep the top suggestion regardless so the
+    # dropdown is never empty — better to surface a thin best-effort
+    # recommendation than nothing.
+    top_key = next(iter(score_filtered))
+    playable = {
+        k: v for k, v in score_filtered.items()
+        if k == top_key or len(v.main_deck) >= _PLAYABLE_FLOOR
+    }
+    return playable
 
 
 def _build_for_pairs(

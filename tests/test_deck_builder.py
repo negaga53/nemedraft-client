@@ -19,6 +19,7 @@ from common.inference.deck_builder import (
     _has_splash_fixing,
     _holistic_score,
     _select_splashes,
+    suggest_decks,
 )
 
 
@@ -300,3 +301,76 @@ class TestSelectSplashes:
             splashable_colors=["W"],
         )
         assert len(selected) == MAX_SPLASH_CARDS
+
+
+class TestPlayableFloorFilter:
+    """The dropdown should drop archetypes with too few playables.
+
+    A reported failure: a user's 42-card SOS pool returned a top
+    recommendation with only 3 main_deck spells + 37 lands. The
+    pool can build a healthy UR deck; the thin alternative is
+    pure noise next to it and shouldn't be offered.
+    """
+
+    def test_thin_alternatives_dropped_when_strong_top_exists(self):
+        """If top archetype has 23 playables and an alternative has 3, drop the alternative."""
+        # Two synthetic pools: a strong UR build with castable spells +
+        # a sparse WB "build" with only 3 castable cards. The score-based
+        # filter (>= top - 20) keeps both if both score above the floor;
+        # the playable-floor filter should still drop the 3-card option.
+        from common.inference.pool_analyzer import ScryfallCard
+
+        def _spell(name, cost, type_line="Instant"):
+            return ScryfallCard(
+                name=name, mana_cost=cost, cmc=2, type_line=type_line,
+                oracle_text="", colors=[], color_identity=[],
+                keywords=[], rarity="common",
+            )
+
+        scryfall = {}
+        pool = []
+        # 23 strong UR spells.
+        for i in range(23):
+            n = f"UR{i}"
+            scryfall[n] = _spell(n, "{1}{U}{R}")
+            pool.append(n)
+        # 3 weak WB spells (would form a 3-card alternative).
+        for i in range(3):
+            n = f"WB{i}"
+            scryfall[n] = _spell(n, "{1}{W}{B}")
+            pool.append(n)
+
+        # No card_map → all _holistic_score returns -1.0. The score-based
+        # filter then keeps everything within 20 of the top (also -1.0),
+        # so all archetypes pass the score filter. The playable floor
+        # must drop the 3-card WB archetype.
+        result = suggest_decks(pool, scryfall, card_map=None, set_metrics=None)
+
+        assert "UR" in result, f"UR (the buildable archetype) missing: {list(result)}"
+        # Anything with <14 main_deck should be filtered unless it's the only option.
+        for key, sug in result.items():
+            if key != next(iter(result)):  # not the top entry
+                assert len(sug.main_deck) >= 14, (
+                    f"Alternative {key} has {len(sug.main_deck)} main_deck "
+                    f"cards — should have been dropped"
+                )
+
+    def test_keeps_top_even_when_thin(self):
+        """If the *only* recommendation is thin, keep it — empty dropdown is worse."""
+        from common.inference.pool_analyzer import ScryfallCard
+
+        def _spell(name, cost):
+            return ScryfallCard(
+                name=name, mana_cost=cost, cmc=2, type_line="Instant",
+                oracle_text="", colors=[], color_identity=[],
+                keywords=[], rarity="common",
+            )
+
+        # Pool of only 3 castable cards across all colour combos.
+        scryfall = {f"a{i}": _spell(f"a{i}", "{1}{W}{B}") for i in range(3)}
+        pool = list(scryfall.keys())
+
+        result = suggest_decks(pool, scryfall, card_map=None, set_metrics=None)
+
+        # Some archetype must be returned (the dropdown can't be empty).
+        assert result, "every pool should produce at least one suggestion"

@@ -60,6 +60,29 @@ class DeckSuggestion:
     avg_cmc: float = 0.0
 
 
+def _card_map_get(
+    card_map: dict[str, CardRatings] | None,
+    name: str,
+) -> CardRatings | None:
+    """Look up a card in the 17Lands card_map, falling back to its front face.
+
+    17Lands keys split-named cards (e.g. SOS Prepared) by the front face only
+    ("Scheming Silvertongue"), while Scryfall and Arena use the full name
+    ("Scheming Silvertongue // Sign in Blood"). Without this fallback every
+    split card falls through to trophy_fallback_power and gets silently
+    sideboarded. Mirrors the inverse direction in
+    ``common/data/trophy_deck_prior.py::_NameResolver``.
+    """
+    if not card_map:
+        return None
+    cr = card_map.get(name)
+    if cr is not None:
+        return cr
+    if " // " in name:
+        return card_map.get(name.split(" // ", 1)[0])
+    return None
+
+
 def _card_power(
     name: str,
     card_map: dict[str, CardRatings] | None,
@@ -75,7 +98,7 @@ def _card_power(
     trophy_bonus = trophy_card_score * TROPHY_CARD_POWER_BONUS
     if not card_map or not set_metrics:
         return _trophy_fallback_power(set_metrics, trophy_card_score) or trophy_bonus
-    cr = card_map.get(name)
+    cr = _card_map_get(card_map, name)
     if not cr:
         return _trophy_fallback_power(set_metrics, trophy_card_score) or trophy_bonus
     blended = get_blended_wr(cr, archetype, pick, set_metrics)
@@ -101,12 +124,21 @@ def _is_castable(
     card: ScryfallCard,
     deck_colors: list[str],
 ) -> bool:
-    """Check if a card is castable in a two-colour deck."""
-    pips = parse_pips(card.mana_cost)
-    for c in CARD_COLORS:
-        if pips[c] > 0 and c not in deck_colors:
-            return False
-    return True
+    """Check if a card is castable in a two-colour deck.
+
+    Split-card mana costs (e.g. SOS Prepared ``"{1}{B} // {B}{B}"`` or
+    Bind // Liberate ``"{1}{G} // {1}{W}"``) carry two independent costs
+    in a single string. Each face can be cast on its own, so the card is
+    castable when *any* face is fully on-colour — not the union.
+    """
+    mc = card.mana_cost or ""
+    faces = mc.split(" // ") if " // " in mc else [mc]
+    deck_set = set(deck_colors)
+    for face in faces:
+        face_pips = parse_pips(face)
+        if all(face_pips[c] == 0 for c in CARD_COLORS if c not in deck_set):
+            return True
+    return False
 
 
 def _karsten_mana_base(
@@ -360,7 +392,7 @@ def _holistic_score(
 
     wrs: list[float] = []
     for name in deck_names:
-        cr = card_map.get(name)
+        cr = _card_map_get(card_map, name)
         if cr:
             ad = cr.deck_colors.get("All Decks", {})
             gihwr = ad.get("gihwr", 0.0)

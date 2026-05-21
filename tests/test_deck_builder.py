@@ -765,3 +765,149 @@ class TestPlayableFloorFilter:
 
         # Some archetype must be returned (the dropdown can't be empty).
         assert result, "every pool should produce at least one suggestion"
+
+
+class TestSplitCardLookup:
+    """17Lands keys split cards by front face only ("Scheming Silvertongue"),
+    while Scryfall and the in-game pool use the full name ("Scheming Silvertongue
+    // Sign in Blood"). Without a front-face fallback, _card_power and
+    _holistic_score miss the 17Lands data for every split card, the card falls
+    through to trophy_fallback_power (≈0.10–0.15), and gets silently sideboarded.
+    """
+
+    def test_card_power_falls_back_to_front_face_name(self):
+        from common.inference.deck_builder import _card_power
+
+        # 17Lands keyed by front face only.
+        card_map = _card_map({"Scheming Silvertongue": 0.591})
+        sm = _set_metrics(mean=0.54, std=0.04)
+
+        power = _card_power(
+            "Scheming Silvertongue // Sign in Blood",
+            card_map, sm, "BG", 22,
+        )
+
+        assert power > 0.5, (
+            f"power={power:.3f} — split card likely fell through to "
+            f"trophy_fallback_power instead of the front-face 17L entry."
+        )
+
+    def test_holistic_score_uses_front_face_for_split_cards(self):
+        full_name = "Studious First-Year // Rampant Growth"
+        card_map = _card_map({"Studious First-Year": 0.57})
+        sm = _set_metrics(mean=0.54, std=0.04)
+
+        score = _holistic_score([full_name], card_map, sm, {}, "BG")
+
+        assert score > 0, (
+            f"_holistic_score returned {score} — split card not resolved by "
+            f"front-face fallback."
+        )
+
+    def test_suggest_decks_keeps_strong_split_card_in_main_deck(self):
+        """End-to-end: a strong SOS Prepared card in a B pool reaches main_deck."""
+        from common.inference.pool_analyzer import ScryfallCard
+
+        scryfall: dict[str, ScryfallCard] = {}
+        pool: list[str] = []
+        for i in range(25):
+            n = f"weak_b_{i}"
+            scryfall[n] = ScryfallCard(
+                name=n, mana_cost="{1}{B}", cmc=2,
+                type_line="Creature", oracle_text="", colors=["B"],
+                color_identity=["B"], keywords=[], rarity="common",
+            )
+            pool.append(n)
+        split_name = "Scheming Silvertongue // Sign in Blood"
+        scryfall[split_name] = ScryfallCard(
+            name=split_name, mana_cost="{1}{B} // {B}{B}", cmc=2,
+            type_line="Creature — Vampire Warlock // Sorcery",
+            oracle_text="", colors=["B"], color_identity=["B"],
+            keywords=["Prepared"], rarity="rare",
+        )
+        pool.append(split_name)
+
+        # The split card is the strongest, but stored under the front face only.
+        card_map = _card_map(
+            {f"weak_b_{i}": 0.50 for i in range(25)}
+            | {"Scheming Silvertongue": 0.61},
+        )
+        sm = _set_metrics(mean=0.54, std=0.04)
+        sm.baseline_wr = 0.54
+
+        result = suggest_decks(pool, scryfall, card_map=card_map, set_metrics=sm)
+
+        top = next(iter(result.values()))
+        assert split_name in top.main_deck, (
+            f"strong SOS Prepared card silently sideboarded. "
+            f"main_deck = {top.main_deck}"
+        )
+
+
+class TestSplitCardCastability:
+    """parse_pips reads every {X} token across both faces, so _is_castable
+    rejects a card like Bind // Liberate ({1}{G} // {1}{W}) from a mono-G deck —
+    even though the front face can be cast in mono-G. The fix is to treat
+    each ' // '-separated face independently."""
+
+    def test_split_with_different_face_colors_castable_in_either(self):
+        from common.inference.deck_builder import _is_castable
+        from common.inference.pool_analyzer import ScryfallCard
+
+        card = ScryfallCard(
+            name="Bind // Liberate", mana_cost="{1}{G} // {1}{W}",
+            cmc=2, type_line="Sorcery // Instant",
+            oracle_text="", colors=["G", "W"], color_identity=["G", "W"],
+            keywords=[], rarity="common",
+        )
+        assert _is_castable(card, ["G"]), "front face {1}{G} fits mono-G"
+        assert _is_castable(card, ["W"]), "back face {1}{W} fits mono-W"
+        assert _is_castable(card, ["G", "W"])
+        assert not _is_castable(card, ["R"]), "neither face fits mono-R"
+
+    def test_split_with_same_face_colors_castable_in_that_color(self):
+        """SOS Prepared like Scheming Silvertongue (both faces B) — mono-B casts it."""
+        from common.inference.deck_builder import _is_castable
+        from common.inference.pool_analyzer import ScryfallCard
+
+        card = ScryfallCard(
+            name="Scheming Silvertongue // Sign in Blood",
+            mana_cost="{1}{B} // {B}{B}",
+            cmc=2, type_line="Creature // Sorcery",
+            oracle_text="", colors=["B"], color_identity=["B"],
+            keywords=["Prepared"], rarity="rare",
+        )
+        assert _is_castable(card, ["B"])
+        assert _is_castable(card, ["U", "B"])
+        assert not _is_castable(card, ["U"])
+
+    def test_split_face_castability_is_per_face(self):
+        """Multi-color front + mono back: castable when at least one face fits."""
+        from common.inference.deck_builder import _is_castable
+        from common.inference.pool_analyzer import ScryfallCard
+
+        card = ScryfallCard(
+            name="Bicolor // Mono", mana_cost="{U}{R} // {1}{R}",
+            cmc=2, type_line="Creature // Sorcery",
+            oracle_text="", colors=["U", "R"], color_identity=["U", "R"],
+            keywords=[], rarity="rare",
+        )
+        assert _is_castable(card, ["U", "R"])
+        assert _is_castable(card, ["R"]), "back face {1}{R} fits mono-R"
+        assert not _is_castable(card, ["U"]), "front needs R, back needs R"
+        assert not _is_castable(card, ["U", "B"])
+
+    def test_non_split_card_castability_unchanged(self):
+        """The single-face path must keep behaving exactly as before."""
+        from common.inference.deck_builder import _is_castable
+        from common.inference.pool_analyzer import ScryfallCard
+
+        card = ScryfallCard(
+            name="Plain", mana_cost="{1}{U}{B}", cmc=3,
+            type_line="Creature", oracle_text="",
+            colors=["U", "B"], color_identity=["U", "B"],
+            keywords=[], rarity="common",
+        )
+        assert _is_castable(card, ["U", "B"])
+        assert not _is_castable(card, ["U"])
+        assert not _is_castable(card, ["B"])

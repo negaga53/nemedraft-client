@@ -20,6 +20,8 @@ from common.inference.deck_builder import (
     TARGET_SPELLS,
     _has_splash_fixing,
     _holistic_score,
+    _is_fixing_land,
+    _multicolor_prior_candidates,
     _select_splashes,
     suggest_decks,
 )
@@ -234,12 +236,19 @@ class TestTrophyDeckPrior:
             )
             pool.append(name)
             card_scores[name] = 1.0
-        scryfall["fixer"] = ScryfallCard(
-            name="fixer", mana_cost="", cmc=0,
+        # 3C needs >= max(len-1, 2) = 2 fixers under the tightened gate.
+        scryfall["any_fixer"] = ScryfallCard(
+            name="any_fixer", mana_cost="", cmc=0,
             type_line="Land", oracle_text="Tap: Add one mana of any colour.",
             colors=[], color_identity=[], keywords=[], rarity="common",
         )
-        pool.append("fixer")
+        scryfall["wb_dual"] = ScryfallCard(
+            name="wb_dual", mana_cost="", cmc=0,
+            type_line="Land", oracle_text="Tap: Add W or B.",
+            colors=[], color_identity=["W", "B"], keywords=[], rarity="common",
+        )
+        pool.append("any_fixer")
+        pool.append("wb_dual")
         prior = TrophyDeckPrior(
             set_code="TST",
             archetypes={
@@ -259,10 +268,230 @@ class TestTrophyDeckPrior:
 
         assert next(iter(result)) == "WBG"
 
+    def test_trophy_fallback_stays_below_baseline_wr(self):
+        """Unrated trophy cards must not outrank a rated card at the format mean."""
+        from common.inference.deck_builder import _card_power, _trophy_fallback_power
+
+        sm = _set_metrics(mean=0.54)
+        sm.baseline_wr = 0.54
+        prior = TrophyDeckPrior(
+            set_code="TST",
+            archetypes={
+                "BG": TrophyArchetypePrior(
+                    deck_count=10,
+                    # Strongest possible trophy signal.
+                    card_scores={"unrated_trophy_card": 1.0},
+                ),
+            },
+        )
+
+        rated_at_baseline = _card_power(
+            "average_card", _card_map({"average_card": 0.54}), sm, "BG", 22, prior,
+        )
+        unrated_in_trophies = _card_power(
+            "unrated_trophy_card", _card_map({}), sm, "BG", 22, prior,
+        )
+
+        assert unrated_in_trophies < rated_at_baseline, (
+            f"unrated trophy card power {unrated_in_trophies:.3f} must stay"
+            f" below baseline-rated card power {rated_at_baseline:.3f}"
+        )
+        # Strongest fallback is still well under baseline (0.54 - 0.05 = 0.49).
+        assert _trophy_fallback_power(sm, 1.0) <= sm.baseline_wr - 0.04
+
+    def test_creature_soft_cap_does_not_drop_strongest_creatures(self):
+        """When noncreatures are scarce the cap must lift, not skip strong creatures."""
+        from common.inference.pool_analyzer import ScryfallCard
+
+        def make(name: str, type_line: str, gihwr: float) -> tuple:
+            sc = ScryfallCard(
+                name=name, mana_cost="{1}{B}", cmc=2,
+                type_line=type_line, oracle_text="", colors=["B"],
+                color_identity=["B"], keywords=[], rarity="common",
+            )
+            return sc, gihwr
+
+        scryfall: dict[str, ScryfallCard] = {}
+        gihwrs: dict[str, float] = {}
+        # 20 creatures sorted strongest → weakest by GIH WR.
+        for i in range(20):
+            name = f"creature_{i:02d}"
+            sc, wr = make(name, "Creature", 0.70 - i * 0.005)
+            scryfall[name] = sc
+            gihwrs[name] = wr
+        # 5 noncreatures, weakest of the lot.
+        for i in range(5):
+            name = f"noncreature_{i}"
+            sc, wr = make(name, "Instant", 0.40 + i * 0.001)
+            scryfall[name] = sc
+            gihwrs[name] = wr
+
+        card_map = _card_map(gihwrs)
+        # All cards rate identically across archetypes for simplicity.
+        for cr in card_map.values():
+            cr.deck_colors["BB"] = cr.deck_colors["All Decks"]
+        sm = _set_metrics(mean=0.54, std=0.04)
+        sm.baseline_wr = 0.54
+
+        prior = TrophyDeckPrior(
+            set_code="TST",
+            archetypes={
+                "BB": TrophyArchetypePrior(
+                    deck_count=10,
+                    card_scores={n: 1.0 for n in scryfall},
+                    # avg_creatures=10 would have produced soft_cap=13;
+                    # with only 5 noncreatures available the new code should
+                    # raise the effective budget to 18 = TARGET_SPELLS - 5.
+                    avg_creatures=10.0,
+                    avg_noncreatures=10.0,
+                    avg_cmc=2.0,
+                ),
+            },
+        )
+
+        result = suggest_decks(
+            list(scryfall),
+            scryfall,
+            card_map=card_map,
+            set_metrics=sm,
+            trophy_prior=prior,
+        )
+
+        top = next(iter(result.values()))
+        # The 5 strongest creatures (creature_00..04) must all survive — under
+        # the old algorithm the strongest creatures past the cap were skipped
+        # in favour of weaker fillers later in the sort.
+        for i in range(5):
+            assert f"creature_{i:02d}" in top.main_deck, (
+                f"strong creature_{i:02d} dropped by the soft cap"
+            )
+        # And we should still end up at ~TARGET_SPELLS spells.
+        assert len(top.main_deck) >= TARGET_SPELLS - 2
+
+    def test_multicolor_prior_rejects_5c_with_insufficient_fixing(self):
+        """A 5C trophy archetype with only 3 fixers must be filtered out."""
+        from common.inference.pool_analyzer import ScryfallCard
+
+        # Pool: a single colourless universal fixer + two duals.
+        # That's 3 fixing sources. 5C needs max(5-1, 2) = 4 sources.
+        scryfall = {
+            "any_fixer": ScryfallCard(
+                name="any_fixer", mana_cost="", cmc=0,
+                type_line="Land", oracle_text="Tap: Add one mana of any colour.",
+                colors=[], color_identity=[], keywords=[], rarity="common",
+            ),
+            "wu_dual": ScryfallCard(
+                name="wu_dual", mana_cost="", cmc=0,
+                type_line="Land", oracle_text="Tap: Add W or U.",
+                colors=[], color_identity=["W", "U"], keywords=[],
+                rarity="common",
+            ),
+            "br_dual": ScryfallCard(
+                name="br_dual", mana_cost="", cmc=0,
+                type_line="Land", oracle_text="Tap: Add B or R.",
+                colors=[], color_identity=["B", "R"], keywords=[],
+                rarity="common",
+            ),
+        }
+        ranked_colors = ["W", "U", "B", "R", "G"]
+        prior = TrophyDeckPrior(
+            set_code="TST",
+            archetypes={
+                "WUBRG": TrophyArchetypePrior(
+                    deck_count=20,
+                    card_scores={},
+                    avg_creatures=15.0,
+                    avg_noncreatures=8.0,
+                    avg_cmc=3.0,
+                ),
+            },
+        )
+
+        cands = _multicolor_prior_candidates(
+            ranked_colors=ranked_colors,
+            pool_names=list(scryfall),
+            scryfall_cards=scryfall,
+            trophy_prior=prior,
+        )
+
+        assert all(len(c) != 5 for c in cands), (
+            "5C trophy candidate slipped through with only 3 fixers"
+        )
+
+    def test_multicolor_prior_accepts_3c_with_two_fixers(self):
+        """A 3C trophy archetype with 2 fixers should still pass the gate."""
+        from common.inference.pool_analyzer import ScryfallCard
+
+        scryfall = {
+            "any_fixer": ScryfallCard(
+                name="any_fixer", mana_cost="", cmc=0,
+                type_line="Land", oracle_text="Tap: Add one mana of any colour.",
+                colors=[], color_identity=[], keywords=[], rarity="common",
+            ),
+            "wb_dual": ScryfallCard(
+                name="wb_dual", mana_cost="", cmc=0,
+                type_line="Land", oracle_text="Tap: Add W or B.",
+                colors=[], color_identity=["W", "B"], keywords=[],
+                rarity="common",
+            ),
+        }
+        prior = TrophyDeckPrior(
+            set_code="TST",
+            archetypes={
+                "WBG": TrophyArchetypePrior(
+                    deck_count=10, card_scores={},
+                    avg_creatures=15.0, avg_noncreatures=8.0, avg_cmc=2.5,
+                ),
+            },
+        )
+
+        cands = _multicolor_prior_candidates(
+            ranked_colors=["W", "B", "G", "U", "R"],
+            pool_names=list(scryfall),
+            scryfall_cards=scryfall,
+            trophy_prior=prior,
+        )
+
+        assert ("W", "B", "G") in cands
+
+
+class TestIsFixingLand:
+    def test_universal_fixer(self):
+        from common.inference.pool_analyzer import ScryfallCard
+        card = ScryfallCard(
+            name="x", mana_cost="", cmc=0, type_line="Land",
+            oracle_text="Add one mana of any colour.",
+            colors=[], color_identity=[], keywords=[], rarity="common",
+        )
+        assert _is_fixing_land(card, {"W", "B"}, min_overlap=2)
+        assert _is_fixing_land(card, {"W"}, min_overlap=1)
+
+    def test_dual_land_fixes_for_multi_color(self):
+        from common.inference.pool_analyzer import ScryfallCard
+        card = ScryfallCard(
+            name="x", mana_cost="", cmc=0, type_line="Land",
+            oracle_text="Tap: Add W or B.",
+            colors=[], color_identity=["W", "B"], keywords=[], rarity="common",
+        )
+        assert _is_fixing_land(card, {"W", "B", "G"}, min_overlap=2)
+        assert _is_fixing_land(card, {"W"}, min_overlap=1)
+        # Off-colour overlap (only W matches, but min_overlap=2) → reject.
+        assert not _is_fixing_land(card, {"W", "U"}, min_overlap=2)
+
+    def test_creature_land_is_not_a_fixer(self):
+        from common.inference.pool_analyzer import ScryfallCard
+        card = ScryfallCard(
+            name="x", mana_cost="", cmc=0, type_line="Land Creature",
+            oracle_text="Tap: Add W or B.",
+            colors=[], color_identity=["W", "B"], keywords=[], rarity="common",
+        )
+        assert not _is_fixing_land(card, {"W", "B"}, min_overlap=2)
+
 
 def _land(name: str, oracle: str = "", color_identity: tuple = ()):
-    """Fake ScryfallCard for a land (only the fields _has_splash_fixing inspects)."""
+    """Fake ScryfallCard for a land — sets the fields _is_fixing_land inspects."""
     sc = MagicMock()
+    sc.type_line = "Land"
     sc.oracle_text = oracle
     sc.color_identity = color_identity
     return sc

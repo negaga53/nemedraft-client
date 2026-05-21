@@ -64,18 +64,23 @@ def functional_cmc(cmc: float, oracle_text: str) -> int:
 CARD_COLORS = ("W", "U", "B", "R", "G")
 
 
-def parse_pips(mana_cost: str) -> dict[str, int]:
+def parse_pips(mana_cost: str | None) -> dict[str, int]:
     """Count each colour pip in a mana cost string.
 
     Hybrid pips (e.g. ``{W/B}``) contribute to both colours.
+    Scryfall reports ``mana_cost = None`` for cards with no cost
+    (lands, MDFC back faces with non-mana fronts); they contribute
+    zero pips.
 
     Args:
-        mana_cost: Scryfall-style mana cost, e.g. ``"{1}{W}{U}"``.
+        mana_cost: Scryfall-style mana cost, e.g. ``"{1}{W}{U}"``, or ``None``.
 
     Returns:
         Dict mapping colour letter to pip count.
     """
     counts: dict[str, int] = {c: 0 for c in CARD_COLORS}
+    if not mana_cost:
+        return counts
     for m in _PIP_RE.finditer(mana_cost):
         pip = m.group(1)
         options = pip.split("/")

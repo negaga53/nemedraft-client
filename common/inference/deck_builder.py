@@ -11,7 +11,6 @@ from common.data.trophy_deck_prior import TrophyDeckPrior
 from common.inference.pool_analyzer import (
     CARD_COLORS,
     ScryfallCard,
-    detect_tags,
     detect_top_colors,
     functional_cmc,
     parse_pips,
@@ -32,8 +31,12 @@ MAX_SPLASH_CARDS = 2
 # The trophy prior is a light nudge, not a replacement for 17Lands GIH WR.
 TROPHY_CARD_POWER_BONUS = 0.015
 TROPHY_DECK_SCORE_BONUS = 8.0
-_TROPHY_FALLBACK_BASE_PENALTY = 0.025
-_TROPHY_FALLBACK_SPAN = 0.035
+# Fallback power for cards absent from 17Lands stats but present in
+# trophy decks. The range stays strictly below baseline_wr so an unrated
+# card never outranks a rated card sitting at the format mean — only
+# very weakly-rated cards (well below baseline) lose to it.
+_TROPHY_FALLBACK_BASE_PENALTY = 0.10
+_TROPHY_FALLBACK_SPAN = 0.05
 
 # Alternative archetypes with fewer playables than this are dropped from
 # the dropdown — they fill out as 35+ lands and are noise next to a real
@@ -174,45 +177,41 @@ def _basics_for(colors: list[str], counts: list[int], budget: int) -> list[str]:
     return lands[:budget]
 
 
-def _has_splash_fixing(
-    splash_color: str,
-    nonbasic_lands: list[str],
-    scryfall_cards: dict[str, ScryfallCard],
-) -> bool:
-    """Return *True* iff the pool's nonbasic lands fix mana for *splash_color*.
-
-    Recognised sources:
-    - Universal fixers: any land whose oracle text says
-      ``"add one mana of any"`` or ``"search your library for a basic"``.
-    - Lands whose color identity contains the splash colour
-      (single- or multi-colour duals that produce the splash colour).
-    """
-    for name in nonbasic_lands:
-        sc = scryfall_cards.get(name)
-        if not sc:
-            continue
-        text = sc.oracle_text.lower()
-        if "add one mana of any" in text:
-            return True
-        if "search your library for a basic" in text:
-            return True
-        if splash_color in set(sc.color_identity):
-            return True
-    return False
-
-
-def _is_fixing_land_for(
+def _is_fixing_land(
     card: ScryfallCard,
-    deck_colors: set[str],
+    target_colors: set[str],
+    *,
+    min_overlap: int = 2,
 ) -> bool:
+    """Return *True* iff *card* is a non-creature land that fixes *target_colors*.
+
+    A land qualifies as a fixing source when it is either a universal
+    fixer (``"add one mana of any"`` or ``"search your library for a basic"``)
+    or shares at least *min_overlap* colour(s) with the target set via
+    its colour identity. Use ``min_overlap=1`` for single-splash fixing
+    and ``min_overlap=2`` for multi-colour mana bases.
+    """
     tl = card.type_line.lower()
     if "land" not in tl or "creature" in tl:
         return False
     text = (card.oracle_text or "").lower()
     if "add one mana of any" in text or "search your library for a basic" in text:
         return True
-    ci = set(card.color_identity)
-    return len(ci & deck_colors) >= 2
+    return len(set(card.color_identity) & target_colors) >= min_overlap
+
+
+def _has_splash_fixing(
+    splash_color: str,
+    nonbasic_lands: list[str],
+    scryfall_cards: dict[str, ScryfallCard],
+) -> bool:
+    """Return *True* iff the pool's nonbasic lands fix mana for *splash_color*."""
+    target = {splash_color}
+    for name in nonbasic_lands:
+        sc = scryfall_cards.get(name)
+        if sc and _is_fixing_land(sc, target, min_overlap=1):
+            return True
+    return False
 
 
 def _fixing_source_count(
@@ -220,12 +219,11 @@ def _fixing_source_count(
     scryfall_cards: dict[str, ScryfallCard],
     deck_colors: set[str],
 ) -> int:
-    count = 0
-    for name in pool_names:
-        sc = scryfall_cards.get(name)
-        if sc and _is_fixing_land_for(sc, deck_colors):
-            count += 1
-    return count
+    return sum(
+        1 for name in pool_names
+        if (sc := scryfall_cards.get(name))
+        and _is_fixing_land(sc, deck_colors, min_overlap=2)
+    )
 
 
 def _select_splashes(
@@ -240,6 +238,7 @@ def _select_splashes(
     splashable_colors: list[str],
     max_splash: int = MAX_SPLASH_CARDS,
     trophy_prior: TrophyDeckPrior | None = None,
+    main_deck_powers: list[float] | None = None,
 ) -> list[tuple[str, ScryfallCard, str, float]]:
     """Pick up to *max_splash* cards from a 3rd colour that beat the weakest main-deck slots.
 
@@ -257,10 +256,13 @@ def _select_splashes(
         return []
 
     # Power of each main_deck card, ascending — used for displacement check.
-    main_powers = sorted(
-        _card_power(n, card_map, set_metrics, archetype_key, 22, trophy_prior)
-        for n in main_deck
-    )
+    if main_deck_powers is not None:
+        main_powers = sorted(main_deck_powers)
+    else:
+        main_powers = sorted(
+            _card_power(n, card_map, set_metrics, archetype_key, 22, trophy_prior)
+            for n in main_deck
+        )
 
     seen: set[str] = set(main_deck)
     candidates: list[tuple[str, ScryfallCard, str, float]] = []
@@ -321,7 +323,12 @@ def _multicolor_prior_candidates(
         color_set = set(colors)
         if len(colors) < 3 or not color_set.issubset(supported):
             continue
-        if _fixing_source_count(pool_names, scryfall_cards, color_set) < len(colors) - 2:
+        # Require near-one-fixer-per-extra-colour: 3C needs 2, 4C needs 3,
+        # 5C needs 4. The previous len(colors)-2 floor let 5C-domain slip in
+        # with three duals, which is unplayable in practice.
+        if _fixing_source_count(
+            pool_names, scryfall_cards, color_set,
+        ) < max(len(colors) - 1, 2):
             continue
         ordered = tuple(sorted(colors, key="WUBRG".index))
         if ordered not in seen:
@@ -527,26 +534,41 @@ def _build_for_pairs(
         main_deck: list[str] = []
         main_deck_cmc: list[int] = []
         main_deck_cards: list[ScryfallCard] = []
-        creature_soft_cap = (
+        main_deck_powers: list[float] = []
+        # Trophy prior suggests an average creature count for this archetype;
+        # honour it as a soft cap, but only when enough noncreatures are
+        # available to fill the remaining slots. Castables are sorted by
+        # power descending, so blindly skipping creatures past the cap would
+        # drop the *strongest* creatures and replace them with weaker ones
+        # later in the list — strictly worse than running over the cap.
+        soft_cap = (
             trophy_prior.creature_soft_cap(key) if trophy_prior else None
         )
+        if soft_cap is not None:
+            noncreature_pool = sum(
+                1 for _, _, sc in castable
+                if "creature" not in sc.type_line.lower()
+            )
+            creature_budget: int | None = max(
+                soft_cap, TARGET_SPELLS - noncreature_pool,
+            )
+        else:
+            creature_budget = None
         creature_slots_used = 0
-        for idx, (name, _power, sc) in enumerate(castable):
+        for name, power, sc in castable:
             if len(main_deck) >= TARGET_SPELLS:
                 break
             is_creature = "creature" in sc.type_line.lower()
             if (
-                creature_soft_cap is not None
+                creature_budget is not None
                 and is_creature
-                and creature_slots_used >= creature_soft_cap
+                and creature_slots_used >= creature_budget
             ):
-                remaining_needed = TARGET_SPELLS - len(main_deck)
-                remaining_after = len(castable) - idx - 1
-                if remaining_after >= remaining_needed:
-                    continue
+                continue
             main_deck.append(name)
             main_deck_cmc.append(functional_cmc(sc.cmc, sc.oracle_text or ""))
             main_deck_cards.append(sc)
+            main_deck_powers.append(power)
             if is_creature:
                 creature_slots_used += 1
 
@@ -624,29 +646,31 @@ def _build_for_pairs(
             splashable_colors=splashable_colors,
             max_splash=deck_max_splash,
             trophy_prior=trophy_prior,
+            main_deck_powers=main_deck_powers,
         ) if len(main_deck) >= 10 else []
 
         splash_colors: list[str] = []
         if splashes:
-            # Displace the weakest main_deck cards to make room.
-            powered = [
-                (n, sc, mcmc, _card_power(
-                    n, card_map, set_metrics, key, 22, trophy_prior,
-                ))
-                for n, sc, mcmc in zip(main_deck, main_deck_cards, main_deck_cmc)
-            ]
+            # Displace the weakest main_deck cards to make room. Reuse the
+            # powers we already computed while filling main_deck instead of
+            # re-invoking _card_power for every card.
+            powered = list(zip(
+                main_deck, main_deck_cards, main_deck_cmc, main_deck_powers,
+            ))
             powered.sort(key=lambda x: x[3], reverse=True)  # strongest first
             keep_count = min(len(powered), TARGET_SPELLS - len(splashes))
             keep = powered[:keep_count]
             main_deck = [x[0] for x in keep]
             main_deck_cards = [x[1] for x in keep]
             main_deck_cmc = [x[2] for x in keep]
-            for splash_name, splash_sc, splash_color, _ in splashes:
+            main_deck_powers = [x[3] for x in keep]
+            for splash_name, splash_sc, splash_color, splash_power in splashes:
                 main_deck.append(splash_name)
                 main_deck_cards.append(splash_sc)
                 main_deck_cmc.append(functional_cmc(
                     splash_sc.cmc, splash_sc.oracle_text or "",
                 ))
+                main_deck_powers.append(splash_power)
             splash_colors = sorted({s[2] for s in splashes})
 
         # Cap nonbasic lands to TARGET_LANDS so we don't exceed 40 cards.

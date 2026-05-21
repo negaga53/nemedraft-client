@@ -48,6 +48,28 @@ pip install -e ".[client]"
 python scripts/run_overlay.py
 ```
 
+## Data
+
+### Bundled grpId → name map
+
+`client/overlay/data/grpid_to_name.json` is a generated snapshot
+(≈530 KB, ≈18k entries) of every MTG Arena card's grpId and English
+name, sourced from [MTGJSON's `AllIdentifiers.json`](https://mtgjson.com/).
+
+It exists because Scryfall publishes new sets without `arena_id`
+populated for weeks, and the per-installation MTGA SQLite fallback only
+works on Windows. On macOS / Linux, this bundled file is the only
+fallback that resolves grpIds for fresh sets.
+
+To regenerate manually:
+
+```bash
+python scripts/refresh_grpid_map.py
+```
+
+A weekly GitHub Actions workflow (`.github/workflows/refresh-grpid-map.yml`)
+opens a PR with the refresh.
+
 ## Pre-built binaries
 
 Releases are published on this repo's [Releases page](https://github.com/negaga53/nemedraft-client/releases). The overlay auto-updates by polling the GitHub releases API on launch.

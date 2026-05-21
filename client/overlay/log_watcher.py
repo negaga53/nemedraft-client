@@ -661,9 +661,18 @@ class LogWatcher:
 
     def _handle_human_draft_pack(self, blob: dict[str, Any]) -> None:
         card_ids = [int(x) for x in blob["PackCards"].split(",")]
-        pack_num = int(blob["SelfPack"])
-        pick_num = int(blob["SelfPick"])
-        logger.info("Human draft pack: P%dP%d (%d cards)", pack_num + 1, pick_num + 1, len(card_ids))
+        # SelfPack/SelfPick are 1-indexed in Arena's human-draft log path;
+        # the rest of the codebase is 0-indexed. Shift here so downstream
+        # consumers see a single canonical scheme. Without this shift
+        # Premier-draft pack 3 is silently dropped by the envelope clamp
+        # in ``_emit`` and pack rollovers are mis-detected server-side,
+        # fragmenting one real draft into four DB rows.
+        pack_num = int(blob["SelfPack"]) - 1
+        pick_num = int(blob["SelfPick"]) - 1
+        logger.info(
+            "Human draft pack: P%dP%d (%d cards)",
+            pack_num + 1, pick_num + 1, len(card_ids),
+        )
         self._emit(PackEvent(
             card_grpids=card_ids,
             pack_number=pack_num,
@@ -674,9 +683,14 @@ class LogWatcher:
     def _handle_human_draft_combined(self, blob: dict[str, Any]) -> None:
         self._cur_draft_event = blob.get("EventId", self._cur_draft_event)
         card_ids = [int(x) for x in blob["CardsInPack"]]
-        pack_num = int(blob["PackNumber"])
-        pick_num = int(blob["PickNumber"])
-        logger.info("Human draft combined pack: P%dP%d (%d cards)", pack_num + 1, pick_num + 1, len(card_ids))
+        # See _handle_human_draft_pack — LogBusinessEvents pack/pick are
+        # 1-indexed for human drafts.
+        pack_num = int(blob["PackNumber"]) - 1
+        pick_num = int(blob["PickNumber"]) - 1
+        logger.info(
+            "Human draft combined pack: P%dP%d (%d cards)",
+            pack_num + 1, pick_num + 1, len(card_ids),
+        )
         self._emit(PackEvent(
             card_grpids=card_ids,
             pack_number=pack_num,
@@ -694,7 +708,15 @@ class LogWatcher:
 
     def _handle_player_draft_pick(self, blob: dict[str, Any]) -> None:
         card_ids = [int(x) for x in blob["GrpIds"]]
-        pack_num = int(blob.get("Pack", -1))
-        pick_num = int(blob.get("Pick", -1))
+        # Pack/Pick are 1-indexed in EventPlayerDraftMakePick. Keep -1 as
+        # the missing-field sentinel (envelope clamp drops it downstream).
+        raw_pack = blob.get("Pack")
+        raw_pick = blob.get("Pick")
+        pack_num = int(raw_pack) - 1 if raw_pack is not None else -1
+        pick_num = int(raw_pick) - 1 if raw_pick is not None else -1
         logger.info("Human draft pick: %s", card_ids)
-        self._emit(PickEvent(card_grpids=card_ids, pack_number=pack_num, pick_number=pick_num))
+        self._emit(PickEvent(
+            card_grpids=card_ids,
+            pack_number=pack_num,
+            pick_number=pick_num,
+        ))

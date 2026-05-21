@@ -222,6 +222,101 @@ def test_diff_drops_negative_position():
 
 
 # ---------------------------------------------------------------------------
+# 1-indexed snapshot normalization
+#
+# Arena's ``_currentPack`` / ``_currentPick`` are 1-indexed for human drafts
+# on some game versions (see commit 04214b7 in this submodule). The walker
+# returns the raw values, so _diff_snapshots must normalize before emitting.
+# Detection uses the pack-size invariant: an unopened pack has
+# len(current_pack) + pick_number == pack_size (14 for Arena standard) in
+# 0-indexed, or pack_size + 1 in 1-indexed.
+# ---------------------------------------------------------------------------
+
+
+def test_diff_normalizes_first_pick_of_premier_draft():
+    """1-indexed start: pack=1, pick=1, full 14-card pack."""
+    fourteen = tuple(range(101, 115))  # 14 grpIds
+    curr = _snapshot(
+        pack_number=1, pick_number=1,
+        current_pack=fourteen, picked_cards=(),
+    )
+    events = _diff_snapshots(None, curr)
+    pack_events = [e for e in events if isinstance(e, PackEvent)]
+    assert len(pack_events) == 1
+    assert pack_events[0].pack_number == 0
+    assert pack_events[0].pick_number == 0
+
+
+def test_diff_normalizes_final_pack_first_pick():
+    """Pack 3 of a Premier draft (1-indexed) → pack 2 emitted.
+
+    Pre-normalization this frame is dropped by the envelope clamp
+    (pack > 2), which is what made Premier-draft pack 3 disappear.
+    """
+    fourteen = tuple(range(301, 315))
+    prev = _snapshot(
+        pack_number=2, pick_number=14, current_pack=(199,), picked_cards=(),
+    )
+    curr = _snapshot(
+        pack_number=3, pick_number=1, current_pack=fourteen, picked_cards=(199,),
+    )
+    events = _diff_snapshots(prev, curr)
+    pack_events = [e for e in events if isinstance(e, PackEvent)]
+    assert len(pack_events) == 1
+    assert pack_events[0].pack_number == 2
+    assert pack_events[0].pick_number == 0
+
+
+def test_diff_keeps_zero_indexed_snapshot_unchanged():
+    """0-indexed snapshots (bot draft / Quick Draft via memory) must pass
+    through without shift. Invariant: len(current_pack) + pick == 14."""
+    fourteen = tuple(range(101, 115))
+    curr = _snapshot(
+        pack_number=0, pick_number=0,
+        current_pack=fourteen, picked_cards=(),
+    )
+    events = _diff_snapshots(None, curr)
+    pack_events = [e for e in events if isinstance(e, PackEvent)]
+    assert len(pack_events) == 1
+    assert pack_events[0].pack_number == 0
+    assert pack_events[0].pick_number == 0
+
+
+def test_diff_normalizes_mid_pack_one_indexed():
+    """1-indexed mid-pack frame: pick=6 with 9 cards remaining
+    (sum=15) is the 6th pick of a 14-card pack."""
+    nine = tuple(range(201, 210))
+    curr = _snapshot(
+        pack_number=1, pick_number=6, current_pack=nine, picked_cards=(11, 12, 13, 14, 15),
+    )
+    events = _diff_snapshots(None, curr)
+    pack_events = [e for e in events if isinstance(e, PackEvent)]
+    assert len(pack_events) == 1
+    assert pack_events[0].pack_number == 0
+    assert pack_events[0].pick_number == 5
+
+
+def test_diff_emits_pick_event_with_normalized_prev_position():
+    """When a pick lands, the emitted PickEvent uses the PREVIOUS
+    snapshot's position; if prev was 1-indexed it must be shifted too."""
+    fourteen = tuple(range(101, 115))
+    prev = _snapshot(
+        pack_number=1, pick_number=1, current_pack=fourteen, picked_cards=(),
+    )
+    curr = _snapshot(
+        pack_number=1, pick_number=2,
+        current_pack=fourteen[1:],
+        picked_cards=(101,),
+    )
+    events = _diff_snapshots(prev, curr)
+    pick_events = [e for e in events if isinstance(e, PickEvent)]
+    assert len(pick_events) == 1
+    # Previous (1.1) → normalized (0.0).
+    assert pick_events[0].pack_number == 0
+    assert pick_events[0].pick_number == 0
+
+
+# ---------------------------------------------------------------------------
 # SetDataManager.lookup_stats fallback ladder
 # ---------------------------------------------------------------------------
 

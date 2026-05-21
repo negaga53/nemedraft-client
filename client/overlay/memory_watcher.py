@@ -185,10 +185,62 @@ class MemoryWatcher:
 
 _MAX_PACK = 2  # 3-pack draft, 0-indexed
 _MAX_PICK = 14  # 15-card pack, 0-indexed
+_ARENA_PACK_SIZE = 14  # standard Arena booster size
 
 
 def _is_valid_position(snap: _DraftSnapshot) -> bool:
     return 0 <= snap.pack_number <= _MAX_PACK and 0 <= snap.pick_number <= _MAX_PICK
+
+
+def _detect_index_offset(snap: _DraftSnapshot) -> int:
+    """Return 1 if ``snap`` looks 1-indexed, else 0.
+
+    Arena's ``_currentPack`` / ``_currentPick`` are 1-indexed for human
+    drafts on some game versions; the walker returns the raw values, so
+    we have to figure out which scheme the current snapshot uses.
+
+    Primary signal is the pack-size invariant: an open pack at pick
+    ``k`` (0-indexed) has ``pack_size - k`` cards left. So for a
+    14-card Arena booster, ``len(current_pack) + pick_number`` equals
+    14 when 0-indexed and 15 when 1-indexed. This is robust per-frame
+    and needs no prior state.
+
+    Fall back to range when ``current_pack`` is empty (rare: the pack
+    has just been auto-picked clean): treat ``pack_number > 2`` or
+    ``pick_number > 14`` as the 1-indexed signal.
+    """
+    if snap.pack_number < 0 or snap.pick_number < 0:
+        return 0
+    if snap.current_pack:
+        total = len(snap.current_pack) + snap.pick_number
+        if total == _ARENA_PACK_SIZE:
+            return 0
+        if total == _ARENA_PACK_SIZE + 1:
+            return 1
+        # Inconsistent invariant — default to no shift rather than risk
+        # a spurious downshift on a 0-indexed odd-pack-size set.
+        return 0
+    if snap.pack_number > _MAX_PACK or snap.pick_number > _MAX_PICK:
+        return 1
+    return 0
+
+
+def _normalize_snapshot(snap: _DraftSnapshot) -> _DraftSnapshot:
+    """Return a copy of ``snap`` with pack/pick shifted to 0-indexed if
+    needed. No-op when the snapshot is already 0-indexed or inactive."""
+    if not snap.is_active:
+        return snap
+    offset = _detect_index_offset(snap)
+    if offset == 0:
+        return snap
+    return _DraftSnapshot(
+        is_active=snap.is_active,
+        event_name=snap.event_name,
+        pack_number=snap.pack_number - offset,
+        pick_number=snap.pick_number - offset,
+        current_pack=snap.current_pack,
+        picked_cards=snap.picked_cards,
+    )
 
 
 def _diff_snapshots(
@@ -196,6 +248,15 @@ def _diff_snapshots(
 ) -> list[DraftEvent]:
     """Return the draft events implied by the prev → curr transition."""
     events: list[DraftEvent] = []
+
+    # Normalize before any further processing so downstream consumers
+    # see a single canonical 0-indexed scheme. Done here (and not at
+    # _DraftSnapshot.from_payload) so dedup against the previously stored
+    # snapshot still works regardless of whether prev was normalized
+    # under the same code version.
+    curr = _normalize_snapshot(curr)
+    if prev is not None:
+        prev = _normalize_snapshot(prev)
 
     # Draft-active transitions ---------------------------------------------
     if curr.is_active and (prev is None or not prev.is_active):
@@ -210,10 +271,7 @@ def _diff_snapshots(
     # Drop phantom frames where Arena reports pack/pick outside the 3-pack,
     # 15-card envelope. These appear at draft boundaries (e.g. memory shows
     # `_currentPack=3` transiently when the draft completes) and otherwise
-    # pollute the DB with rows like Pack 4. If this triggers frequently
-    # for a real draft, the upstream memory walker likely needs to
-    # normalise the indexing (Arena's `_currentPack`/`_currentPick` may
-    # be 1-indexed in some game versions).
+    # pollute the DB with rows like Pack 4.
     if not _is_valid_position(curr):
         logger.debug(
             "MemoryWatcher: dropping phantom frame pack=%d pick=%d",

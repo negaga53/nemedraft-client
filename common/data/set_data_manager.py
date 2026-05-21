@@ -12,6 +12,7 @@ from typing import Callable
 
 from common.data.card_stats import SetMetrics
 from common.data.seventeenlands import CardRatings, SeventeenLandsClient
+from common.data.trophy_deck_prior import TrophyDeckPrior, default_prior_path
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +40,8 @@ class SetDataManager:
         refresh_interval_s: TTL after which a cached bundle is considered
             stale. ``refresh_all`` uses it to decide which entries to
             re-fetch.
+        trophy_prior_dir: Directory containing optional
+            ``<SET>_trophy_deck_prior.json`` artifacts.
     """
 
     def __init__(
@@ -50,12 +53,14 @@ class SetDataManager:
         date_range_days: int = 90,
         draft_format: str = "PremierDraft",
         refresh_interval_s: float = DEFAULT_REFRESH_INTERVAL_S,
+        trophy_prior_dir: Path | None = None,
     ) -> None:
         self._cache_base = cache_base
         self._user_group = user_group
         self._date_range_days = date_range_days
         self._default_draft_format = draft_format
         self._refresh_interval_s = refresh_interval_s
+        self._trophy_prior_dir = trophy_prior_dir or card_id_map_path.parent
 
         # name → nemedraft internal card ID
         with open(card_id_map_path, encoding="utf-8") as f:
@@ -63,6 +68,7 @@ class SetDataManager:
 
         # (set_code, draft_format) → bundle
         self._sets: dict[tuple[str, str], _SetBundle] = {}
+        self._trophy_priors: dict[str, TrophyDeckPrior | None] = {}
         self._lock = threading.Lock()
         self._loading: set[tuple[str, str]] = set()
 
@@ -133,6 +139,18 @@ class SetDataManager:
         with self._lock:
             bundle = self._sets.get((set_code, fmt))
         return bundle.metrics if bundle else None
+
+    def get_trophy_prior(
+        self,
+        set_code: str,
+        *,
+        draft_format: str | None = None,
+    ) -> TrophyDeckPrior | None:
+        """Return the optional trophy-deck prior for *(set_code, draft_format)*."""
+        fmt = draft_format or self._default_draft_format
+        with self._lock:
+            bundle = self._sets.get((set_code, fmt))
+        return bundle.trophy_prior if bundle else None
 
     def get_card_ratings_by_id(
         self,
@@ -296,10 +314,12 @@ class SetDataManager:
             if cid:
                 by_id[cid] = cr
 
+        trophy_prior = self._load_trophy_prior(set_code)
         bundle = _SetBundle(
             card_map=card_map,
             metrics=metrics,
             by_id=by_id,
+            trophy_prior=trophy_prior,
             draft_format=draft_format,
             fetched_at=time.time(),
         )
@@ -308,9 +328,43 @@ class SetDataManager:
             self._loading.discard((set_code, draft_format))
 
         logger.info(
-            "17Lands data ready for %s/%s (%d cards, %d matched by ID)",
-            set_code, draft_format, len(card_map), len(by_id),
+            "17Lands data ready for %s/%s "
+            "(%d cards, %d matched by ID, trophy_prior=%s)",
+            set_code,
+            draft_format,
+            len(card_map),
+            len(by_id),
+            trophy_prior is not None,
         )
+
+    def _load_trophy_prior(self, set_code: str) -> TrophyDeckPrior | None:
+        key = set_code.upper()
+        with self._lock:
+            if key in self._trophy_priors:
+                return self._trophy_priors[key]
+
+        path = default_prior_path(self._trophy_prior_dir, key)
+        if not path.exists():
+            with self._lock:
+                self._trophy_priors[key] = None
+            return None
+
+        try:
+            prior = TrophyDeckPrior.load(path)
+        except (OSError, ValueError, TypeError, json.JSONDecodeError):
+            logger.warning(
+                "Ignoring invalid trophy-deck prior at %s", path, exc_info=True,
+            )
+            prior = None
+
+        with self._lock:
+            self._trophy_priors[key] = prior
+        if prior:
+            logger.info(
+                "Loaded trophy-deck prior for %s from %s (%d archetypes)",
+                key, path, len(prior.archetypes),
+            )
+        return prior
 
 
 @dataclass
@@ -318,5 +372,6 @@ class _SetBundle:
     card_map: dict[str, CardRatings]
     metrics: SetMetrics
     by_id: dict[int, CardRatings]
+    trophy_prior: TrophyDeckPrior | None
     draft_format: str
     fetched_at: float

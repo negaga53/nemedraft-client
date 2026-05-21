@@ -15,11 +15,18 @@ import pytest
 
 from common.inference.deck_builder import (
     MAX_SPLASH_CARDS,
+    TROPHY_CARD_POWER_BONUS,
+    TROPHY_DECK_SCORE_BONUS,
     TARGET_SPELLS,
     _has_splash_fixing,
     _holistic_score,
     _select_splashes,
     suggest_decks,
+)
+from common.data.trophy_deck_prior import (
+    TrophyArchetypePrior,
+    TrophyDeckPrior,
+    build_prior_from_trophy_rows,
 )
 
 
@@ -96,6 +103,161 @@ class TestHolisticScoreCompleteness:
         card_map: dict = {}
         sm = _set_metrics()
         assert _holistic_score(["nonexistent"], card_map, sm, {}, "U") == -1.0
+
+
+class TestTrophyDeckPrior:
+    def test_card_power_gets_bounded_trophy_prior_bonus(self):
+        from common.inference.deck_builder import _card_power
+
+        prior = TrophyDeckPrior(
+            set_code="TST",
+            archetypes={
+                "BG": TrophyArchetypePrior(
+                    deck_count=10,
+                    card_scores={"synergy_card": 1.0},
+                ),
+            },
+        )
+        card_map = _card_map({"synergy_card": 0.55})
+        sm = _set_metrics()
+
+        without = _card_power("synergy_card", card_map, sm, "BG", 22)
+        with_prior = _card_power("synergy_card", card_map, sm, "BG", 22, prior)
+
+        assert with_prior == pytest.approx(without + TROPHY_CARD_POWER_BONUS)
+
+    def test_holistic_score_uses_trophy_prior_without_17lands_data(self):
+        prior = TrophyDeckPrior(
+            set_code="TST",
+            archetypes={
+                "BG": TrophyArchetypePrior(
+                    deck_count=10,
+                    card_scores={"a": 1.0, "b": 1.0},
+                    pair_scores={"a\tb": 1.0},
+                    avg_creatures=2.0,
+                    avg_noncreatures=0.0,
+                    avg_cmc=2.0,
+                ),
+            },
+        )
+        scryfall = {
+            "a": _spell("a", ("B",)),
+            "b": _spell("b", ("G",)),
+        }
+
+        score = _holistic_score(["a", "b"], None, None, scryfall, "BG", prior)
+
+        assert 0.0 < score <= TROPHY_DECK_SCORE_BONUS
+
+    def test_suggest_decks_prior_can_choose_more_trophy_like_card(self):
+        from common.inference.pool_analyzer import ScryfallCard
+
+        def spell(name: str) -> ScryfallCard:
+            return ScryfallCard(
+                name=name,
+                mana_cost="{1}{B}",
+                cmc=2,
+                type_line="Creature",
+                oracle_text="",
+                colors=["B"],
+                color_identity=["B"],
+                keywords=[],
+                rarity="common",
+            )
+
+        scryfall = {
+            "high_prior": spell("high_prior"),
+            "low_prior": spell("low_prior"),
+        }
+        prior = TrophyDeckPrior(
+            set_code="TST",
+            archetypes={
+                "WB": TrophyArchetypePrior(
+                    deck_count=10,
+                    card_scores={"high_prior": 1.0, "low_prior": 0.0},
+                    avg_creatures=1.0,
+                    avg_noncreatures=0.0,
+                    avg_cmc=2.0,
+                ),
+            },
+        )
+
+        result = suggest_decks(
+            ["low_prior", "high_prior"],
+            scryfall,
+            card_map=None,
+            set_metrics=None,
+            trophy_prior=prior,
+        )
+
+        top = next(iter(result.values()))
+        assert top.main_deck[0] == "high_prior"
+
+    def test_prior_builder_keeps_true_multicolor_archetype(self):
+        scryfall = {
+            "white": _spell("white", ("W",)),
+            "black": _spell("black", ("B",)),
+            "green": _spell("green", ("G",)),
+        }
+        prior = build_prior_from_trophy_rows(
+            [{"deck_white": 1, "deck_black": 1, "deck_green": 1}],
+            deck_columns=["deck_white", "deck_black", "deck_green"],
+            set_code="TST",
+            scryfall_cards=scryfall,
+            min_pair_count=1,
+        )
+
+        assert any(len(key) == 2 for key in prior.archetypes)
+        assert "WBG" in prior.archetypes
+
+    def test_multicolor_prior_candidate_can_build_three_color_deck(self):
+        from common.inference.pool_analyzer import ScryfallCard
+
+        scryfall: dict[str, ScryfallCard] = {}
+        pool: list[str] = []
+        card_scores: dict[str, float] = {}
+        for i in range(8):
+            name = f"black{i}"
+            scryfall[name] = ScryfallCard(
+                name=name, mana_cost="{1}{B}", cmc=2,
+                type_line="Creature", oracle_text="", colors=["B"],
+                color_identity=["B"], keywords=[], rarity="common",
+            )
+            pool.append(name)
+            card_scores[name] = 0.8
+        for i in range(8):
+            name = f"white_green{i}"
+            scryfall[name] = ScryfallCard(
+                name=name, mana_cost="{1}{W}{G}", cmc=3,
+                type_line="Creature", oracle_text="", colors=["W", "G"],
+                color_identity=["W", "G"], keywords=[], rarity="common",
+            )
+            pool.append(name)
+            card_scores[name] = 1.0
+        scryfall["fixer"] = ScryfallCard(
+            name="fixer", mana_cost="", cmc=0,
+            type_line="Land", oracle_text="Tap: Add one mana of any colour.",
+            colors=[], color_identity=[], keywords=[], rarity="common",
+        )
+        pool.append("fixer")
+        prior = TrophyDeckPrior(
+            set_code="TST",
+            archetypes={
+                "WBG": TrophyArchetypePrior(
+                    deck_count=10,
+                    card_scores=card_scores,
+                    avg_creatures=16.0,
+                    avg_noncreatures=0.0,
+                    avg_cmc=2.5,
+                ),
+            },
+        )
+
+        result = suggest_decks(
+            pool, scryfall, card_map=None, set_metrics=None, trophy_prior=prior,
+        )
+
+        assert next(iter(result)) == "WBG"
 
 
 def _land(name: str, oracle: str = "", color_identity: tuple = ()):

@@ -1,0 +1,40 @@
+name: Refresh grpId Map
+
+on:
+  schedule:
+    # Every Monday 06:00 UTC — a day after MTGJSON's typical daily build.
+    - cron: "0 6 * * 1"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Regenerate grpId map
+        run: python scripts/refresh_grpid_map.py
+
+      - name: Open PR if changed
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "chore: refresh bundled grpId→name map from mtgjson"
+          title: "chore: refresh bundled grpId→name map"
+          body: |
+            Automated refresh of `client/overlay/data/grpid_to_name.json`
+            from MTGJSON's `AllIdentifiers.json`. Merge after a quick sanity
+            check that the file still parses and the count looks reasonable
+            (expected ≳18k mappings).
+          branch: chore/refresh-grpid-map
+          delete-branch: true
+          add-paths: client/overlay/data/grpid_to_name.json

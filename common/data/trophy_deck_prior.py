@@ -9,8 +9,6 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import polars as pl
-
 from common.inference.pool_analyzer import (
     CARD_COLORS,
     ScryfallCard,
@@ -187,6 +185,8 @@ def build_prior_from_17lands_game_data(
     max_pairs_per_archetype: int = 1500,
 ) -> TrophyDeckPrior:
     """Build a compact prior from 17Lands game CSV trophy deck columns."""
+    import polars as pl
+
     deck_cols = _deck_columns(game_data_path)
     if not deck_cols:
         raise ValueError(f"no deck_* columns found in {game_data_path}")
@@ -360,6 +360,8 @@ class _MutableArchetypeStats:
 
 
 def _deck_columns(path: Path) -> list[str]:
+    import polars as pl
+
     return [
         name
         for name in pl.scan_csv(path, infer_schema_length=1000).collect_schema().names()

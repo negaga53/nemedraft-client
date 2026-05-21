@@ -10,7 +10,6 @@ import json
 from pathlib import Path
 
 import httpx
-from tqdm import tqdm
 
 SCRYFALL_BULK_URL = "https://api.scryfall.com/bulk-data"
 
@@ -31,6 +30,8 @@ _FILTERED_FIELDS = [
 
 def download_scryfall_bulk(output_dir: Path = SCRYFALL_DIR) -> Path:
     """Download Scryfall default_cards bulk export and return the path."""
+    from tqdm import tqdm
+
     output_dir.mkdir(parents=True, exist_ok=True)
     out_path = output_dir / "default_cards.json"
     if out_path.exists():

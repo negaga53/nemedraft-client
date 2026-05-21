@@ -13,6 +13,10 @@ datas = [
     (str(ROOT / "client" / "overlay" / "i18n" / "translations.json"), "client/overlay/i18n"),
     # Base client configuration (bundled as fallback defaults)
     (str(ROOT / ".env.client"), "."),
+    # Bundled mtgjson grpId→name fallback — cross-platform; required on
+    # macOS/Linux where the MTGA SQLite fallback can't reach the
+    # Wine-installed card DB.
+    (str(ROOT / "client" / "overlay" / "data" / "grpid_to_name.json"), "client/overlay/data"),
 ]
 
 # Mana icon SVGs (bundled so they work offline — may not exist in CI)

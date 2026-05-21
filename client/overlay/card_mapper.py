@@ -7,6 +7,7 @@ import logging
 import os
 import re
 import sqlite3
+from importlib.resources import files as _resource_files
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -85,10 +86,12 @@ class ArenaCardMapper:
         self._scryfall_dir = scryfall_dir
         self._loaded_sets: set[str] = set()
         self._mtga_db_loaded = False
+        self._bundled_loaded = False
 
         self._load_card_id_map(card_id_map_path)
         if not lazy:
             self._load_scryfall(scryfall_dir)
+            self._load_bundled_mtgjson()
             self._load_mtga_card_db()
 
     def _load_card_id_map(self, path: Path) -> None:
@@ -132,7 +135,10 @@ class ArenaCardMapper:
         return added
 
     def ensure_mtga_fallback(self) -> None:
-        """Load the MTGA client SQLite fallback (idempotent)."""
+        """Load cross-platform mtgjson + MTGA SQLite fallbacks (idempotent)."""
+        if not self._bundled_loaded:
+            self._load_bundled_mtgjson()
+            self._bundled_loaded = True
         if not self._mtga_db_loaded:
             self._load_mtga_card_db()
             self._mtga_db_loaded = True
@@ -204,6 +210,46 @@ class ArenaCardMapper:
                 "Loaded %d additional grpId→name mappings from MTGA client DB (%s)",
                 added,
                 db_path.name,
+            )
+
+    def _load_bundled_mtgjson(self) -> None:
+        """Load grpId→name from the bundled MTGJSON snapshot.
+
+        Cross-platform fallback for sets where Scryfall has no arena_ids
+        (most modern sets at release time). Only grpIds not already covered
+        by Scryfall are added — Scryfall remains primary.
+        """
+        try:
+            raw = (
+                _resource_files("client.overlay.data") / "grpid_to_name.json"
+            ).read_text(encoding="utf-8")
+        except (FileNotFoundError, ModuleNotFoundError):
+            logger.debug("Bundled mtgjson map not found — skipping")
+            return
+        try:
+            payload = json.loads(raw)
+            mapping = payload["grpid_to_name"]
+        except (json.JSONDecodeError, KeyError, TypeError):
+            logger.exception("Bundled mtgjson map is malformed — skipping")
+            return
+
+        added = 0
+        for k, name in mapping.items():
+            try:
+                gid = int(k)
+            except ValueError:
+                continue
+            if gid in self._grpid_to_name or not name:
+                continue
+            self._grpid_to_name[gid] = name
+            self._name_to_grpid.setdefault(name, gid)
+            added += 1
+        if added:
+            meta = payload.get("_meta", {})
+            logger.info(
+                "Loaded %d grpId→name mappings from bundled mtgjson "
+                "(source_date=%s)",
+                added, meta.get("source_date", "unknown"),
             )
 
     def grpid_to_name(self, grpid: int) -> str | None:

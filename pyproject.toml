@@ -40,3 +40,4 @@ namespaces = true
 
 [tool.setuptools.package-data]
 "client.overlay.i18n" = ["*.json"]
+"client.overlay.data" = ["*.json"]

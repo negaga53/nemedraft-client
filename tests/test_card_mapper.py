@@ -46,7 +46,13 @@ def test_bundled_mtgjson_covers_supported_sets(
         card_id_map_path=empty_card_id_map,
     )
     sentinels = {
+        "TMT": (100549, "Improvised Arsenal"),
+        "TLA": (97346, "Sokka's Haiku"),
+        "FDN": (93828, "Alesha, Who Laughs at Fate"),
+        "ECL": (98559, "Noggle Robber"),
         "EOE": (96612, "Starfighter Pilot"),
+        "FIN": (96150, "Balamb Garden, SeeD Academy // Balamb Garden, Airborne"),
+        "SOS": (102577, "Heated Argument"),
     }
     for set_code, (grpid, name) in sentinels.items():
         assert mapper.grpid_to_name(grpid) == name, set_code

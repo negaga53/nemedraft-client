@@ -224,7 +224,10 @@ class ArenaCardMapper:
                 _resource_files("client.overlay.data") / "grpid_to_name.json"
             ).read_text(encoding="utf-8")
         except (FileNotFoundError, ModuleNotFoundError):
-            logger.debug("Bundled mtgjson map not found — skipping")
+            logger.warning(
+                "Bundled mtgjson map not found — grpId resolution will fall "
+                "back to MTGA SQLite (Windows only)"
+            )
             return
         try:
             payload = json.loads(raw)

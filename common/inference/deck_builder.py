@@ -1208,12 +1208,12 @@ def _build_for_pairs(
                 break
 
         # Cap nonbasic lands to adaptive_lands so we don't exceed 40 cards.
-        target_lands = adaptive_lands - len(nonbasic_lands)
-        if target_lands < 0:
-            nonbasic_lands = nonbasic_lands[:adaptive_lands]
-            target_lands = 0
-        if len(nonbasic_lands) > adaptive_lands:
-            nonbasic_lands = nonbasic_lands[:adaptive_lands]
+        # target_lands is the TOTAL land count (basics + nonbasics);
+        # _karsten_mana_base subtracts fixing_lands internally to derive
+        # the basics budget, so we must NOT subtract here too.
+        target_lands = adaptive_lands
+        if len(nonbasic_lands) > target_lands:
+            nonbasic_lands = nonbasic_lands[:target_lands]
 
         fixing_count = len(nonbasic_lands)
         mana_base_colors = list(deck_colors) + splash_colors

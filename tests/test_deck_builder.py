@@ -1407,3 +1407,44 @@ class TestSuggestDecksAdaptiveLandCount:
             f"High-curve deck got {top.land_count} lands, expected 18. "
             f"avg_cmc={top.avg_cmc}"
         )
+
+    def test_total_lands_correct_when_pool_has_nonbasic_lands(self):
+        """Regression: nonbasic lands must not be subtracted twice.
+
+        Caught by the audit harness when post-Karsten snapshots showed
+        land_count of 11-14 on pools that contained Evolving Wilds.
+        _karsten_mana_base subtracts fixing_lands internally to derive
+        the basics budget; the caller passes the TOTAL target.
+        """
+        from common.inference.deck_builder import suggest_decks
+
+        wilds = _sc(
+            "Evolving Wilds",
+            "",
+            0,
+            type_line="Land",
+            oracle="search your library for a basic land card",
+            ci=[],
+        )
+        # Midrange UB pool (avg CMC ~2.7 → targets 17 lands) + 4 Wilds.
+        spells = (
+            [_sc(f"U2_{i}", "{1}{U}", 2, ci=["U"]) for i in range(6)]
+            + [_sc(f"U3_{i}", "{2}{U}", 3, ci=["U"]) for i in range(6)]
+            + [_sc(f"B2_{i}", "{1}{B}", 2, ci=["B"]) for i in range(6)]
+            + [_sc(f"B3_{i}", "{2}{B}", 3, ci=["B"]) for i in range(7)]
+        )
+        pool_names = [c.name for c in spells] + ["Evolving Wilds"] * 4
+        scryfall = {c.name: c for c in spells} | {"Evolving Wilds": wilds}
+
+        suggestions = suggest_decks(
+            pool_names=pool_names, scryfall_cards=scryfall,
+        )
+        top = next(iter(suggestions.values()))
+        # Midrange curve → 17 lands; 4 Wilds + 13 basics = 17.
+        assert top.land_count == 17, (
+            f"Expected 17 total lands, got {top.land_count}. "
+            f"basics={top.lands}, nonbasics={top.nonbasic_lands}, "
+            f"main_deck_size={len(top.main_deck)}"
+        )
+        assert len(top.nonbasic_lands) == 4
+        assert len(top.lands) == 13

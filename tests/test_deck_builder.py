@@ -1318,12 +1318,25 @@ class TestKarstenManaBase:
 
 
 class TestDemoteInfeasibleMinority:
-    def test_eoe_regression_drops_gg_cards_without_sources(self):
-        """Mostly-blue pool with three GG cards used to produce UG with
-        5 Forests. After the demotion fix the GG cards are cut (no
-        green fixing) and the deck collapses to mono-U-ish.
+    def test_eoe_regression_raises_forests_to_floor_keeps_gg_cards(self):
+        """Mostly-blue pool with three GG cards.
+
+        Original behavior (pre-Karsten): 5 Forest / 12 Island with all
+        GG cards in main deck — uncastable.
+
+        Karsten-only behavior (intermediate): demoted to mono-U, all G
+        cards cut.
+
+        Current behavior (floor + keep-cards): UG with ≥7 Forests, all
+        committed-color cards kept including GG cards. The GG cards
+        will be under-supported in practice (8 Forests for a GG
+        4-drop = 57% on curve) but the user prefers this over the
+        algorithm cutting their cards.
         """
-        from common.inference.deck_builder import suggest_decks
+        from common.inference.deck_builder import (
+            suggest_decks,
+            MIN_BASICS_PER_COMMIT_COLOR,
+        )
 
         pool_cards = (
             [_sc(f"BlueU{i}", "{1}{U}", 2, ci=["U"]) for i in range(8)]
@@ -1353,16 +1366,14 @@ class TestDemoteInfeasibleMinority:
         assert suggestions, "expected at least one suggestion"
         top = next(iter(suggestions.values()))
 
-        gg_cards = {"Godmaw", "Grovestrider", "Harmonizer"}
-        kept_gg = [name for name in top.main_deck if name in gg_cards]
-        # No green fixing in pool → all GG cards must be cut.
-        assert kept_gg == [], (
-            f"GG cards survived without green fixing: {kept_gg}. "
-            f"Forests in deck: {top.lands.count('Forest')}"
+        # The 5-Forest / 12-Island anti-pattern must not recur.
+        assert top.lands.count("Forest") >= MIN_BASICS_PER_COMMIT_COLOR, (
+            f"Forest count {top.lands.count('Forest')} below floor; "
+            f"committed G color must reach {MIN_BASICS_PER_COMMIT_COLOR} basics. "
+            f"Lands: {top.lands}"
         )
-        # And the build should not insist on 5 Forests anymore.
-        assert top.lands.count("Forest") <= 2, (
-            f"Too many Forests: {top.lands.count('Forest')} in {top.lands}"
+        assert top.lands.count("Island") >= MIN_BASICS_PER_COMMIT_COLOR, (
+            f"Island count {top.lands.count('Island')} below floor."
         )
 
 
@@ -1504,3 +1515,125 @@ class TestHolisticScoreTrophyFallback:
 
         score = _holistic_score(["a"], card_map, sm, {}, "UR", trophy_prior=None)
         assert score == -1.0
+
+
+class TestBasicsFloor:
+    """A non-splash committed color must receive at least
+    MIN_BASICS_PER_COMMIT_COLOR basic lands, taking from over-floor
+    committed colors when proportional allocation falls short.
+    """
+
+    def test_floor_bumps_under_supplied_minority(self):
+        from common.inference.deck_builder import (
+            _allocate_basics_for_demand,
+            MIN_BASICS_PER_COMMIT_COLOR,
+        )
+
+        # Demand heavily skewed toward G (e.g., GG cards in pool).
+        # Without floor: R would get ~5, G ~11. With floor: R = 7.
+        basics = _allocate_basics_for_demand(
+            deck_colors=["R", "G"],
+            demand={"R": 8, "G": 16},
+            fixing_sources={"R": 0.0, "G": 0.0},
+            basics_budget=16,
+        )
+        assert sum(basics.values()) == 16
+        assert basics["R"] >= MIN_BASICS_PER_COMMIT_COLOR
+        # Donor (G) loses what R gained; still ≥ floor if possible.
+        assert basics["G"] >= MIN_BASICS_PER_COMMIT_COLOR
+
+    def test_floor_does_not_apply_to_splash(self):
+        """Splash colors are handled via the splash-basic-guarantee
+        elsewhere; the allocator should not bump them to 7 basics."""
+        from common.inference.deck_builder import _allocate_basics_for_demand
+
+        basics = _allocate_basics_for_demand(
+            deck_colors=["R", "G", "W"],  # W is the splash
+            demand={"R": 10, "G": 13, "W": 2},
+            fixing_sources={"R": 0.0, "G": 0.0, "W": 0.0},
+            basics_budget=16,
+            splash_colors=["W"],
+        )
+        assert sum(basics.values()) == 16
+        # Splash W can have <7 basics (it just needs 1-2).
+        assert basics["W"] < 7
+        # Committed R and G both at floor.
+        assert basics["R"] >= 7
+        assert basics["G"] >= 7
+
+    def test_floor_skipped_when_budget_too_small(self):
+        """If basics_budget can't support floor for all committed
+        colors, fall back to proportional and let demotion decide."""
+        from common.inference.deck_builder import _allocate_basics_for_demand
+
+        # 3 committed colors, budget only 13 → 3*7 = 21 > 13. Can't meet
+        # floor. Allocator should still return a valid allocation summing
+        # to budget without crashing.
+        basics = _allocate_basics_for_demand(
+            deck_colors=["W", "U", "B"],
+            demand={"W": 10, "U": 10, "B": 10},
+            fixing_sources={"W": 0.0, "U": 0.0, "B": 0.0},
+            basics_budget=13,
+        )
+        assert sum(basics.values()) == 13
+
+
+class TestDemotionSkippedAboveFloor:
+    """Demotion should NOT cut cards if both committed colors can
+    reach MIN_BASICS_PER_COMMIT_COLOR basics. The user explicitly
+    prefers under-supported cards over cut cards.
+    """
+
+    def test_rg_pool_with_five_single_pip_red_keeps_them(self):
+        """Single-pip red cards in a green-heavy RG pool should be
+        kept when 7+ Mountains can be allocated. The minority-color
+        cut path was too aggressive before this change.
+
+        Pool sized so main_deck reaches TARGET_SPELLS (23) and the
+        17-land budget actually exercises proportional allocation +
+        demotion — small pools over-allocate lands and never trigger
+        the bug.
+        """
+        from common.inference.deck_builder import suggest_decks
+
+        # 18 castable green cards (overflows into TARGET_SPELLS = 23
+        # alongside the 5 red cards) → main_deck full, 17 lands.
+        pool_cards = (
+            [_sc(f"G2_{i}", "{1}{G}", 2, ci=["G"]) for i in range(6)]
+            + [_sc(f"G3_{i}", "{2}{G}", 3, ci=["G"]) for i in range(6)]
+            + [_sc(f"G4_{i}", "{3}{G}", 4, ci=["G"]) for i in range(6)]
+            # Red side: 5 single-pip cards across the curve.
+            + [_sc("R1", "{R}", 1, ci=["R"], type_line="Instant")]
+            + [_sc(f"R4_{i}", "{3}{R}", 4, ci=["R"]) for i in range(2)]
+            + [_sc("R4b", "{3}{R}", 4, ci=["R"], type_line="Sorcery")]
+            + [_sc("R7", "{6}{R}", 7, ci=["R"])]
+        )
+        scryfall = {c.name: c for c in pool_cards}
+        pool_names = [c.name for c in pool_cards]
+
+        suggestions = suggest_decks(
+            pool_names=pool_names, scryfall_cards=scryfall,
+        )
+        top = next(iter(suggestions.values()))
+
+        # Main deck should fill out to TARGET_SPELLS, not collapse from
+        # over-aggressive demotion cuts. Before the floor change,
+        # demotion shrank main_deck to ~10 cards because it kept cutting
+        # under-supported R cards instead of allocating 7 Mountains.
+        assert len(top.main_deck) >= 22, (
+            f"main_deck collapsed to {len(top.main_deck)} cards "
+            f"(demotion over-cut). Should be ≥22 with floor. "
+            f"archetype={top.archetype}, lands={dict(__import__('collections').Counter(top.lands))}"
+        )
+        # With floor enforced, all 5 red cards should survive.
+        kept_red = [n for n in top.main_deck if n.startswith("R")]
+        assert len(kept_red) >= 4, (
+            f"Expected ≥4 red cards kept (single-pip safe with floor), "
+            f"got {len(kept_red)}: {kept_red}. Mountains: "
+            f"{top.lands.count('Mountain')}, archetype: {top.archetype}"
+        )
+        mountains = top.lands.count("Mountain")
+        assert mountains >= 7, (
+            f"Expected ≥7 Mountains (floor), got {mountains}. "
+            f"Lands: {top.lands}, archetype: {top.archetype}"
+        )

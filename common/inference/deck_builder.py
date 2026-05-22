@@ -371,23 +371,48 @@ def _fixing_sources_per_color(
     return sources
 
 
+# Minimum basic-land count for a committed (non-splash) color. A
+# 2-color deck with 7+ basics per color reliably casts its single-pip
+# spells across the curve (Karsten ~55%-90% depending on CMC) — below
+# this floor the color is effectively a splash, not a commitment.
+# Per-user preference: rather than cut under-supported cards, raise the
+# minority color's basics to the floor and accept some mana variance
+# on demanding cards (double-pip 3-4 drops still under-supported, but
+# the deck stays the deck a human would register).
+MIN_BASICS_PER_COMMIT_COLOR = 7
+
+
 def _allocate_basics_for_demand(
     *,
     deck_colors: list[str],
     demand: dict[str, int],
     fixing_sources: dict[str, float],
     basics_budget: int,
+    splash_colors: list[str] | None = None,
 ) -> dict[str, int]:
     """Allocate basic lands to meet per-color source demand within budget.
 
     When effective demand (demand − fixing) sums ≤ basics_budget, each
     color receives its effective demand and the remainder pads the
     primary (highest-demand) color. When demand exceeds budget, basics
-    are allocated proportionally to effective demand and the caller
-    must check feasibility via :func:`_is_feasible`.
+    are allocated proportionally to effective demand.
+
+    After proportional allocation, enforces a per-color floor of
+    ``MIN_BASICS_PER_COMMIT_COLOR`` for committed (non-splash) colors:
+    any under-floor committed color is bumped up by taking from the
+    highest-allocated committed color (but never pulling that donor
+    below the floor itself). Splash colors are excluded — they're
+    handled by ``_select_splashes`` + the splash-basic-guarantee.
+
+    The floor is skipped when ``basics_budget`` is too small to fit it
+    for every committed color (e.g., a 3-color deck on a 17-land budget
+    with 4 nonbasic fixers leaves only 13 basics, less than 3*7).
     """
     if not deck_colors:
         return {}
+
+    splash_set = set(splash_colors or [])
+    committed = [c for c in deck_colors if c not in splash_set]
 
     effective = {
         c: max(0, demand.get(c, 0) - int(fixing_sources.get(c, 0.0)))
@@ -412,6 +437,29 @@ def _allocate_basics_for_demand(
     if diff != 0:
         primary = max(deck_colors, key=lambda c: effective.get(c, 0))
         basics[primary] = max(0, basics[primary] + diff)
+
+    # Enforce floor for committed colors. Bump under-floor colors by
+    # pulling from the highest-allocated committed donor that can
+    # afford to give without dropping below its own floor.
+    if committed and basics_budget >= len(committed) * MIN_BASICS_PER_COMMIT_COLOR:
+        for c in committed:
+            shortage = MIN_BASICS_PER_COMMIT_COLOR - basics.get(c, 0)
+            if shortage <= 0:
+                continue
+            donors = sorted(
+                [(basics[x], x) for x in committed if x != c],
+                reverse=True,
+            )
+            for _, donor in donors:
+                available = basics[donor] - MIN_BASICS_PER_COMMIT_COLOR
+                if available <= 0:
+                    continue
+                take = min(shortage, available)
+                basics[c] += take
+                basics[donor] -= take
+                shortage -= take
+                if shortage <= 0:
+                    break
 
     return basics
 
@@ -522,7 +570,25 @@ def _demote_infeasible_minority(
             demand=demand,
             fixing_sources=fixing_sources,
             basics_budget=basics_budget,
+            splash_colors=list(splash_colors),
         )
+        # Floor-aware feasibility: if every committed (non-splash)
+        # color reaches MIN_BASICS_PER_COMMIT_COLOR basics, accept the
+        # deck even when some individual cards are under-supported.
+        # User preference: keep all castable cards and raise basics
+        # rather than cut them. Strict Karsten feasibility only fires
+        # when the floor itself can't be met (e.g., budget too tight
+        # or a color has zero basics after redistribution).
+        committed_colors_in_base = [c for c in deck_colors if c in mana_base_colors]
+        all_committed_at_floor = (
+            committed_colors_in_base
+            and all(
+                trial_basics.get(c, 0) >= MIN_BASICS_PER_COMMIT_COLOR
+                for c in committed_colors_in_base
+            )
+        )
+        if all_committed_at_floor:
+            break
         if _is_feasible(
             demand=demand,
             basics=trial_basics,

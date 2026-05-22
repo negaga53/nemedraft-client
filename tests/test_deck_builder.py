@@ -1448,3 +1448,59 @@ class TestSuggestDecksAdaptiveLandCount:
         )
         assert len(top.nonbasic_lands) == 4
         assert len(top.lands) == 13
+
+
+class TestHolisticScoreTrophyFallback:
+    def test_falls_back_to_trophy_when_card_map_has_no_gihwr(self):
+        """When card_map is present but every entry has gihwr == 0
+        (e.g. a brand-new set that 17Lands hasn't aggregated game data
+        for yet), `_holistic_score` should fall back to the trophy-prior
+        score rather than returning the -1.0 sentinel. Otherwise an EOE
+        deck score reads "-1.00" in the admin GUI / Discord summary
+        even though the recommendation itself is good.
+        """
+        from unittest.mock import MagicMock
+        from common.inference.deck_builder import (
+            _holistic_score,
+            TROPHY_DECK_SCORE_BONUS,
+        )
+
+        # card_map populated but with gihwr=0 everywhere.
+        def _empty_cr() -> MagicMock:
+            cr = MagicMock()
+            cr.deck_colors = {"All Decks": {"gihwr": 0.0}}
+            return cr
+
+        card_map = {f"card{i}": _empty_cr() for i in range(5)}
+        sm = MagicMock()
+        sm.get_metrics.return_value = (0.0, 1.0)
+
+        # Trophy prior returns a known score for the deck.
+        trophy = MagicMock()
+        trophy.score_deck.return_value = 0.5
+
+        deck = [f"card{i}" for i in range(5)]
+        score = _holistic_score(deck, card_map, sm, {}, "UR", trophy)
+
+        # Without the fix this would be -1.0; with the fix it's
+        # 0.5 * TROPHY_DECK_SCORE_BONUS = 4.0.
+        assert score == 0.5 * TROPHY_DECK_SCORE_BONUS, (
+            f"Expected trophy fallback score "
+            f"{0.5 * TROPHY_DECK_SCORE_BONUS}, got {score}"
+        )
+
+    def test_returns_minus_one_when_no_gihwr_and_no_trophy_prior(self):
+        from unittest.mock import MagicMock
+        from common.inference.deck_builder import _holistic_score
+
+        def _empty_cr() -> MagicMock:
+            cr = MagicMock()
+            cr.deck_colors = {"All Decks": {"gihwr": 0.0}}
+            return cr
+
+        card_map = {"a": _empty_cr()}
+        sm = MagicMock()
+        sm.get_metrics.return_value = (0.0, 1.0)
+
+        score = _holistic_score(["a"], card_map, sm, {}, "UR", trophy_prior=None)
+        assert score == -1.0

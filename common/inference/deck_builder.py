@@ -846,6 +846,17 @@ def _holistic_score(
                 wrs.append(gihwr)
 
     if not wrs:
+        # card_map is present but content-empty (e.g. a brand-new set
+        # like EOE that 17Lands hasn't aggregated game data for yet).
+        # Mirror the no-card_map fallback above: trophy-prior score if
+        # we have one, sentinel otherwise. Without this branch the
+        # admin GUI / Discord summary shows "-1.00" on every fresh-set
+        # deck even though the recommendation itself is fine (card
+        # selection has its own trophy fallback in _card_power).
+        if trophy_prior:
+            return trophy_prior.score_deck(
+                deck_names, archetype, scryfall_cards,
+            ) * TROPHY_DECK_SCORE_BONUS
         return -1.0
 
     import statistics

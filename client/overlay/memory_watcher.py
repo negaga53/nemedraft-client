@@ -114,6 +114,16 @@ class MemoryWatcher:
             thread.join(timeout=1.0)
         self._thread = None
 
+    def reset_deck_pool_fingerprint(self) -> None:
+        """Drop the dedup fingerprint so the next poll re-fires DeckPoolDetectedEvent.
+
+        Called by main when the user re-enters Arena's deck-builder. The
+        first emit usually populated the overlay's pool, but the deck tab
+        may have been left for the Pack/Settings tab in the meantime —
+        re-emitting on re-entry guarantees the deck-tab switch fires.
+        """
+        self._previous_deck_pool = None
+
     # -------- internals ----------------------------------------------------
 
     def _run(self) -> None:

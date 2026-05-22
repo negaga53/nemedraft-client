@@ -1319,6 +1319,18 @@ class OverlayApp:
                     if not self.state.draft_active:
                         home.set_draft_loading("")
                         home.set_draft_untrained(False)
+                    # Re-entry into Arena's DeckBuilder for an existing
+                    # draft pool: switch to the overlay's deck tab and
+                    # nudge MemoryWatcher to re-fire DeckPoolDetectedEvent
+                    # so the suggestions refresh.
+                    if event.destination == "DeckBuilder":
+                        if self.memory_watcher is not None:
+                            self.memory_watcher.reset_deck_pool_fingerprint()
+                        if self.state.pool:
+                            self._draft_completed = True
+                            if self.config.features.deck_builder_enabled:
+                                self._update_deck_suggestions()
+                            self.window.show_draft_complete()
                 # If draft was flagged active (e.g. Event_Join) but no pack
                 # has arrived yet, the player backed out from the queue —
                 # reset the session so the UI returns to the home view.

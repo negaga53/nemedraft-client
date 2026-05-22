@@ -421,3 +421,12 @@ def test_lookup_stats_skips_format_with_no_bundle():
     )
     assert source == "PremierDraft"
     assert stats["gihwr"] == 0.6
+
+
+def test_reset_deck_pool_fingerprint_clears_dedup_state():
+    """After reset, the next poll must re-fire DeckPoolDetectedEvent even
+    for the same Arena deck-pool the watcher just emitted on."""
+    mw = MemoryWatcher()
+    mw._previous_deck_pool = ("QuickDraft_EOE_20260511", (1, 2, 3))
+    mw.reset_deck_pool_fingerprint()
+    assert mw._previous_deck_pool is None

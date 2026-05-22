@@ -287,8 +287,15 @@ class DraftCompleteEvent:
 
 @dataclass
 class DraftLobbyEvent:
-    """Emitted when the player navigates to a draft event landing page."""
+    """Emitted when the player navigates to/from a draft event landing page.
+
+    ``context`` is the event identifier (e.g. ``EOE_Quick_Draft``) when
+    entering the lobby, empty when leaving. ``destination`` carries the
+    target scene name on leave (``"Home"``, ``"DeckBuilder"``, …); it is
+    empty on entry and on legacy emissions.
+    """
     context: str
+    destination: str = ""
 
 
 @dataclass
@@ -578,7 +585,7 @@ class LogWatcher:
                     self._emit(DraftLobbyEvent(context=ctx))
             elif from_scene == "EventLanding" and to_scene != "Draft":
                 logger.info("Left draft lobby \u2192 %s", to_scene)
-                self._emit(DraftLobbyEvent(context=""))
+                self._emit(DraftLobbyEvent(context="", destination=to_scene))
             return
 
         # Human draft completion (DraftCompleteDraft).

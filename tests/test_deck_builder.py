@@ -911,3 +911,499 @@ class TestSplitCardCastability:
         assert _is_castable(card, ["U", "B"])
         assert not _is_castable(card, ["U"])
         assert not _is_castable(card, ["B"])
+
+
+# ---------------------------------------------------------------------------
+# Karsten-aware mana base (spec 2026-05-23)
+# ---------------------------------------------------------------------------
+
+
+def _sc(
+    name: str,
+    mc: str,
+    cmc: int,
+    *,
+    type_line: str = "Creature",
+    oracle: str = "",
+    colors: list[str] | None = None,
+    ci: list[str] | None = None,
+    power: str = "2",
+    toughness: str = "2",
+):
+    """Test helper — minimal ScryfallCard with sensible defaults."""
+    from common.inference.pool_analyzer import ScryfallCard
+
+    return ScryfallCard(
+        name=name,
+        mana_cost=mc,
+        cmc=cmc,
+        type_line=type_line,
+        oracle_text=oracle,
+        colors=colors or [],
+        color_identity=ci or [],
+        keywords=[],
+        rarity="common",
+        power=power,
+        toughness=toughness,
+    )
+
+
+class TestRequiredSources:
+    def test_single_pip_curve(self):
+        from common.inference.deck_builder import _required_sources
+
+        # Karsten 40-card single-pip table, with _KARSTEN_RELIABILITY_DROP = 1
+        # (so 80% reliability target — matches limited pro practice).
+        assert _required_sources(1, 1) == 13  # 14 - 1
+        assert _required_sources(1, 2) == 12
+        assert _required_sources(1, 3) == 11
+        assert _required_sources(1, 4) == 10
+        assert _required_sources(1, 5) == 9
+        assert _required_sources(1, 6) == 8
+        assert _required_sources(1, 7) == 7
+        assert _required_sources(1, 8) == 7
+
+    def test_double_pip_curve(self):
+        from common.inference.deck_builder import _required_sources
+
+        assert _required_sources(2, 2) == 17
+        assert _required_sources(2, 3) == 15
+        assert _required_sources(2, 4) == 14
+        assert _required_sources(2, 5) == 13
+        assert _required_sources(2, 6) == 12
+
+    def test_triple_pip_sentinel_unplayable(self):
+        from common.inference.deck_builder import _required_sources
+
+        # Triple pip at any CMC needs ~16-19 sources — effectively
+        # unplayable in a 2-color deck. The lookup returns a high
+        # sentinel so the feasibility check trips correctly.
+        assert _required_sources(3, 3) >= 19
+        assert _required_sources(3, 5) >= 17
+
+    def test_clamps_high_cmc(self):
+        from common.inference.deck_builder import _required_sources
+
+        # CMC > 8 collapses to the CMC 8 row.
+        assert _required_sources(1, 9) == _required_sources(1, 8)
+        assert _required_sources(2, 15) == _required_sources(2, 8)
+
+    def test_zero_pips_returns_zero(self):
+        from common.inference.deck_builder import _required_sources
+
+        assert _required_sources(0, 3) == 0
+        assert _required_sources(0, 7) == 0
+
+
+class TestDemandPerColor:
+    def test_single_card(self):
+        from common.inference.deck_builder import _demand_per_color
+
+        cards = [_sc("Grovestrider", "{3}{G}{G}", 5, ci=["G"])]
+        demand = _demand_per_color(cards, deck_colors=["G", "U"])
+        # GG at CMC 5 → 14 sources at 90%, 13 at 80%.
+        assert demand["G"] == 13
+        assert demand.get("U", 0) == 0
+
+    def test_max_not_sum(self):
+        from common.inference.deck_builder import _demand_per_color
+
+        # Three single-pip green cards at the same CMC: demand should be
+        # one card's worth (12 at 90%, 11 at 80%), not three times that.
+        cards = [
+            _sc("g1", "{2}{G}", 3, ci=["G"], type_line="Sorcery"),
+            _sc("g2", "{2}{G}", 3, ci=["G"], type_line="Sorcery"),
+            _sc("g3", "{2}{G}", 3, ci=["G"], type_line="Sorcery"),
+        ]
+        demand = _demand_per_color(cards, deck_colors=["G"])
+        assert demand["G"] == 11
+
+    def test_takes_max_across_pips(self):
+        from common.inference.deck_builder import _demand_per_color
+
+        # Single-pip 6-drop vs. double-pip 4-drop: double-pip wins.
+        six = _sc("Six", "{5}{G}", 6, ci=["G"], type_line="Sorcery")
+        four = _sc("Four", "{2}{G}{G}", 4, ci=["G"])
+        demand = _demand_per_color([six, four], deck_colors=["G"])
+        # Single-pip 6: 9 - 1 = 8. Double-pip 4: 15 - 1 = 14. Max wins.
+        assert demand["G"] == 14
+
+    def test_handles_split_cards(self):
+        from common.inference.deck_builder import _demand_per_color
+
+        # {1}{G} // {2}{B}{B} — playable on either face, so demand is
+        # max(single-pip G CMC 2, double-pip B CMC 4).
+        split = _sc(
+            "Bind // Liberate",
+            "{1}{G} // {2}{B}{B}",
+            2,
+            ci=["B", "G"],
+            type_line="Sorcery // Sorcery",
+        )
+        demand = _demand_per_color([split], deck_colors=["B", "G"])
+        # Single-pip G at CMC 2: 13 - 1 = 12. Double-pip B at CMC 4: 15 - 1 = 14.
+        assert demand["G"] == 12
+        assert demand["B"] == 14
+
+
+class TestFixingSourcesPerColor:
+    def test_universal_fixer(self):
+        from common.inference.deck_builder import _fixing_sources_per_color
+
+        wilds = _sc(
+            "Evolving Wilds",
+            "",
+            0,
+            type_line="Land",
+            oracle="search your library for a basic land card",
+            ci=[],
+        )
+        sources = _fixing_sources_per_color(
+            ["Evolving Wilds"],
+            {"Evolving Wilds": wilds},
+            deck_colors=["W", "U"],
+        )
+        # Universal fixer = 1.0 source for every deck color.
+        assert sources["W"] == 1.0
+        assert sources["U"] == 1.0
+
+    def test_tapped_dual_discounted(self):
+        from common.inference.deck_builder import _fixing_sources_per_color
+
+        dual = _sc(
+            "Sunken Hollow",
+            "",
+            0,
+            type_line="Land",
+            oracle="Sunken Hollow enters the battlefield tapped.\n{T}: Add {U} or {B}.",
+            ci=["B", "U"],
+        )
+        sources = _fixing_sources_per_color(
+            ["Sunken Hollow"],
+            {"Sunken Hollow": dual},
+            deck_colors=["B", "U"],
+        )
+        assert sources["B"] == 0.85
+        assert sources["U"] == 0.85
+
+    def test_untapped_dual_full(self):
+        from common.inference.deck_builder import _fixing_sources_per_color
+
+        dual = _sc(
+            "Brushland",
+            "",
+            0,
+            type_line="Land",
+            oracle="{T}: Add {C}. {T}: Add {G} or {W}. Brushland deals 1 damage to you.",
+            ci=["G", "W"],
+        )
+        sources = _fixing_sources_per_color(
+            ["Brushland"],
+            {"Brushland": dual},
+            deck_colors=["G", "W"],
+        )
+        assert sources["G"] == 1.0
+        assert sources["W"] == 1.0
+
+    def test_off_color_ignored(self):
+        from common.inference.deck_builder import _fixing_sources_per_color
+
+        dual = _sc(
+            "Stomping Ground",
+            "",
+            0,
+            type_line="Land",
+            oracle="{T}: Add {R} or {G}.",
+            ci=["G", "R"],
+        )
+        sources = _fixing_sources_per_color(
+            ["Stomping Ground"],
+            {"Stomping Ground": dual},
+            deck_colors=["W", "U"],
+        )
+        assert sources.get("W", 0) == 0
+        assert sources.get("U", 0) == 0
+
+
+class TestAllocateBasicsForDemand:
+    def test_over_budget_proportional(self):
+        from common.inference.deck_builder import _allocate_basics_for_demand
+
+        # UG deck, demand G=11, U=9 → totals 20, over budget. Allocate
+        # proportionally to demand: G = round(11/20 * 17) = 9,
+        # U = 17 - 9 = 8.
+        basics = _allocate_basics_for_demand(
+            deck_colors=["G", "U"],
+            demand={"G": 11, "U": 9},
+            fixing_sources={"G": 0.0, "U": 0.0},
+            basics_budget=17,
+        )
+        assert sum(basics.values()) == 17
+        assert basics["G"] == 9
+        assert basics["U"] == 8
+
+    def test_under_budget_pads_primary(self):
+        from common.inference.deck_builder import _allocate_basics_for_demand
+
+        # Mono-U demand 9, budget 17 — pads to 17 islands.
+        basics = _allocate_basics_for_demand(
+            deck_colors=["U"],
+            demand={"U": 9},
+            fixing_sources={"U": 0.0},
+            basics_budget=17,
+        )
+        assert basics["U"] == 17
+
+    def test_fixing_subtracts_from_demand(self):
+        from common.inference.deck_builder import _allocate_basics_for_demand
+
+        # UG deck, demand G=11, U=9. One Evolving Wilds → +1 to each.
+        # basics_budget = 16 (the Wilds takes a land slot). Effective
+        # demand G=10, U=8 → totals 18, still over budget. Allocate
+        # proportionally: G = round(10/18 * 16) = 9, U = 16 - 9 = 7.
+        basics = _allocate_basics_for_demand(
+            deck_colors=["G", "U"],
+            demand={"G": 11, "U": 9},
+            fixing_sources={"G": 1.0, "U": 1.0},
+            basics_budget=16,
+        )
+        assert sum(basics.values()) == 16
+        assert basics["G"] == 9
+        assert basics["U"] == 7
+
+
+class TestIsFeasible:
+    def test_satisfied(self):
+        from common.inference.deck_builder import _is_feasible
+
+        # G demand 11, allocation gives 11 basics + 0 fixing = 11 sources.
+        assert _is_feasible(
+            demand={"G": 11, "U": 9},
+            basics={"G": 11, "U": 9},
+            fixing_sources={"G": 0.0, "U": 0.0},
+        )
+
+    def test_starved(self):
+        from common.inference.deck_builder import _is_feasible
+
+        # G demand 15 (the EOE GG case), basics gives 5, no G fixing.
+        # 5 < 15 → infeasible.
+        assert not _is_feasible(
+            demand={"G": 15, "U": 12},
+            basics={"G": 5, "U": 12},
+            fixing_sources={"G": 0.0, "U": 0.0},
+        )
+
+
+class TestAdaptiveTargetLands:
+    def test_aggro_runs_16(self):
+        from common.inference.deck_builder import _adaptive_target_lands
+
+        # 23 low-curve creatures, avg CMC ~2.0, no 6+ drops, no X-spells.
+        cards = [
+            _sc(f"Aggro{i}", "{1}{R}", 2, ci=["R"], power="2", toughness="1")
+            for i in range(23)
+        ]
+        cmcs = [2] * 23
+        assert _adaptive_target_lands(cards, cmcs) == 16
+
+    def test_midrange_runs_17(self):
+        from common.inference.deck_builder import _adaptive_target_lands
+
+        cards = (
+            [_sc(f"c2_{i}", "{1}{U}", 2, ci=["U"]) for i in range(8)]
+            + [_sc(f"c3_{i}", "{2}{U}", 3, ci=["U"]) for i in range(10)]
+            + [_sc(f"c4_{i}", "{3}{U}", 4, ci=["U"]) for i in range(5)]
+        )
+        cmcs = [2] * 8 + [3] * 10 + [4] * 5
+        assert _adaptive_target_lands(cards, cmcs) == 17
+
+    def test_high_curve_runs_18(self):
+        from common.inference.deck_builder import _adaptive_target_lands
+
+        # Avg CMC 3.4, with multiple 6-drops.
+        cards = (
+            [_sc(f"c2_{i}", "{1}{U}", 2, ci=["U"]) for i in range(3)]
+            + [_sc(f"c3_{i}", "{2}{U}", 3, ci=["U"]) for i in range(8)]
+            + [_sc(f"c4_{i}", "{3}{U}", 4, ci=["U"]) for i in range(8)]
+            + [_sc(f"c6_{i}", "{5}{U}", 6, ci=["U"]) for i in range(4)]
+        )
+        cmcs = [2] * 3 + [3] * 8 + [4] * 8 + [6] * 4
+        assert _adaptive_target_lands(cards, cmcs) == 18
+
+    def test_mana_sinks_force_18(self):
+        from common.inference.deck_builder import _adaptive_target_lands
+
+        # Low curve but 4 X-spell mana sinks → 18 lands.
+        sinks = [
+            _sc(f"x_{i}", "{X}{U}", 2, ci=["U"], type_line="Sorcery")
+            for i in range(2)
+        ] + [
+            _sc("x3", "{X}{U}{U}", 3, ci=["U"], type_line="Sorcery"),
+            _sc("x4", "{X}{U}{U}{U}", 4, ci=["U"], type_line="Sorcery"),
+        ]
+        filler = [_sc(f"f{i}", "{1}{U}", 2, ci=["U"]) for i in range(19)]
+        cards = sinks + filler
+        cmcs = [c.cmc for c in cards]
+        assert _adaptive_target_lands(cards, cmcs) == 18
+
+
+class TestKarstenManaBase:
+    def test_satisfies_demand_when_possible(self):
+        from common.inference.deck_builder import _karsten_mana_base
+
+        # UG deck: U=9 (CMC 5 single-pip), G=11 (CMC 3 single-pip).
+        # Total 20 > 17 → over budget, allocate proportionally.
+        cards = [
+            _sc("U5", "{4}{U}", 5, ci=["U"], type_line="Sorcery"),
+            _sc("G3", "{2}{G}", 3, ci=["G"], power="3", toughness="3"),
+        ]
+        lands = _karsten_mana_base(cards, ["G", "U"], fixing_lands=0)
+        assert len(lands) == 17
+        # G demand 11 vs U demand 9 → proportional 11/20*17=9, 17-9=8.
+        assert lands.count("Forest") == 9
+        assert lands.count("Island") == 8
+
+    def test_eoe_regression_proportional_output(self):
+        """The EOE pool that motivated the rework. The rewritten
+        _karsten_mana_base allocates the best proportional split it can;
+        the demotion path (Task 7) is what turns this into a sensible
+        deck. This test only pins the proportional output.
+        """
+        from common.inference.deck_builder import _karsten_mana_base
+
+        cards = (
+            [_sc(f"U{i}", "{1}{U}", 2, ci=["U"]) for i in range(11)]
+            + [_sc("UU2", "{U}{U}", 2, ci=["U"])]
+            + [_sc("Godmaw", "{5}{G}{G}", 7, ci=["G"], power="3", toughness="3")]
+            + [_sc("Grove", "{3}{G}{G}", 5, ci=["G"], power="3", toughness="3")]
+            + [_sc("Harm", "{2}{G}{G}", 4, ci=["G"], power="3", toughness="3")]
+            + [_sc("Way", "{2}{G}", 3, ci=["G"], power="3", toughness="3")]
+            + [_sc("Seed", "{G}", 1, ci=["G"], type_line="Instant")]
+        )
+        lands = _karsten_mana_base(cards, ["G", "U"], fixing_lands=0)
+        assert len(lands) == 17
+        assert lands.count("Forest") + lands.count("Island") == 17
+
+    def test_with_fixing_returns_basics_and_sources(self):
+        from common.inference.deck_builder import (
+            _karsten_mana_base_with_fixing,
+        )
+
+        wilds = _sc(
+            "Evolving Wilds",
+            "",
+            0,
+            type_line="Land",
+            oracle="search your library for a basic land card",
+            ci=[],
+        )
+        scryfall = {"Evolving Wilds": wilds}
+        cards = [
+            _sc("U3", "{2}{U}", 3, ci=["U"]),
+            _sc("G3", "{2}{G}", 3, ci=["G"]),
+        ]
+        lands, sources = _karsten_mana_base_with_fixing(
+            deck_cards=cards,
+            deck_colors=["G", "U"],
+            nonbasic_lands=["Evolving Wilds"],
+            scryfall_cards=scryfall,
+            total_land_slots=17,
+        )
+        # 16 basics + 1 universal fixer = 17 total slots.
+        assert len(lands) == 16
+        # Universal fixer contributes 1.0 to each color.
+        assert sources["G"] == 1.0
+        assert sources["U"] == 1.0
+
+
+class TestDemoteInfeasibleMinority:
+    def test_eoe_regression_drops_gg_cards_without_sources(self):
+        """Mostly-blue pool with three GG cards used to produce UG with
+        5 Forests. After the demotion fix the GG cards are cut (no
+        green fixing) and the deck collapses to mono-U-ish.
+        """
+        from common.inference.deck_builder import suggest_decks
+
+        pool_cards = (
+            [_sc(f"BlueU{i}", "{1}{U}", 2, ci=["U"]) for i in range(8)]
+            + [_sc(f"BlueUU{i}", "{U}{U}", 2, ci=["U"]) for i in range(3)]
+            + [_sc("Mouth", "{6}{U}", 7, ci=["U"])]
+            + [_sc("Mechanozoa1", "{4}{U}{U}", 6, ci=["U"])]
+            + [_sc("Mechanozoa2", "{4}{U}{U}", 6, ci=["U"])]
+            + [_sc("Mechanozoa3", "{4}{U}{U}", 6, ci=["U"])]
+            + [
+                _sc("DivertA", "{1}{U}", 2, ci=["U"], type_line="Instant"),
+                _sc("DivertB", "{1}{U}", 2, ci=["U"], type_line="Instant"),
+                _sc("DivertC", "{1}{U}", 2, ci=["U"], type_line="Instant"),
+                _sc("DivertD", "{1}{U}", 2, ci=["U"], type_line="Instant"),
+            ]
+            + [_sc("Godmaw", "{5}{G}{G}", 7, ci=["G"])]
+            + [_sc("Grovestrider", "{3}{G}{G}", 5, ci=["G"])]
+            + [_sc("Harmonizer", "{2}{G}{G}", 4, ci=["G"])]
+            + [_sc("Wayfarer", "{2}{G}", 3, ci=["G"])]
+            + [_sc("SeedshipImpact", "{G}", 1, ci=["G"], type_line="Instant")]
+        )
+        scryfall = {c.name: c for c in pool_cards}
+        pool_names = [c.name for c in pool_cards]
+
+        suggestions = suggest_decks(
+            pool_names=pool_names, scryfall_cards=scryfall,
+        )
+        assert suggestions, "expected at least one suggestion"
+        top = next(iter(suggestions.values()))
+
+        gg_cards = {"Godmaw", "Grovestrider", "Harmonizer"}
+        kept_gg = [name for name in top.main_deck if name in gg_cards]
+        # No green fixing in pool → all GG cards must be cut.
+        assert kept_gg == [], (
+            f"GG cards survived without green fixing: {kept_gg}. "
+            f"Forests in deck: {top.lands.count('Forest')}"
+        )
+        # And the build should not insist on 5 Forests anymore.
+        assert top.lands.count("Forest") <= 2, (
+            f"Too many Forests: {top.lands.count('Forest')} in {top.lands}"
+        )
+
+
+class TestSuggestDecksAdaptiveLandCount:
+    def test_aggro_pool_runs_16_lands(self):
+        """All-1-and-2-drop pool should produce a 16-land build."""
+        from common.inference.deck_builder import suggest_decks
+
+        # Mono-U so the WU pair (default when top_colors pads to two
+        # colors) builds a real deck rather than an empty one.
+        pool = (
+            [_sc(f"Aggro{i}", "{U}", 1, ci=["U"]) for i in range(12)]
+            + [_sc(f"Med{i}", "{1}{U}", 2, ci=["U"]) for i in range(20)]
+        )
+        scryfall = {c.name: c for c in pool}
+        suggestions = suggest_decks(
+            pool_names=[c.name for c in pool],
+            scryfall_cards=scryfall,
+        )
+        top = next(iter(suggestions.values()))
+        assert top.land_count == 16, (
+            f"Aggro deck got {top.land_count} lands, expected 16. "
+            f"avg_cmc={top.avg_cmc}"
+        )
+
+    def test_high_curve_pool_runs_18_lands(self):
+        """Pool with many 5-6 drops should produce an 18-land build."""
+        from common.inference.deck_builder import suggest_decks
+
+        pool = (
+            [_sc(f"Big{i}", "{5}{U}", 6, ci=["U"]) for i in range(8)]
+            + [_sc(f"Mid4{i}", "{3}{U}", 4, ci=["U"]) for i in range(10)]
+            + [_sc(f"Mid3{i}", "{2}{U}", 3, ci=["U"]) for i in range(10)]
+        )
+        scryfall = {c.name: c for c in pool}
+        suggestions = suggest_decks(
+            pool_names=[c.name for c in pool],
+            scryfall_cards=scryfall,
+        )
+        top = next(iter(suggestions.values()))
+        assert top.land_count == 18, (
+            f"High-curve deck got {top.land_count} lands, expected 18. "
+            f"avg_cmc={top.avg_cmc}"
+        )

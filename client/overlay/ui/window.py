@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from PySide6.QtCore import QPoint, QThread, QTimer, Qt, Signal, Slot
-from PySide6.QtGui import QCloseEvent, QCursor, QPixmap
+from PySide6.QtGui import QCloseEvent, QCursor, QPixmap, QShowEvent
 from PySide6.QtWidgets import (
     QApplication,
     QHBoxLayout,
@@ -23,6 +23,7 @@ from common.inference.pool_analyzer import PoolAnalysis
 from client.overlay.config import OverlayConfig
 from client.overlay.i18n import Translator, card_name, tr
 from common.inference.signals import SignalResult
+from client.overlay.ui._macos import elevate_to_floating
 from client.overlay.ui.deck_tab import DeckTab
 from client.overlay.ui.pack_tab import PackTab
 from client.overlay.ui.settings_tab import SettingsTab
@@ -160,6 +161,18 @@ class OverlayWindow(QWidget):
         drag_row.addWidget(self._brand_label)
         drag_row.addWidget(self._version_label)
         drag_row.addStretch()
+
+        self._min_btn = QPushButton("‒")
+        self._min_btn.setFixedSize(26, 22)
+        self._min_btn.setToolTip(tr("minimize_tooltip"))
+        self._min_btn.setStyleSheet(
+            "QPushButton { background: rgba(50,50,80,.5);"
+            " border: 1px solid #2a2a3e; border-radius: 3px; color: #e0e0e0;"
+            " font-size: 16px; font-weight: 700; padding: 0 0 4px 0; }"
+            "QPushButton:hover { background: rgba(80,80,120,.9); color: #fff; }"
+        )
+        self._min_btn.clicked.connect(self.showMinimized)
+        drag_row.addWidget(self._min_btn)
 
         self._close_btn = QPushButton("✕")
         self._close_btn.setFixedSize(26, 22)
@@ -393,6 +406,7 @@ class OverlayWindow(QWidget):
         """Refresh all UI labels and re-render cached data with the current language."""
         self.setWindowTitle(f"{tr('app_title')} — v{__version__}")
         self._toggle_btn.setToolTip(tr("toggle_compact_tooltip"))
+        self._min_btn.setToolTip(tr("minimize_tooltip"))
         self._close_btn.setToolTip(tr("close_tooltip"))
         self.tabs.setTabText(self._tab_pack_idx, tr("tab_pack"))
         self.tabs.setTabText(self._tab_deck_idx, tr("tab_deck"))
@@ -440,6 +454,11 @@ class OverlayWindow(QWidget):
         """Quit the entire application when the overlay window is closed."""
         event.accept()
         QApplication.instance().quit()
+
+    def showEvent(self, event: QShowEvent) -> None:  # noqa: N802
+        """Elevate the macOS NSWindow level after the native window exists."""
+        super().showEvent(event)
+        elevate_to_floating(self)
 
     # -- thread-safe update entry points -------------------------------------
 

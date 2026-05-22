@@ -231,3 +231,31 @@ def test_show_art_false_hides_art_label(qapp):
     row = CardRow(show_stats=True, show_art=False)
     row.set_data(pick, max_score=1.0)
     assert row.art_label.isHidden()
+
+
+def test_overlay_window_has_minimize_button(qapp):
+    from PySide6.QtCore import Qt
+    from client.overlay.ui.window import OverlayWindow
+    from client.overlay.config import OverlayConfig
+
+    w = OverlayWindow(OverlayConfig(), transparent=False, show_art=False)
+    assert hasattr(w, "_min_btn")
+    # Sits immediately before the close button in the drag row.
+    assert w._min_btn.toolTip() == "Minimize overlay"
+    # Click minimises the window.
+    w.show()
+    w._min_btn.click()
+    qapp.processEvents()
+    assert w.windowState() & Qt.WindowState.WindowMinimized
+
+
+def test_elevate_to_floating_is_noop_off_darwin():
+    """On non-Mac platforms (including the WSL test machine) the helper must not raise."""
+    from client.overlay.ui._macos import elevate_to_floating
+
+    # Pass a dummy object; the function should bail out before touching it.
+    class _Dummy:
+        def winId(self) -> int:
+            raise AssertionError("should not be called off-darwin")
+
+    elevate_to_floating(_Dummy())

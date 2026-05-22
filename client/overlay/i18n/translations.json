@@ -87,6 +87,7 @@
 
     "toggle_compact_tooltip": "Toggle compact / full view",
     "close_tooltip": "Close overlay",
+    "minimize_tooltip": "Minimize overlay",
 
     "archetype_label": "Archetype:",
     "copy_deck_btn": "Copy",
@@ -204,6 +205,7 @@
 
     "toggle_compact_tooltip": "Basculer vue compacte / complète",
     "close_tooltip": "Fermer l'overlay",
+    "minimize_tooltip": "Réduire l'overlay",
 
     "archetype_label": "Archétype :",
     "copy_deck_btn": "Copier",
@@ -321,6 +323,7 @@
 
     "toggle_compact_tooltip": "Alternar vista compacta / completa",
     "close_tooltip": "Cerrar overlay",
+    "minimize_tooltip": "Minimizar overlay",
 
     "archetype_label": "Arquetipo:",
     "copy_deck_btn": "Copiar",
@@ -438,6 +441,7 @@
 
     "toggle_compact_tooltip": "Kompakt- / Vollansicht umschalten",
     "close_tooltip": "Overlay schließen",
+    "minimize_tooltip": "Overlay minimieren",
 
     "archetype_label": "Archetyp:",
     "copy_deck_btn": "Kopieren",
@@ -555,6 +559,7 @@
 
     "toggle_compact_tooltip": "Alternar vista compacta / completa",
     "close_tooltip": "Fechar overlay",
+    "minimize_tooltip": "Minimizar overlay",
 
     "archetype_label": "Arquétipo:",
     "copy_deck_btn": "Copiar",
@@ -672,6 +677,7 @@
 
     "toggle_compact_tooltip": "Alterna vista compatta / completa",
     "close_tooltip": "Chiudi overlay",
+    "minimize_tooltip": "Riduci overlay",
 
     "archetype_label": "Archetipo:",
     "copy_deck_btn": "Copia",
@@ -789,6 +795,7 @@
 
     "toggle_compact_tooltip": "コンパクト/フル表示切替",
     "close_tooltip": "オーバーレイを閉じる",
+    "minimize_tooltip": "オーバーレイを最小化",
 
     "archetype_label": "アーキタイプ:",
     "copy_deck_btn": "コピー",
@@ -905,6 +912,7 @@
 
     "toggle_compact_tooltip": "컴팩트 / 전체 보기 전환",
     "close_tooltip": "오버레이 닫기",
+    "minimize_tooltip": "오버레이 최소화",
 
     "archetype_label": "아키타입:",
     "copy_deck_btn": "복사",
@@ -1021,6 +1029,7 @@
 
     "toggle_compact_tooltip": "切换紧凑/完整视图",
     "close_tooltip": "关闭覆盖层",
+    "minimize_tooltip": "最小化覆盖层",
 
     "archetype_label": "原型:",
     "copy_deck_btn": "复制",

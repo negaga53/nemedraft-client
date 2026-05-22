@@ -65,6 +65,7 @@ jobs:
           fi
 
       - name: Upload artefact
+        if: runner.os != 'macOS'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.asset_name }}

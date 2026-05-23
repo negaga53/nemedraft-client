@@ -23,11 +23,15 @@ GITHUB_API_URL = (
 )
 
 # Map (system, machine) → expected release asset name.
+# macOS ships a zipped .app bundle (a directory, not a single binary),
+# so the asset has a ``-app.zip`` suffix — matching the build-client
+# workflow's ``${{ matrix.asset_name }}-app`` upload step. The release-
+# prep script then writes the file out as ``…-app.zip``.
 _ASSET_MAP: dict[tuple[str, str], str] = {
     ("Windows", "AMD64"): "NemeDraft-Windows-x64.exe",
     ("Windows", "x86_64"): "NemeDraft-Windows-x64.exe",
-    ("Darwin", "arm64"): "NemeDraft-macOS-arm64",
-    ("Darwin", "x86_64"): "NemeDraft-macOS-x64",
+    ("Darwin", "arm64"): "NemeDraft-macOS-arm64-app.zip",
+    ("Darwin", "x86_64"): "NemeDraft-macOS-x64-app.zip",
     ("Linux", "x86_64"): "NemeDraft-Linux-x64",
     ("Linux", "AMD64"): "NemeDraft-Linux-x64",
 }
@@ -131,7 +135,15 @@ def download_update(
         httpx.HTTPStatusError: On HTTP errors.
         OSError: On filesystem errors.
     """
-    suffix = ".exe" if platform.system() == "Windows" else ""
+    system = platform.system()
+    if system == "Windows":
+        suffix = ".exe"
+    elif system == "Darwin":
+        # macOS ships a zipped .app bundle — keep the .zip extension so
+        # ``unzip`` recognises the archive later.
+        suffix = ".zip"
+    else:
+        suffix = ""
     fd, tmp_path = tempfile.mkstemp(prefix="nemedraft_update_", suffix=suffix)
     os.close(fd)
     tmp = Path(tmp_path)
@@ -149,8 +161,10 @@ def download_update(
                         if progress_callback and total:
                             progress_callback(downloaded, total)
 
-        # Mark executable on Unix.
-        if platform.system() != "Windows":
+        # Mark executable on Linux (single-file binary). macOS downloads
+        # a .zip archive — chmod +x on a zip is meaningless and the
+        # actual executable inside the bundle keeps its original mode.
+        if system == "Linux":
             tmp.chmod(
                 tmp.stat().st_mode | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH
             )
@@ -170,14 +184,21 @@ def apply_update_and_restart(new_binary: Path) -> None:
     process to release the file lock, then swaps the binary and launches
     the updated version.
 
-    On **macOS / Linux** the binary is replaced in-place and the process
-    is restarted via ``os.execv``.
+    On **macOS** the downloaded ``.zip`` is unpacked, then a helper
+    shell script waits for this process to exit and swaps the entire
+    ``.app`` bundle directory before relaunching via ``open``.
+
+    On **Linux** the binary is replaced in-place and the process is
+    restarted via ``os.execv``.
     """
     current_exe = Path(sys.executable).resolve()
     logger.info("Applying update: %s → %s", new_binary, current_exe)
 
-    if platform.system() == "Windows":
+    system = platform.system()
+    if system == "Windows":
         _apply_windows(current_exe, new_binary)
+    elif system == "Darwin":
+        _apply_macos(current_exe, new_binary)
     else:
         _apply_unix(current_exe, new_binary)
 
@@ -250,3 +271,90 @@ def _apply_unix(current_exe: Path, new_binary: Path) -> None:
 
     # Replace the current process image with the updated binary.
     os.execv(str(current_exe), [str(current_exe)] + sys.argv[1:])
+
+
+def _apply_macos(current_exe: Path, new_archive: Path) -> None:
+    """Replace the running ``.app`` bundle on macOS and relaunch.
+
+    The frozen overlay ships as a ``.app`` directory bundle (typically
+    ``/Applications/NemeDraft.app``) with the actual binary buried at
+    ``Contents/MacOS/NemeDraft``. macOS file-locks the bundle while the
+    binary is executing, so an in-process swap is unsafe — spawn a
+    detached shell helper that waits for our PID to exit, extracts the
+    new bundle, swaps it in, and relaunches via ``open``.
+    """
+    # Walk up from the inner Mach-O binary to find the .app directory.
+    app_bundle: Path | None = None
+    for parent in [current_exe, *current_exe.parents]:
+        if parent.suffix == ".app":
+            app_bundle = parent
+            break
+    if app_bundle is None:
+        raise RuntimeError(
+            f"Could not locate .app bundle starting from {current_exe}; "
+            "macOS update requires the overlay to run from a .app build.",
+        )
+
+    # Extract the zipped bundle into a sibling tempdir so the helper
+    # has a fully-built replacement to move into place.
+    extract_dir = Path(tempfile.mkdtemp(prefix="nemedraft_update_extract_"))
+    try:
+        subprocess.run(
+            ["/usr/bin/unzip", "-q", str(new_archive), "-d", str(extract_dir)],
+            check=True,
+        )
+    except Exception:
+        shutil.rmtree(extract_dir, ignore_errors=True)
+        raise
+
+    extracted_apps = list(extract_dir.glob("*.app"))
+    if not extracted_apps:
+        shutil.rmtree(extract_dir, ignore_errors=True)
+        raise RuntimeError(
+            f"No .app bundle found inside {new_archive}; nothing to install.",
+        )
+    new_app = extracted_apps[0]
+
+    # Strip macOS quarantine xattr so Gatekeeper doesn't block the
+    # relaunch (otherwise the user sees an unsigned-app warning every
+    # update). The signed-app case will fail this check harmlessly.
+    subprocess.run(
+        ["/usr/bin/xattr", "-dr", "com.apple.quarantine", str(new_app)],
+        check=False,
+    )
+
+    # Build a helper that:
+    #   1. Polls until our PID exits (releases the bundle's file locks).
+    #   2. Removes the old .app and moves the new one into place.
+    #   3. Cleans up temp files.
+    #   4. Relaunches via ``open`` (delegates to LaunchServices, which
+    #      starts the app in its own session — no inherited fds).
+    #   5. Self-deletes.
+    our_pid = os.getpid()
+    script_fd, script_path = tempfile.mkstemp(
+        prefix="nemedraft_update_", suffix=".sh",
+    )
+    script = (
+        "#!/bin/bash\n"
+        "set -e\n"
+        f"while kill -0 {our_pid} 2>/dev/null; do sleep 0.3; done\n"
+        "sleep 1\n"
+        f'rm -rf "{app_bundle}"\n'
+        f'mv "{new_app}" "{app_bundle}"\n'
+        f'rm -rf "{extract_dir}"\n'
+        f'rm -f "{new_archive}"\n'
+        f'open "{app_bundle}"\n'
+        f'rm -f "{script_path}"\n'
+    )
+    with os.fdopen(script_fd, "w") as f:
+        f.write(script)
+    os.chmod(script_path, 0o755)
+
+    subprocess.Popen(  # noqa: S603 — script path is generated above
+        ["/bin/bash", script_path],
+        close_fds=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        start_new_session=True,
+    )
+    sys.exit(0)

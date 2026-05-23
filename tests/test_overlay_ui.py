@@ -240,13 +240,20 @@ def test_overlay_window_has_minimize_button(qapp):
 
     w = OverlayWindow(OverlayConfig(), transparent=False, show_art=False)
     assert hasattr(w, "_min_btn")
-    # Sits immediately before the close button in the drag row.
-    assert w._min_btn.toolTip() == "Minimize overlay"
-    # Click minimises the window.
+    # Tooltip mentions the hide-to-tray behaviour added so Windows
+    # users (where Qt.Tool windows have no taskbar entry) can find
+    # the overlay again after clicking minimise.
+    assert "tray" in w._min_btn.toolTip().lower()
+    # Click hides the window. On a headless test runner there's no
+    # system tray, so _minimize_to_tray falls back to showMinimized —
+    # either way the window leaves the normal visible state.
     w.show()
     w._min_btn.click()
     qapp.processEvents()
-    assert w.windowState() & Qt.WindowState.WindowMinimized
+    assert (
+        not w.isVisible()
+        or bool(w.windowState() & Qt.WindowState.WindowMinimized)
+    )
 
 
 def test_elevate_to_floating_is_noop_off_darwin():

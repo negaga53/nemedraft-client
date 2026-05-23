@@ -24,6 +24,15 @@ _mana_icons = ROOT / "data" / "mana_icons"
 if _mana_icons.is_dir() and any(_mana_icons.iterdir()):
     datas.append((str(_mana_icons), "data/mana_icons"))
 
+# App icon — needed at runtime for the window icon AND the system-tray
+# icon (used by minimize-to-tray on Windows where Qt.Tool windows have no
+# taskbar entry). The PyInstaller `icon=` argument below sets the .exe /
+# .icns icon but does NOT copy the PNG into the bundle; this datas entry
+# does. Per AGENTS.md memory, package-data isn't honored here.
+_app_icon = ROOT / "assets" / "icon.png"
+if _app_icon.is_file():
+    datas.append((str(_app_icon), "assets"))
+
 # Card cache directory (may not exist yet at build time)
 card_cache = ROOT / "client" / "overlay" / "i18n" / "card_cache"
 if card_cache.is_dir() and any(card_cache.iterdir()):

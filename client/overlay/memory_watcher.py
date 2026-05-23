@@ -195,7 +195,12 @@ class MemoryWatcher:
 
 _MAX_PACK = 2  # 3-pack draft, 0-indexed
 _MAX_PICK = 14  # 15-card pack, 0-indexed
-_ARENA_PACK_SIZE = 14  # standard Arena booster size
+# Arena booster sizes in current rotation. Older sets use 14-card Play
+# Boosters; newer Premier Draft sets ship 15-card packs. Detection must
+# support both — otherwise 15-card 1-indexed snapshots (total=16) fall
+# through to "no shift" and the overlay displays P2P2 at the first pick.
+_ARENA_PACK_SIZES: tuple[int, ...] = (14, 15)
+_ARENA_PACK_SIZE = _ARENA_PACK_SIZES[0]  # legacy alias — kept for back-compat
 
 
 def _is_valid_position(snap: _DraftSnapshot) -> bool:
@@ -210,10 +215,13 @@ def _detect_index_offset(snap: _DraftSnapshot) -> int:
     we have to figure out which scheme the current snapshot uses.
 
     Primary signal is the pack-size invariant: an open pack at pick
-    ``k`` (0-indexed) has ``pack_size - k`` cards left. So for a
-    14-card Arena booster, ``len(current_pack) + pick_number`` equals
-    14 when 0-indexed and 15 when 1-indexed. This is robust per-frame
-    and needs no prior state.
+    ``k`` (0-indexed) has ``pack_size - k`` cards left. So for a pack
+    of size ``S``, ``len(current_pack) + pick_number`` equals ``S``
+    when 0-indexed and ``S + 1`` when 1-indexed. The ambiguous case is
+    ``total == 15``: it could be a 0-indexed 15-card frame or a
+    1-indexed 14-card frame. Disambiguate via zero-presence — Arena's
+    1-indexed positions are always >= 1, so a zero in pack or pick
+    proves 0-indexing.
 
     Fall back to range when ``current_pack`` is empty (rare: the pack
     has just been auto-picked clean): treat ``pack_number > 2`` or
@@ -223,12 +231,20 @@ def _detect_index_offset(snap: _DraftSnapshot) -> int:
         return 0
     if snap.current_pack:
         total = len(snap.current_pack) + snap.pick_number
-        if total == _ARENA_PACK_SIZE:
-            return 0
-        if total == _ARENA_PACK_SIZE + 1:
+        max_size = max(_ARENA_PACK_SIZES)
+        if total > max_size and total in {s + 1 for s in _ARENA_PACK_SIZES}:
+            # total == max_size + 1 is unambiguous 1-indexed (no 0-indexed
+            # frame can exceed pack_size for any known pack size).
             return 1
-        # Inconsistent invariant — default to no shift rather than risk
-        # a spurious downshift on a 0-indexed odd-pack-size set.
+        if total in _ARENA_PACK_SIZES:
+            # total == 14 → unambiguous 0-indexed 14-card.
+            # total == 15 with all sizes considered: could be 0-indexed
+            # 15-card OR 1-indexed 14-card. Resolve by zero-presence.
+            if total == 15 and snap.pack_number >= 1 and snap.pick_number >= 1:
+                return 1  # 1-indexed 14-card frame (no zeros => 1-indexed)
+            return 0
+        # Inconsistent invariant (e.g. mid-pack with stale read) — default
+        # to no shift rather than risk a spurious downshift.
         return 0
     if snap.pack_number > _MAX_PACK or snap.pick_number > _MAX_PICK:
         return 1

@@ -349,6 +349,62 @@ class _ArenaCurrentEventWorker(QThread):
             self.finished_event.emit(None)
 
 
+class _PredictionWorker(QThread):
+    """Background worker that calls ``api_client.predict`` off the UI thread.
+
+    The HTTP round-trip can take a few seconds; running it synchronously
+    on the Qt main thread freezes the overlay (the dreaded new-pack
+    stutter). Emits ``finished_ok`` with the picks or ``failed`` with an
+    error string. The dispatching call also remembers the pack/pick the
+    worker was started for so stale results from a previous pack can be
+    discarded.
+    """
+
+    finished_ok = Signal(object, int, int)  # list[Pick], pack_number, pick_number
+    failed = Signal(str, int, int)          # error, pack_number, pick_number
+
+    def __init__(
+        self,
+        api_client: NemeDraftClient,
+        *,
+        pack_cards: list[str],
+        pool_cards: list[str],
+        set_code: str,
+        pack_number: int,
+        pick_number: int,
+        draft_format: str,
+        last_pick: str | None,
+        parent: QObject | None = None,
+    ) -> None:
+        super().__init__(parent)
+        self._api_client = api_client
+        self._pack_cards = list(pack_cards)
+        self._pool_cards = list(pool_cards)
+        self._set_code = set_code
+        self._pack_number = pack_number
+        self._pick_number = pick_number
+        self._draft_format = draft_format
+        self._last_pick = last_pick
+
+    def run(self) -> None:  # noqa: D401
+        try:
+            results = self._api_client.predict(
+                pack_cards=self._pack_cards,
+                pool_cards=self._pool_cards,
+                set_code=self._set_code,
+                pack_number=self._pack_number,
+                pick_number=self._pick_number,
+                draft_format=self._draft_format,
+                last_pick=self._last_pick,
+            )
+        except Exception as exc:  # noqa: BLE001
+            self.failed.emit(str(exc), self._pack_number, self._pick_number)
+            return
+        self.finished_ok.emit(
+            list(results or []), self._pack_number, self._pick_number,
+        )
+
+
 _DEDUPE_WINDOW_S = 2.0
 
 
@@ -567,6 +623,13 @@ class OverlayApp:
         # Discard only when the QThread's own `finished` signal fires —
         # that fires after run() has fully returned.
         self._inflight_arena_workers: set[QThread] = set()
+
+        # Ref-keeper for prediction workers; same rationale as above.
+        # ``_current_predict_worker`` tracks the latest dispatch so that
+        # results from a worker started for a now-stale pack can be
+        # discarded without disturbing the in-flight one.
+        self._inflight_predict_workers: set[QThread] = set()
+        self._current_predict_worker: _PredictionWorker | None = None
 
         # If the overlay starts before Arena, keep trying once Arena appears.
         self._arena_identity_worker: _ArenaIdentityWorker | None = None
@@ -1564,89 +1627,162 @@ class OverlayApp:
         return extract_draft_format(self.state.event_name) or ""
 
     def _attempt_prediction(self) -> None:
-        """Single prediction attempt — schedules retry on failure."""
-        try:
-            results = self.api_client.predict(
-                pack_cards=self.state.current_pack,
-                pool_cards=self.state.pool,
-                set_code=self.state.set_code,
-                pack_number=self.state.pack_number,
-                pick_number=self.state.pick_number,
-                draft_format=self._draft_format(),
-                last_pick=self.state.last_pick,
+        """Dispatch a prediction attempt to a background worker.
+
+        The HTTP call runs off the Qt main thread; results land on
+        ``_on_prediction_finished`` (success) or ``_on_prediction_failed``
+        (network/exception). A loading indicator is shown until the
+        worker completes — preventing the new-pack stutter that came
+        from blocking the Qt event loop for the full 5s timeout.
+        """
+        # Surface a spinner immediately so the user gets feedback while
+        # the network call is in flight.
+        self.window.show_prediction_loading(
+            self.state.pack_number, self.state.pick_number,
+        )
+
+        worker = _PredictionWorker(
+            self.api_client,
+            pack_cards=self.state.current_pack,
+            pool_cards=self.state.pool,
+            set_code=self.state.set_code,
+            pack_number=self.state.pack_number,
+            pick_number=self.state.pick_number,
+            draft_format=self._draft_format(),
+            last_pick=self.state.last_pick,
+        )
+        # Capture the worker ref so the slot can compare against the
+        # current-dispatch token. OverlayApp isn't a QObject, so QObject.sender()
+        # is not available here — the closure carries the identity instead.
+        worker.finished_ok.connect(
+            lambda results, pn, pk, w=worker: self._on_prediction_finished(
+                w, results, pn, pk,
+            ),
+        )
+        worker.failed.connect(
+            lambda err, pn, pk, w=worker: self._on_prediction_failed(w, err, pn, pk),
+        )
+        worker.finished.connect(worker.deleteLater)
+        worker.finished.connect(
+            lambda w=worker: self._inflight_predict_workers.discard(w),
+        )
+        self._inflight_predict_workers.add(worker)
+        # Newest dispatch wins — older workers' results get discarded by
+        # the slot when ``worker is not self._current_predict_worker``.
+        self._current_predict_worker = worker
+        worker.start()
+
+    def _on_prediction_finished(
+        self,
+        worker: _PredictionWorker,
+        results: list,
+        pack_number: int,
+        pick_number: int,
+    ) -> None:
+        """Apply prediction results delivered from a ``_PredictionWorker``."""
+        if worker is not self._current_predict_worker:
+            logger.debug(
+                "Discarding stale prediction worker result for P%dP%d",
+                pack_number + 1, pick_number + 1,
             )
-            if not results:
-                logger.warning(
-                    "No prediction results from server (attempt %d)",
-                    self._retry_attempt + 1,
-                )
-                self._schedule_retry()
-                return
-
-            # Success — clear retry state and push results.
-            self._retry_attempt = 0
-            self._retry_start = 0.0
-
-            art_paths: dict[str, Path | None] = {}
-            if self.art_cache.enabled:
-                art_paths = {
-                    r.card: self.art_cache.get(r.card) for r in results
-                }
-            self.window.update_predictions(
-                results=results,
-                set_code=self.state.set_code,
-                pack_number=self.state.pack_number,
-                pick_number=self.state.pick_number,
-                pool_size=len(self.state.pool),
-                art_paths=art_paths if art_paths else None,
+            return
+        if (
+            pack_number != self.state.pack_number
+            or pick_number != self.state.pick_number
+        ):
+            # The user already moved past this pack — drop the result.
+            logger.debug(
+                "Prediction arrived for P%dP%d but state is P%dP%d — discarding",
+                pack_number + 1, pick_number + 1,
+                self.state.pack_number + 1, self.state.pick_number + 1,
             )
+            return
 
-            # Record pick history for the navigator.
-            key = (self.state.pack_number, self.state.pick_number)
-            self.state.pick_history[key] = PickHistoryEntry(
-                pack_number=self.state.pack_number,
-                pick_number=self.state.pick_number,
-                picked_card="",
-                picks=[
-                    {
-                        "card": p.card,
-                        "card_id": p.card_id,
-                        "rank": p.rank,
-                        "score": p.score,
-                        "gihwr": p.gihwr,
-                        "ata": p.ata,
-                        "iwd": p.iwd,
-                        "mana_cost": p.mana_cost,
-                        "colors": list(p.colors),
-                        "type_line": p.type_line,
-                        "is_elite": p.is_elite,
-                        "stats_loaded": p.stats_loaded,
-                        "stats_format": p.stats_format,
-                    }
-                    for p in results
-                ],
-            )
-            self.window.sync_pick_history(self.state.pick_history)
+        self._current_predict_worker = None
 
-            # Pool analysis stays client-side (lightweight).
-            from common.inference.pool_analyzer import analyze_pool
-
-            pool_analysis = analyze_pool(self.state.pool, self.scryfall_cards)
-            self.window.update_pool_analysis(pool_analysis)
-
-            # Signals computed server-side.
-            if self.config.features.signals_enabled:
-                self._update_signals()
-
-            # Deck suggestions client-side.
-            if self.config.features.deck_builder_enabled:
-                self._update_deck_suggestions()
-
-        except Exception:
-            logger.exception(
-                "Prediction failed (attempt %d)", self._retry_attempt + 1,
+        if not results:
+            logger.warning(
+                "No prediction results from server (attempt %d)",
+                self._retry_attempt + 1,
             )
             self._schedule_retry()
+            return
+
+        # Success — clear retry state and push results.
+        self._retry_attempt = 0
+        self._retry_start = 0.0
+
+        art_paths: dict[str, Path | None] = {}
+        if self.art_cache.enabled:
+            art_paths = {
+                r.card: self.art_cache.get(r.card) for r in results
+            }
+        self.window.update_predictions(
+            results=results,
+            set_code=self.state.set_code,
+            pack_number=self.state.pack_number,
+            pick_number=self.state.pick_number,
+            pool_size=len(self.state.pool),
+            art_paths=art_paths if art_paths else None,
+        )
+
+        # Record pick history for the navigator.
+        key = (self.state.pack_number, self.state.pick_number)
+        self.state.pick_history[key] = PickHistoryEntry(
+            pack_number=self.state.pack_number,
+            pick_number=self.state.pick_number,
+            picked_card="",
+            picks=[
+                {
+                    "card": p.card,
+                    "card_id": p.card_id,
+                    "rank": p.rank,
+                    "score": p.score,
+                    "gihwr": p.gihwr,
+                    "ata": p.ata,
+                    "iwd": p.iwd,
+                    "mana_cost": p.mana_cost,
+                    "colors": list(p.colors),
+                    "type_line": p.type_line,
+                    "is_elite": p.is_elite,
+                    "stats_loaded": p.stats_loaded,
+                    "stats_format": p.stats_format,
+                }
+                for p in results
+            ],
+        )
+        self.window.sync_pick_history(self.state.pick_history)
+
+        # Pool analysis stays client-side (lightweight).
+        from common.inference.pool_analyzer import analyze_pool
+
+        pool_analysis = analyze_pool(self.state.pool, self.scryfall_cards)
+        self.window.update_pool_analysis(pool_analysis)
+
+        # Signals computed server-side.
+        if self.config.features.signals_enabled:
+            self._update_signals()
+
+        # Deck suggestions client-side.
+        if self.config.features.deck_builder_enabled:
+            self._update_deck_suggestions()
+
+    def _on_prediction_failed(
+        self,
+        worker: _PredictionWorker,
+        error: str,
+        pack_number: int,
+        pick_number: int,
+    ) -> None:
+        """Handle a failed prediction call from ``_PredictionWorker``."""
+        if worker is not self._current_predict_worker:
+            return
+        self._current_predict_worker = None
+        logger.warning(
+            "Prediction failed for P%dP%d (attempt %d): %s",
+            pack_number + 1, pick_number + 1, self._retry_attempt + 1, error,
+        )
+        self._schedule_retry()
 
     def _schedule_retry(self) -> None:
         """Schedule the next retry, or give up after ``_RETRY_TIMEOUT_S``."""
@@ -1679,6 +1815,8 @@ class OverlayApp:
         self._retry_timer.stop()
         self._retry_attempt = 0
         self._retry_start = 0.0
+        self._current_predict_worker = None
+        self.window.pack_tab.hide_loading()
 
         # Mark server as unreachable on the home tab.
         self.window.pack_tab.home_widget.set_server_status(

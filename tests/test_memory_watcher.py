@@ -207,9 +207,15 @@ def test_diff_drops_phantom_pack_above_two():
 
 
 def test_diff_drops_phantom_pick_above_fourteen():
-    """A 15-card pack has pick_numbers 0..14. Anything past 14 is phantom."""
+    """A pack with pick_numbers above the legitimate range is phantom.
+
+    With 15-card boosters in rotation, 1-indexed ``pick=15`` with one
+    card left is a valid last-pick (total=16, normalised to (0,14)).
+    Use ``len=2`` here so total=17 doesn't match any known pack-size
+    invariant — that's the unambiguous phantom signal we want to drop.
+    """
     prev = _snapshot(pack_number=1, pick_number=14)
-    curr = _snapshot(pack_number=1, pick_number=15, current_pack=(1,))
+    curr = _snapshot(pack_number=1, pick_number=15, current_pack=(1, 2))
     assert _diff_snapshots(prev, curr) == []
 
 
@@ -314,6 +320,61 @@ def test_diff_emits_pick_event_with_normalized_prev_position():
     # Previous (1.1) → normalized (0.0).
     assert pick_events[0].pack_number == 0
     assert pick_events[0].pick_number == 0
+
+
+def test_diff_normalizes_first_pick_of_15_card_booster():
+    """1-indexed start with a 15-card booster: pack=1, pick=1, full 15-card pack.
+
+    Newer Premier Draft sets ship 15-card packs. At 1-indexed P1P1,
+    len(current_pack) + pick_number = 15 + 1 = 16, which is one above
+    pack_size for a 15-card pack. The detector must recognise this as
+    a 1-indexed snapshot and shift to (0, 0); otherwise the overlay
+    silently displays P2P2 at the very first pick.
+    """
+    fifteen = tuple(range(101, 116))  # 15 grpIds
+    curr = _snapshot(
+        pack_number=1, pick_number=1,
+        current_pack=fifteen, picked_cards=(),
+    )
+    events = _diff_snapshots(None, curr)
+    pack_events = [e for e in events if isinstance(e, PackEvent)]
+    assert len(pack_events) == 1
+    assert pack_events[0].pack_number == 0
+    assert pack_events[0].pick_number == 0
+
+
+def test_diff_zero_indexed_15_card_first_pick_unchanged():
+    """0-indexed 15-card P1P1: pack=0, pick=0, len=15.
+
+    total = 15 matches `pack_size+1` for a 14-card pack (1-indexed signal)
+    but the explicit zero in pack/pick proves it's 0-indexed — Arena's
+    1-indexed scheme never emits zeros. The frame must pass through
+    unchanged, not get spuriously shifted to (-1, -1).
+    """
+    fifteen = tuple(range(201, 216))
+    curr = _snapshot(
+        pack_number=0, pick_number=0,
+        current_pack=fifteen, picked_cards=(),
+    )
+    events = _diff_snapshots(None, curr)
+    pack_events = [e for e in events if isinstance(e, PackEvent)]
+    assert len(pack_events) == 1
+    assert pack_events[0].pack_number == 0
+    assert pack_events[0].pick_number == 0
+
+
+def test_diff_normalizes_mid_pack_one_indexed_15_card():
+    """1-indexed mid-pack 15-card: pick=6 with 10 cards left → total=16."""
+    ten = tuple(range(301, 311))
+    curr = _snapshot(
+        pack_number=1, pick_number=6, current_pack=ten,
+        picked_cards=(11, 12, 13, 14, 15),
+    )
+    events = _diff_snapshots(None, curr)
+    pack_events = [e for e in events if isinstance(e, PackEvent)]
+    assert len(pack_events) == 1
+    assert pack_events[0].pack_number == 0
+    assert pack_events[0].pick_number == 5
 
 
 # ---------------------------------------------------------------------------

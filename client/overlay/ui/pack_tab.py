@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
     QLabel,
+    QProgressBar,
     QPushButton,
     QScrollArea,
     QStackedWidget,
@@ -83,6 +84,28 @@ class PackTab(QWidget):
         pill_row.addWidget(self.context_pill)
         pill_row.addStretch()
         layout.addLayout(pill_row)
+
+        # Indeterminate loading bar shown while a prediction is in flight.
+        # Sits between the context pill and the card list so users get
+        # immediate visual feedback when a new pack opens; the existing
+        # ranking stays on screen until the new prediction lands, but the
+        # bar makes clear that a fresher one is on the way.
+        self.loading_bar = QProgressBar()
+        self.loading_bar.setObjectName("predictionLoading")
+        self.loading_bar.setRange(0, 0)  # indeterminate — Qt animates it
+        self.loading_bar.setTextVisible(False)
+        self.loading_bar.setFixedHeight(3)
+        self.loading_bar.setStyleSheet(
+            "QProgressBar#predictionLoading {"
+            "  border: none; background-color: rgba(20, 20, 36, .6);"
+            "  border-radius: 1px; margin: 1px 8px 0 8px;"
+            "}"
+            "QProgressBar#predictionLoading::chunk {"
+            "  background-color: #cfb53b; border-radius: 1px;"
+            "}"
+        )
+        self.loading_bar.setVisible(False)
+        layout.addWidget(self.loading_bar)
 
         # Column header + scrollable card list.
         self._column_header = _ColumnHeader(show_stats=self._show_stats)
@@ -206,6 +229,14 @@ class PackTab(QWidget):
     def is_showing_pack(self) -> bool:
         """True when the pack predictions page is visible."""
         return self._stack.currentIndex() == 1
+
+    def show_loading(self) -> None:
+        """Show the prediction-in-flight loading bar."""
+        self.loading_bar.setVisible(True)
+
+    def hide_loading(self) -> None:
+        """Hide the prediction loading bar (called when results arrive)."""
+        self.loading_bar.setVisible(False)
 
     def update_predictions(
         self,

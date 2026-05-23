@@ -87,7 +87,9 @@
 
     "toggle_compact_tooltip": "Toggle compact / full view",
     "close_tooltip": "Close overlay",
-    "minimize_tooltip": "Minimize overlay",
+    "minimize_tooltip": "Minimize overlay (hide to tray)",
+    "tray_show": "Show NemeDraft",
+    "tray_quit": "Quit",
 
     "archetype_label": "Archetype:",
     "copy_deck_btn": "Copy",

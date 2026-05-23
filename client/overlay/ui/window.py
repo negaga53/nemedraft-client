@@ -5,12 +5,15 @@ from __future__ import annotations
 from pathlib import Path
 
 from PySide6.QtCore import QPoint, QThread, QTimer, Qt, Signal, Slot
-from PySide6.QtGui import QCloseEvent, QCursor, QPixmap, QShowEvent
+from PySide6.QtGui import QAction, QCloseEvent, QCursor, QIcon, QPixmap, QShowEvent
 from PySide6.QtWidgets import (
     QApplication,
     QHBoxLayout,
     QLabel,
+    QMenu,
     QPushButton,
+    QStyle,
+    QSystemTrayIcon,
     QTabWidget,
     QVBoxLayout,
     QWidget,
@@ -120,6 +123,11 @@ class OverlayWindow(QWidget):
         # Drag support — always enabled (frameless window).
         self._drag_pos = None
 
+        # System tray icon for minimize-to-tray. Built lazily-but-eagerly:
+        # the icon must exist before the minimize button can use it.
+        self._tray_icon: QSystemTrayIcon | None = None
+        self._build_tray_icon()
+
     # -- UI construction -----------------------------------------------------
 
     def _build_ui(self) -> None:
@@ -171,7 +179,12 @@ class OverlayWindow(QWidget):
             " font-size: 16px; font-weight: 700; padding: 0 0 4px 0; }"
             "QPushButton:hover { background: rgba(80,80,120,.9); color: #fff; }"
         )
-        self._min_btn.clicked.connect(self.showMinimized)
+        # Hide-to-tray instead of showMinimized: on Windows, ``Qt.Tool +
+        # FramelessWindowHint`` windows have no taskbar entry, so a normal
+        # minimize disappears the window with no way to bring it back —
+        # users report this as "the app closed". The tray icon gives them
+        # a reliable restore path.
+        self._min_btn.clicked.connect(self._minimize_to_tray)
         drag_row.addWidget(self._min_btn)
 
         self._close_btn = QPushButton("✕")
@@ -351,6 +364,99 @@ class OverlayWindow(QWidget):
     def show_draft_complete(self) -> None:
         """Thread-safe: emit signal to switch to the deck tab."""
         self.draft_complete_signal.emit()
+
+    def show_prediction_loading(self, pack_number: int, pick_number: int) -> None:
+        """Surface a loading indicator while a prediction is in flight.
+
+        Called when a new pack opens; hidden once the prediction lands
+        on ``_on_prediction``. The pack/pick are passed for future use
+        (e.g. updating the context pill to "Predicting P{n}P{m}…") but
+        are not strictly required by the current bar UI.
+        """
+        del pack_number, pick_number  # reserved for future affordances
+        self.pack_tab.show_loading()
+
+    # -- system tray (minimize-to-tray) --------------------------------------
+
+    def _app_icon(self) -> QIcon:
+        """Return the overlay's app icon, falling back to a Qt standard one.
+
+        The PNG is bundled under ``assets/`` via the PyInstaller spec;
+        in dev mode it's resolved relative to the project root.
+        """
+        from client.overlay.env import bundle_root
+
+        for candidate in (
+            bundle_root() / "assets" / "icon.png",
+            bundle_root() / "external" / "nemedraft-client" / "assets" / "icon.png",
+        ):
+            if candidate.is_file():
+                return QIcon(str(candidate))
+        # Fallback so the tray icon is always something — better than
+        # an empty pixmap that some Linux trays refuse to render.
+        return self.style().standardIcon(QStyle.StandardPixmap.SP_ComputerIcon)
+
+    def _build_tray_icon(self) -> None:
+        """Create the system tray icon used by minimize-to-tray.
+
+        No-op when the platform doesn't expose a tray (some Linux
+        desktops). In that case the minimize button falls back to
+        ``showMinimized`` and the user gets the same behaviour as
+        before this fix.
+        """
+        if not QSystemTrayIcon.isSystemTrayAvailable():
+            return
+
+        icon = self._app_icon()
+        self.setWindowIcon(icon)
+
+        self._tray_icon = QSystemTrayIcon(icon, self)
+        self._tray_icon.setToolTip(f"{tr('app_title')} — v{__version__}")
+
+        menu = QMenu()
+        show_action = QAction(tr("tray_show"), self)
+        show_action.triggered.connect(self._restore_from_tray)
+        menu.addAction(show_action)
+        menu.addSeparator()
+        quit_action = QAction(tr("tray_quit"), self)
+        quit_action.triggered.connect(self._quit_from_tray)
+        menu.addAction(quit_action)
+        self._tray_icon.setContextMenu(menu)
+
+        self._tray_icon.activated.connect(self._on_tray_activated)
+
+    def _minimize_to_tray(self) -> None:
+        """Hide the overlay to the system tray instead of minimising it."""
+        if self._tray_icon is None:
+            # No tray available — fall back to the old behaviour so at
+            # least something happens on click.
+            self.showMinimized()
+            return
+        self._tray_icon.show()
+        self.hide()
+
+    def _restore_from_tray(self) -> None:
+        """Bring the overlay back from the tray."""
+        if self._tray_icon is not None:
+            self._tray_icon.hide()
+        self.showNormal()
+        self.raise_()
+        self.activateWindow()
+
+    @Slot(QSystemTrayIcon.ActivationReason)
+    def _on_tray_activated(self, reason: QSystemTrayIcon.ActivationReason) -> None:
+        """Restore on left-click / double-click of the tray icon."""
+        if reason in (
+            QSystemTrayIcon.ActivationReason.Trigger,
+            QSystemTrayIcon.ActivationReason.DoubleClick,
+        ):
+            self._restore_from_tray()
+
+    def _quit_from_tray(self) -> None:
+        """Quit the app cleanly from the tray menu."""
+        if self._tray_icon is not None:
+            self._tray_icon.hide()
+        QApplication.instance().quit()
 
     @Slot()
     def _on_draft_complete(self) -> None:
@@ -532,6 +638,8 @@ class OverlayWindow(QWidget):
     ) -> None:
         """Update the pack tab with new predictions (runs on UI thread)."""
         self.status.setVisible(False)
+        # The prediction landed — dismiss the in-flight loading bar.
+        self.pack_tab.hide_loading()
         if not results:
             self._show_status(tr("no_predictions"))
             return

@@ -993,6 +993,14 @@ def suggest_decks(
         ]
 
     pairs = _make_pairs(top)
+    # Explicit mono candidates. Without these, mono pools are only ever
+    # reached via demotion from a weak 2-colour attempt, which preserves
+    # whatever main_deck the 2-colour build left after Karsten stripped the
+    # minority — typically 8-15 spells. Direct mono construction starts
+    # from the full castable list of the dominant colour and reaches the
+    # natural mono spell count, after which the splash logic at line
+    # ~1175 can add a 3rd colour if fixing is available.
+    pairs.extend((c,) for c in top[:2])
     pairs.extend(_multicolor_prior_candidates(
         ranked_colors=ranked_colors,
         pool_names=pool_names,

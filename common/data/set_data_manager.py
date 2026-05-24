@@ -164,6 +164,28 @@ class SetDataManager:
             bundle = self._sets.get((set_code, fmt))
         return bundle.by_id if bundle else None
 
+    def get_card_ratings(
+        self,
+        set_code: str,
+        card_name: str,
+        *,
+        draft_format: str | None = None,
+    ) -> CardRatings | None:
+        """Return the 17Lands :class:`CardRatings` for *card_name*.
+
+        Mirrors the front-face fallback used by
+        :meth:`lookup_stats` so callers that need colour identity or other
+        non-stats fields (e.g. the signals route) don't have to re-implement
+        the lookup. Returns ``None`` when neither the full split name nor
+        its front face is present.
+        """
+        fmt = draft_format or self._default_draft_format
+        with self._lock:
+            bundle = self._sets.get((set_code, fmt))
+        if not bundle:
+            return None
+        return _card_map_lookup(bundle.card_map, card_name)
+
     def is_loaded(
         self,
         set_code: str,
@@ -212,7 +234,7 @@ class SetDataManager:
                 bundle = self._sets.get((set_code, fmt))
             if not bundle:
                 continue
-            cr = bundle.card_map.get(card_name)
+            cr = _card_map_lookup(bundle.card_map, card_name)
             if not cr:
                 continue
             stats = cr.deck_colors.get(archetype, {})
@@ -365,6 +387,26 @@ class SetDataManager:
                 key, path, len(prior.archetypes),
             )
         return prior
+
+
+def _card_map_lookup(
+    card_map: dict[str, CardRatings],
+    name: str,
+) -> CardRatings | None:
+    """Look up a card in a 17Lands card_map, with a front-face fallback.
+
+    17Lands keys split cards by the front face only ("Harmonized Trio"),
+    while Arena, Scryfall, and the predict request use the full split name
+    ("Harmonized Trio // Brainstorm"). Without this fallback every SOS
+    Prepared card returns gihwr=ata=iwd=0.0 from the predict response.
+    Mirrors :func:`common.inference.deck_builder._card_map_get`.
+    """
+    cr = card_map.get(name)
+    if cr is not None:
+        return cr
+    if " // " in name:
+        return card_map.get(name.split(" // ", 1)[0])
+    return None
 
 
 @dataclass

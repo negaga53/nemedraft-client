@@ -484,6 +484,87 @@ def test_lookup_stats_skips_format_with_no_bundle():
     assert stats["gihwr"] == 0.6
 
 
+def test_lookup_stats_falls_back_to_front_face_for_split_cards():
+    """17Lands keys split cards (SOS Prepared, etc.) by their front face only
+    ("Harmonized Trio"), while Arena/Scryfall and the predict request use the
+    full name ("Harmonized Trio // Brainstorm"). Without a front-face fallback
+    the predict response returns gihwr=ata=iwd=0.0 for every split card and
+    the UI renders blank stats columns."""
+    mgr = _make_mgr_with_bundles({
+        ("SOS", "PremierDraft"): _StubBundle({
+            "Harmonized Trio": _StubCardRatings(
+                {"gihwr": 0.534, "ata": 4.23, "iwd": 0.05},
+            ),
+        }),
+    })
+    stats, source = mgr.lookup_stats(
+        "SOS", "Harmonized Trio // Brainstorm", formats=["PremierDraft"],
+    )
+    assert source == "PremierDraft"
+    assert stats["gihwr"] == 0.534
+    assert stats["ata"] == 4.23
+
+
+def test_lookup_stats_split_card_prefers_full_name_when_both_present():
+    """If 17Lands ever started keying by full name too, the full-name entry
+    must win — the front-face fallback is a fallback, not a rewrite."""
+    mgr = _make_mgr_with_bundles({
+        ("SOS", "PremierDraft"): _StubBundle({
+            "Harmonized Trio // Brainstorm": _StubCardRatings(
+                {"gihwr": 0.60, "ata": 3.0},
+            ),
+            "Harmonized Trio": _StubCardRatings(
+                {"gihwr": 0.50, "ata": 5.0},
+            ),
+        }),
+    })
+    stats, source = mgr.lookup_stats(
+        "SOS", "Harmonized Trio // Brainstorm", formats=["PremierDraft"],
+    )
+    assert source == "PremierDraft"
+    assert stats["gihwr"] == 0.60
+
+
+def test_lookup_stats_split_card_misses_when_neither_form_present():
+    """A split-named card whose front face also isn't in 17Lands stays empty —
+    no spurious match against an unrelated card."""
+    mgr = _make_mgr_with_bundles({
+        ("SOS", "PremierDraft"): _StubBundle({
+            "Some Other Card": _StubCardRatings({"gihwr": 0.55, "ata": 4.0}),
+        }),
+    })
+    stats, source = mgr.lookup_stats(
+        "SOS", "Harmonized Trio // Brainstorm", formats=["PremierDraft"],
+    )
+    assert stats == {}
+    assert source == ""
+
+
+def test_get_card_ratings_resolves_split_card_front_face():
+    """Server-side colors lookup goes through get_card_ratings rather than
+    a raw card_map.get(); both predict and signals routes need the same
+    front-face fallback for SOS Prepared cards."""
+    cr = _StubCardRatings({"gihwr": 0.534, "ata": 4.23})
+    cr.colors = ["U"]
+    mgr = _make_mgr_with_bundles({
+        ("SOS", "PremierDraft"): _StubBundle({"Harmonized Trio": cr}),
+    })
+    got = mgr.get_card_ratings(
+        "SOS", "Harmonized Trio // Brainstorm", draft_format="PremierDraft",
+    )
+    assert got is cr
+    assert got.colors == ["U"]
+
+
+def test_get_card_ratings_returns_none_for_unknown_card():
+    mgr = _make_mgr_with_bundles({
+        ("SOS", "PremierDraft"): _StubBundle({}),
+    })
+    assert mgr.get_card_ratings(
+        "SOS", "Harmonized Trio // Brainstorm", draft_format="PremierDraft",
+    ) is None
+
+
 def test_reset_deck_pool_fingerprint_clears_dedup_state():
     """After reset, the next poll must re-fire DeckPoolDetectedEvent even
     for the same Arena deck-pool the watcher just emitted on."""

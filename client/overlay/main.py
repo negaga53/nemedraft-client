@@ -48,6 +48,7 @@ from client.overlay.log_watcher import (
 )
 from client.overlay.memory.platform import is_memory_supported
 from client.overlay.memory_watcher import MemoryWatcher
+from client.overlay.single_instance import SingleInstance
 from client.overlay.ui.window import OverlayWindow
 
 logger = logging.getLogger("overlay")
@@ -1985,6 +1986,19 @@ def main() -> None:
     # Allow Ctrl+C to close the app.
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
+    # Single-instance lock — frozen builds only. Devs running from source
+    # can launch multiple overlays side-by-side. Lock dies with this
+    # process, so the updater's spawn-after-PID-exits pattern is unaffected.
+    single_instance = SingleInstance()
+    if getattr(sys, "frozen", False) and not single_instance.acquire(
+        "nemedraft-overlay",
+    ):
+        logger.info(
+            "Another NemeDraft overlay is already running — raised its "
+            "window and exiting.",
+        )
+        return
+
     # Load persisted configuration and client env.
     config = load_config()
     env = load_client_env()
@@ -2017,6 +2031,15 @@ def main() -> None:
 
     window.show_loading()
     window.show()
+
+    def _raise_to_foreground() -> None:
+        if window.isMinimized():
+            window.showNormal()
+        window.show()
+        window.raise_()
+        window.activateWindow()
+
+    single_instance.raise_requested.connect(_raise_to_foreground)
 
     # --- Check for updates before anything else ---
     overlay_holder: list[OverlayApp | None] = [None]

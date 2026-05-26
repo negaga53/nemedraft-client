@@ -13,13 +13,13 @@ logger = logging.getLogger(__name__)
 # Patterns for extracting set code from Arena event names like
 # "PremierDraft_TMT_20250401", "QuickDraft_FIN_20250301", "BotDraft_ECL_..."
 _EVENT_SET_RE = re.compile(
-    r"(?:PremierDraft|QuickDraft|BotDraft|TradDraft|CompDraft)[_]([A-Z0-9]{3})",
+    r"(?:PremierDraft|QuickDraft|BotDraft|TradDraft|CompDraft|ContenderDraft)[_]([A-Z0-9]{3})",
     re.IGNORECASE,
 )
 
 # Reversed format used in SceneChange context, e.g. "TMT_Premier_Draft".
 _CONTEXT_SET_RE = re.compile(
-    r"([A-Z0-9]{3})[_](?:Premier[_]?Draft|Quick[_]?Draft|Bot[_]?Draft|Trad[_]?Draft|Comp[_]?Draft)",
+    r"([A-Z0-9]{3})[_](?:Premier[_]?Draft|Quick[_]?Draft|Bot[_]?Draft|Trad[_]?Draft|Comp[_]?Draft|Contender[_]?Draft)",
     re.IGNORECASE,
 )
 
@@ -30,16 +30,17 @@ _FORMAT_MAP: dict[str, str] = {
     "BotDraft": "QuickDraft",
     "TradDraft": "TradDraft",
     "CompDraft": "PremierDraft",
+    "ContenderDraft": "PremierDraft",
 }
 
 _EVENT_FORMAT_RE = re.compile(
-    r"(PremierDraft|QuickDraft|BotDraft|TradDraft|CompDraft)",
+    r"(PremierDraft|QuickDraft|BotDraft|TradDraft|CompDraft|ContenderDraft)",
     re.IGNORECASE,
 )
 
 # Supported draft format keywords (case-insensitive substrings).
 # Anything containing "draft" but NOT matching these is unsupported.
-_SUPPORTED_FORMAT_KEYWORDS = {"premier", "quick", "bot", "trad", "comp"}
+_SUPPORTED_FORMAT_KEYWORDS = {"premier", "quick", "bot", "trad", "comp", "contender"}
 
 
 def extract_set_code(event_name: str) -> str | None:

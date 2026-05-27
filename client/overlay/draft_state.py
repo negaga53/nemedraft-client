@@ -13,13 +13,13 @@ logger = logging.getLogger(__name__)
 # Patterns for extracting set code from Arena event names like
 # "PremierDraft_TMT_20250401", "QuickDraft_FIN_20250301", "BotDraft_ECL_..."
 _EVENT_SET_RE = re.compile(
-    r"(?:PremierDraft|QuickDraft|BotDraft|TradDraft|CompDraft|ContenderDraft)[_]([A-Z0-9]{3})",
+    r"(?:PremierDraft|QuickDraft|BotDraft|TradDraft|CompDraft|ContenderDraft|PickTwoDraft)[_]([A-Z0-9]{3})",
     re.IGNORECASE,
 )
 
 # Reversed format used in SceneChange context, e.g. "TMT_Premier_Draft".
 _CONTEXT_SET_RE = re.compile(
-    r"([A-Z0-9]{3})[_](?:Premier[_]?Draft|Quick[_]?Draft|Bot[_]?Draft|Trad[_]?Draft|Comp[_]?Draft|Contender[_]?Draft)",
+    r"([A-Z0-9]{3})[_](?:Premier[_]?Draft|Quick[_]?Draft|Bot[_]?Draft|Trad[_]?Draft|Comp[_]?Draft|Contender[_]?Draft|PickTwo[_]?Draft)",
     re.IGNORECASE,
 )
 
@@ -31,16 +31,37 @@ _FORMAT_MAP: dict[str, str] = {
     "TradDraft": "TradDraft",
     "CompDraft": "PremierDraft",
     "ContenderDraft": "PremierDraft",
+    # PickTwo has no 17Lands sample; reuse PremierDraft stats.
+    "PickTwoDraft": "PremierDraft",
 }
 
 _EVENT_FORMAT_RE = re.compile(
-    r"(PremierDraft|QuickDraft|BotDraft|TradDraft|CompDraft|ContenderDraft)",
+    r"(PremierDraft|QuickDraft|BotDraft|TradDraft|CompDraft|ContenderDraft|PickTwoDraft)",
     re.IGNORECASE,
 )
 
 # Supported draft format keywords (case-insensitive substrings).
 # Anything containing "draft" but NOT matching these is unsupported.
-_SUPPORTED_FORMAT_KEYWORDS = {"premier", "quick", "bot", "trad", "comp", "contender"}
+_SUPPORTED_FORMAT_KEYWORDS = {"premier", "quick", "bot", "trad", "comp", "contender", "picktwo"}
+
+# Raw Arena format token, normalized to a canonical display string. Matches
+# both the forward join name ("PickTwoDraft_SOS_…") and the reversed
+# SceneChange context ("SOS_PickTwo_Draft"). This is sent to the server as
+# `arena_format` (mechanics + troubleshooting) — distinct from the 17Lands
+# stats format above.
+_ARENA_FORMAT_RE = re.compile(
+    r"(Premier|Quick|Bot|Trad|Comp|Contender|PickTwo)[_]?Draft",
+    re.IGNORECASE,
+)
+_ARENA_FORMAT_CANON: dict[str, str] = {
+    "premier": "PremierDraft",
+    "quick": "QuickDraft",
+    "bot": "BotDraft",
+    "trad": "TradDraft",
+    "comp": "CompDraft",
+    "contender": "ContenderDraft",
+    "picktwo": "PickTwo",
+}
 
 
 def extract_set_code(event_name: str) -> str | None:
@@ -83,6 +104,25 @@ def extract_draft_format(event_name: str) -> str | None:
     return None
 
 
+def extract_arena_format(event_name: str) -> str:
+    """Extract the canonical raw Arena format token from an event name.
+
+    Args:
+        event_name: Arena event name or SceneChange context, e.g.
+            ``"PickTwoDraft_SOS_20260601"`` or ``"SOS_PickTwo_Draft"``.
+
+    Returns:
+        A canonical token (``"PremierDraft"``, ``"QuickDraft"``,
+        ``"PickTwo"``, …) or ``""`` if no draft format is recognized. This
+        is the server's source of truth for draft mechanics and is logged
+        in draft history for troubleshooting.
+    """
+    m = _ARENA_FORMAT_RE.search(event_name)
+    if m:
+        return _ARENA_FORMAT_CANON.get(m.group(1).lower(), "")
+    return ""
+
+
 def is_supported_draft_format(context: str) -> bool:
     """Return True if *context* refers to a supported draft format.
 
@@ -103,6 +143,41 @@ def is_supported_draft_format(context: str) -> bool:
     if "draft" not in lower:
         return True  # not a draft context — not our concern
     return any(kw in lower for kw in _SUPPORTED_FORMAT_KEYWORDS)
+
+
+@dataclass(frozen=True)
+class DraftFormatProfile:
+    """Format-specific draft mechanics, keyed by the Arena format token.
+
+    Centralizes the numbers that were previously hardcoded as a 3×14×1
+    booster draft. PickTwo numbers are best-guess (see the design spec)
+    until a real Player.log is captured.
+    """
+
+    arena_format: str
+    cards_per_pick: int
+    recommend_count: int
+    picks_per_pack: int
+    num_packs: int = 3
+
+
+_DEFAULT_PROFILE = DraftFormatProfile(
+    arena_format="", cards_per_pick=1, recommend_count=1, picks_per_pack=14,
+)
+_PROFILES: dict[str, DraftFormatProfile] = {
+    "picktwo": DraftFormatProfile(
+        arena_format="PickTwo", cards_per_pick=2, recommend_count=2, picks_per_pack=7,
+    ),
+}
+
+
+def profile_for(arena_format: str) -> DraftFormatProfile:
+    """Return the draft mechanics for *arena_format* (case-insensitive).
+
+    Unknown / empty formats fall back to the single-pick default, which
+    leaves all existing behavior byte-identical.
+    """
+    return _PROFILES.get(arena_format.strip().lower(), _DEFAULT_PROFILE)
 
 
 @dataclass
@@ -133,6 +208,9 @@ class DraftState:
     set_code: str = ""
     event_name: str = ""
     draft_format: str = ""  # 17Lands format string, e.g. "QuickDraft"
+    arena_format: str = ""  # canonical Arena format token, e.g. "PickTwo"
+    cards_per_pick: int = 1
+    recommend_count: int = 1
     pack_number: int = 0
     pick_number: int = 0
     current_pack: list[str] = field(default_factory=list)
@@ -177,6 +255,10 @@ class DraftState:
         fmt = extract_draft_format(event_name)
         if fmt:
             self.draft_format = fmt
+        self.arena_format = extract_arena_format(event_name)
+        profile = profile_for(self.arena_format)
+        self.cards_per_pick = profile.cards_per_pick
+        self.recommend_count = profile.recommend_count
         logger.info(
             "Draft started: event=%s set=%s format=%s",
             event_name, self.set_code or "unknown", self.draft_format or "unknown",
@@ -222,6 +304,10 @@ class DraftState:
         """Reset for a new draft."""
         self.set_code = ""
         self.event_name = ""
+        self.draft_format = ""
+        self.arena_format = ""
+        self.cards_per_pick = 1
+        self.recommend_count = 1
         self.pack_number = 0
         self.pick_number = 0
         self.current_pack.clear()
@@ -327,6 +413,10 @@ class DraftState:
 
         saved_event = data.get("event_name", "")
         saved_pool: list[str] = data.get("pool", [])
+
+        # NOTE: the format fields (arena_format / cards_per_pick /
+        # recommend_count) are NOT persisted or restored here — they are set
+        # by on_draft_start, which always runs before this method on reconnect.
 
         # Only restore if same event and saved pool is larger.
         if saved_event != self.event_name or not saved_event:

@@ -69,6 +69,7 @@ class NemeDraftClient:
         pick_number: int = 0,
         *,
         draft_format: str = "",
+        arena_format: str = "",
         last_pick: str | None = None,
     ) -> list[Pick]:
         """Call ``POST /api/predict`` and return ranked picks.
@@ -86,6 +87,8 @@ class NemeDraftClient:
         }
         if draft_format:
             body["draft_format"] = draft_format
+        if arena_format:
+            body["arena_format"] = arena_format
         if last_pick is not None:
             body["last_pick"] = last_pick
         data = self._authed_request("POST", "/api/predict", json=body, timeout=5)

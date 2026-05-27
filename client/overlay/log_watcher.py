@@ -434,7 +434,11 @@ class LogWatcher:
     # -- internals -----------------------------------------------------------
 
     _MAX_PACK = 2  # 3-pack draft, 0-indexed
-    _MAX_PICK = 14  # 15-card pack, 0-indexed
+    # 0-indexed max pick. Sized for a 15-card pack; intentionally NOT
+    # narrowed for PickTwo (picks 0-6 sit inside this range under either
+    # increment scheme) — narrowing risks dropping valid frames. See
+    # docs/superpowers/specs/2026-05-27-picktwo-draft-design.md.
+    _MAX_PICK = 14
 
     def _emit(self, event: DraftEvent) -> None:
         # Phantom-frame filter for PackEvent/PickEvent. Arena log paths

@@ -46,6 +46,8 @@ class PackTab(QWidget):
         self._show_stats = show_stats
         self._art_paths: dict[str, Path | None] = {}
         self._art_cache: object | None = None  # CardArtCache, set via set_art_cache()
+        # Top rows to flag as recommended in the live view (PickTwo bumps to 2).
+        self._recommend_count = 1
         self.setMouseTracking(True)
 
         outer = QVBoxLayout(self)
@@ -261,7 +263,7 @@ class PackTab(QWidget):
         # Rebuild navigable keys (the live key is now excluded from history).
         self._rebuild_nav_keys()
 
-        self._render_picks(picks)
+        self._render_picks(picks, live=True)
 
         # Taken cards — greyed-out rows for cards picked by other players.
         if taken_names and picks:
@@ -398,7 +400,7 @@ class PackTab(QWidget):
         self._update_nav_buttons()
         # Re-render the live predictions if we have cached results.
         if hasattr(self, "_live_picks") and self._live_picks:
-            self._render_picks(self._live_picks)
+            self._render_picks(self._live_picks, live=True)
 
     def _show_history_at_index(self) -> None:
         """Render the history entry at the current nav index."""
@@ -431,10 +433,32 @@ class PackTab(QWidget):
         self._render_picks(picks, highlight_card=entry.picked_card)
         self._update_nav_buttons()
 
+    def set_recommend_count(self, count: int) -> None:
+        """Set how many top rows to flag as recommended in the live view.
+
+        PickTwo drafts pick 2 cards per pass, so the top 2 get the
+        recommended highlight; single-pick formats use 1 (the default,
+        which leaves the live view visually unchanged).
+        """
+        self._recommend_count = max(1, count)
+
+    def _recommended_row_count(self, live: bool) -> int:
+        """Number of top rows to flag as recommended.
+
+        Only in the live prediction view (``live=True``) and only when the
+        format picks more than one card — otherwise 0. History navigation
+        renders with ``live=False`` (even when the picked card is unknown
+        and ``highlight_card == ""``), so it never shows the recommend tint.
+        """
+        count = getattr(self, "_recommend_count", 1)
+        return count if (live and count >= 2) else 0
+
     def _render_picks(
         self,
         picks: list[Pick],
         highlight_card: str = "",
+        *,
+        live: bool = False,
     ) -> None:
         """Render a list of picks into the card layout.
 
@@ -466,6 +490,7 @@ class PackTab(QWidget):
             ordered = picks
 
         max_score = picks[0].score if picks else 1.0
+        rec_count = self._recommended_row_count(live)
 
         gihwr_ranks: dict[str, int] = {}
         valid_gihwr = [(p.card, p.gihwr) for p in picks if p.gihwr > 0]
@@ -473,13 +498,23 @@ class PackTab(QWidget):
         for rank_idx, (cname, _) in enumerate(valid_gihwr[:3], start=1):
             gihwr_ranks[cname] = rank_idx
 
-        for p in ordered:
+        for idx, p in enumerate(ordered):
             row = CardRow(self._card_container, show_stats=self._show_stats, show_art=self._show_art)
             art = self._art_paths.get(p.card)
             row.set_data(p, max_score, art_path=art, gihwr_rank=gihwr_ranks.get(p.card, 0))
 
             # Highlight the player's actual pick with a background tint and left border.
             if highlight_card and p.card == highlight_card:
+                row.setStyleSheet(
+                    row.styleSheet()
+                    + " CardRow { border-left: 3px solid #4fc3f7;"
+                    " background: rgba(79, 195, 247, 0.10); }"
+                )
+
+            # Live-view recommendation: tint the top rec_count rows (PickTwo
+            # highlights 2). Mutually exclusive with the actual-pick highlight
+            # above, which only fires in history view (highlight_card set).
+            if idx < rec_count:
                 row.setStyleSheet(
                     row.styleSheet()
                     + " CardRow { border-left: 3px solid #4fc3f7;"

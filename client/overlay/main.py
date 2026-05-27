@@ -374,6 +374,7 @@ class _PredictionWorker(QThread):
         pack_number: int,
         pick_number: int,
         draft_format: str,
+        arena_format: str,
         last_pick: str | None,
         parent: QObject | None = None,
     ) -> None:
@@ -385,6 +386,7 @@ class _PredictionWorker(QThread):
         self._pack_number = pack_number
         self._pick_number = pick_number
         self._draft_format = draft_format
+        self._arena_format = arena_format
         self._last_pick = last_pick
 
     def run(self) -> None:  # noqa: D401
@@ -396,6 +398,7 @@ class _PredictionWorker(QThread):
                 pack_number=self._pack_number,
                 pick_number=self._pick_number,
                 draft_format=self._draft_format,
+                arena_format=self._arena_format,
                 last_pick=self._last_pick,
             )
         except Exception as exc:  # noqa: BLE001
@@ -1406,7 +1409,7 @@ class OverlayApp:
                     logger.info("Left lobby with no draft progress — ending draft session")
                     self._on_event(DraftEndEvent(), replaying)
                 return
-            # Check for unsupported draft formats (e.g. PickTwo).
+            # Reject draft formats the overlay doesn't support yet.
             from client.overlay.draft_state import extract_set_code, is_supported_draft_format
             if not is_supported_draft_format(event.context):
                 self._in_lobby_context = ""
@@ -1552,12 +1555,16 @@ class OverlayApp:
             if event.card_grpids:
                 names = self.mapper.grpids_to_names(event.card_grpids)
                 if names:
-                    picked = names[0]
+                    # PickTwo passes carry two picked cards; single-pick
+                    # formats keep cards_per_pick == 1. Slicing covers both
+                    # the one-event-two-grpids and two-single-events shapes.
+                    picked_names = names[: max(1, self.state.cards_per_pick)]
                     key = (self.state.pack_number, self.state.pick_number)
                     if key in self.state.pick_history:
-                        self.state.pick_history[key].picked_card = picked
+                        self.state.pick_history[key].picked_card = picked_names[0]
 
-                    self.state.on_pick(picked)
+                    for picked in picked_names:
+                        self.state.on_pick(picked)
                     if not replaying:
                         self.state.save_state(self._cache_dir)
                         self.state.save_pick_history(self._cache_dir)
@@ -1641,6 +1648,7 @@ class OverlayApp:
         self.window.show_prediction_loading(
             self.state.pack_number, self.state.pick_number,
         )
+        self.window.pack_tab.set_recommend_count(self.state.recommend_count)
 
         worker = _PredictionWorker(
             self.api_client,
@@ -1650,6 +1658,7 @@ class OverlayApp:
             pack_number=self.state.pack_number,
             pick_number=self.state.pick_number,
             draft_format=self._draft_format(),
+            arena_format=self.state.arena_format,
             last_pick=self.state.last_pick,
         )
         # Capture the worker ref so the slot can compare against the

@@ -19,6 +19,13 @@ from client.overlay.env import ClientEnv, clear_client_tokens, save_client_token
 
 logger = logging.getLogger(__name__)
 
+# /api/login fans out to two server-side Supabase round-trips (arena-player
+# upsert + VIP lookup), each with its own ~10s budget. A client timeout at or
+# below the server's worst case makes us abandon a request the server is still
+# legitimately processing — observed as a ReadTimeout on the cold connection
+# pool right after a restart. Wait comfortably longer than the server can take.
+_SERVER_LOGIN_TIMEOUT_S = 30.0
+
 
 def _read_jwt_claims(token: str) -> dict:
     """Decode JWT payload without cryptographic verification.
@@ -254,7 +261,7 @@ class AuthClient:
             resp = httpx.post(
                 f"{self._server_base}/api/login",
                 json=body,
-                timeout=10,
+                timeout=_SERVER_LOGIN_TIMEOUT_S,
             )
             if resp.status_code != 200:
                 logger.error("Server login failed: %d %s", resp.status_code, resp.text)

@@ -1562,6 +1562,7 @@ class OverlayApp:
                     key = (self.state.pack_number, self.state.pick_number)
                     if key in self.state.pick_history:
                         self.state.pick_history[key].picked_card = picked_names[0]
+                        self.state.pick_history[key].picked_cards = list(picked_names)
 
                     for picked in picked_names:
                         self.state.on_pick(picked)

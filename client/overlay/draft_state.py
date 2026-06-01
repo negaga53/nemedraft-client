@@ -150,8 +150,8 @@ class DraftFormatProfile:
     """Format-specific draft mechanics, keyed by the Arena format token.
 
     Centralizes the numbers that were previously hardcoded as a 3×14×1
-    booster draft. PickTwo numbers are best-guess (see the design spec)
-    until a real Player.log is captured.
+    booster draft. PickTwo numbers were verified against a real Player.log on
+    2026-06-01 (see the design spec §7).
     """
 
     arena_format: str
@@ -196,6 +196,10 @@ class PickHistoryEntry:
     pack_number: int
     pick_number: int
     picked_card: str = ""
+    # Every card taken at this coordinate. PickTwo takes two; single-pick
+    # formats one. picked_card stays = picked_cards[0] for callers that show
+    # a single pick.
+    picked_cards: list[str] = field(default_factory=list)
     picks: list[dict] = field(default_factory=list)
     """Each dict mirrors a serialised :class:`Pick`: card, rank, score, gihwr, ata,
     iwd, mana_cost, colors, type_line, is_elite, stats_loaded."""
@@ -350,6 +354,8 @@ class DraftState:
             candidates = [d["card"] for d in entry.picks if d["card"] in pool_set]
             if len(candidates) == 1:
                 entry.picked_card = candidates[0]
+                if not entry.picked_cards:
+                    entry.picked_cards = [candidates[0]]
                 logger.debug(
                     "Inferred picked card for P%dP%d: %s",
                     entry.pack_number + 1,
@@ -455,6 +461,7 @@ class DraftState:
                 "pack_number": entry.pack_number,
                 "pick_number": entry.pick_number,
                 "picked_card": entry.picked_card,
+                "picked_cards": entry.picked_cards,
                 "picks": entry.picks,
             })
         data = {"event_name": self.event_name, "entries": entries}
@@ -485,10 +492,12 @@ class DraftState:
 
         for e in data.get("entries", []):
             key = (e["pack_number"], e["pick_number"])
+            picked_card = e.get("picked_card", "")
             self.pick_history[key] = PickHistoryEntry(
                 pack_number=e["pack_number"],
                 pick_number=e["pick_number"],
-                picked_card=e.get("picked_card", ""),
+                picked_card=picked_card,
+                picked_cards=e.get("picked_cards") or ([picked_card] if picked_card else []),
                 picks=e.get("picks", []),
             )
         logger.info("Loaded pick history: %d entries", len(self.pick_history))

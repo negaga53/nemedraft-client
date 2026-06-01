@@ -430,7 +430,10 @@ class PackTab(QWidget):
                 stats_format=d.get("stats_format", ""),
             ))
 
-        self._render_picks(picks, highlight_card=entry.picked_card)
+        highlight = tuple(entry.picked_cards) or (
+            (entry.picked_card,) if entry.picked_card else ()
+        )
+        self._render_picks(picks, highlight_cards=highlight)
         self._update_nav_buttons()
 
     def set_recommend_count(self, count: int) -> None:
@@ -458,15 +461,19 @@ class PackTab(QWidget):
         picks: list[Pick],
         highlight_card: str = "",
         *,
+        highlight_cards: tuple[str, ...] = (),
         live: bool = False,
     ) -> None:
         """Render a list of picks into the card layout.
 
         Args:
             picks: Picks to display.
-            highlight_card: Card name to highlight (the player's actual pick).
-                When set, that card is moved to the top of the list.
+            highlight_card: Single card name to highlight (back-compat).
+            highlight_cards: All cards the player took at this coordinate
+                (PickTwo takes two). Supersedes ``highlight_card`` when set;
+                every named card is moved to the top and tinted.
         """
+        highlight_set = set(highlight_cards) or ({highlight_card} if highlight_card else set())
         self.show_pack_view()
         if self._preview:
             self._preview.hide()
@@ -481,10 +488,10 @@ class PackTab(QWidget):
         if not picks:
             return
 
-        # Move the picked card to the top of the display order.
-        if highlight_card:
-            picked = [p for p in picks if p.card == highlight_card]
-            rest = [p for p in picks if p.card != highlight_card]
+        # Move the picked card(s) to the top of the display order.
+        if highlight_set:
+            picked = [p for p in picks if p.card in highlight_set]
+            rest = [p for p in picks if p.card not in highlight_set]
             ordered = picked + rest
         else:
             ordered = picks
@@ -503,8 +510,8 @@ class PackTab(QWidget):
             art = self._art_paths.get(p.card)
             row.set_data(p, max_score, art_path=art, gihwr_rank=gihwr_ranks.get(p.card, 0))
 
-            # Highlight the player's actual pick with a background tint and left border.
-            if highlight_card and p.card == highlight_card:
+            # Highlight the player's actual pick(s) with a background tint and left border.
+            if highlight_set and p.card in highlight_set:
                 row.setStyleSheet(
                     row.styleSheet()
                     + " CardRow { border-left: 3px solid #4fc3f7;"

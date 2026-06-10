@@ -13,15 +13,30 @@ logger = logging.getLogger(__name__)
 # Patterns for extracting set code from Arena event names like
 # "PremierDraft_TMT_20250401", "QuickDraft_FIN_20250301", "BotDraft_ECL_..."
 _EVENT_SET_RE = re.compile(
-    r"(?:PremierDraft|QuickDraft|BotDraft|TradDraft|CompDraft|ContenderDraft|PickTwoDraft)[_]([A-Z0-9]{3})",
+    r"(?:^|_)(?:PremierDraft|QuickDraft|BotDraft|TradDraft|CompDraft|ContenderDraft|PickTwoDraft)"
+    r"[_]([A-Z0-9]{3})(?=_|$)",
     re.IGNORECASE,
 )
 
 # Reversed format used in SceneChange context, e.g. "TMT_Premier_Draft".
 _CONTEXT_SET_RE = re.compile(
-    r"([A-Z0-9]{3})[_](?:Premier[_]?Draft|Quick[_]?Draft|Bot[_]?Draft|Trad[_]?Draft|Comp[_]?Draft|Contender[_]?Draft|PickTwo[_]?Draft)",
+    r"(?:^|_)([A-Z0-9]{3})[_]"
+    r"(?:Premier[_]?Draft|Quick[_]?Draft|Bot[_]?Draft|Trad[_]?Draft|Comp[_]?Draft|Contender[_]?Draft|PickTwo[_]?Draft)"
+    r"(?=_|$)",
     re.IGNORECASE,
 )
+
+# Midweek Magic's SOS Cascade bot draft can show up as
+# "MWM_SOS_Cascade_BotDraft_..." rather than the normal format-first shape.
+_CASCADE_BOT_DRAFT_SET_RE = re.compile(
+    r"(?:^|_)(SOS|CAS)[_](?:Cascade|CAS)[_](?:Bot[_]?Draft)(?=_|$)",
+    re.IGNORECASE,
+)
+
+_SET_CODE_ALIASES: dict[str, str] = {
+    # Arena uses CAS as a pseudo-set code for the SOS Cascade bot-draft event.
+    "CAS": "SOS",
+}
 
 # Mapping from Arena event prefix to 17Lands format string.
 _FORMAT_MAP: dict[str, str] = {
@@ -75,14 +90,23 @@ def extract_set_code(event_name: str) -> str | None:
         ``supported_sets`` health check is the authority on whether the
         model has been trained on the returned set.
     """
+    m = _CASCADE_BOT_DRAFT_SET_RE.search(event_name)
+    if m:
+        return _normalize_set_code(m.group(1))
     m = _EVENT_SET_RE.search(event_name)
     if m:
-        return m.group(1).upper()
+        return _normalize_set_code(m.group(1))
     # Reversed format (SceneChange context), e.g. "TMT_Premier_Draft".
     m = _CONTEXT_SET_RE.search(event_name)
     if m:
-        return m.group(1).upper()
+        return _normalize_set_code(m.group(1))
     return None
+
+
+def _normalize_set_code(code: str) -> str:
+    """Return the production set code for an Arena event-set token."""
+    upper = code.upper()
+    return _SET_CODE_ALIASES.get(upper, upper)
 
 
 def extract_draft_format(event_name: str) -> str | None:

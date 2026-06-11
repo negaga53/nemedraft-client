@@ -9,11 +9,10 @@ import signal
 import sys
 from pathlib import Path
 
-from PySide6.QtCore import QThread, QTimer, Signal
+from PySide6.QtCore import QThread, QTimer
 from PySide6.QtWidgets import QApplication
 
 from client.overlay.api_client import NemeDraftClient
-from client.overlay.arena_memory import ArenaCurrentEvent
 from client.overlay.auth_client import AuthClient
 from client.overlay.boot import (
     ArenaIdentityResolution,
@@ -40,16 +39,12 @@ from client.overlay.log_watcher import (
     PackEvent,
     PickEvent,
     ReplayDoneEvent,
-    is_arena_running,
 )
+from client.overlay.managers.arena_poller import ArenaMemoryPoller
 from client.overlay.managers.auth_polling import AuthPollingManager, ServerStatus
 from client.overlay.managers.prediction import PredictionManager, PredictionRequest
 from client.overlay.managers.set_data import SetDataManager
-from client.overlay.managers.workers import (
-    ArenaCurrentEventWorker,
-    ArenaIdentityWorker,
-    SetDataResult,
-)
+from client.overlay.managers.workers import SetDataResult
 from client.overlay.memory_watcher import MemoryWatcher
 from client.overlay.single_instance import SingleInstance
 from client.overlay.ui.window import OverlayWindow
@@ -104,13 +99,8 @@ class OverlayApp:
         self._set_untrained = False
         # Current lobby context (e.g. "TMT_Quick_Draft"), empty when not in a lobby.
         self._in_lobby_context: str = ""
-        # Memory-side draft lobby presence — independent of `_in_lobby_context`
-        # which can be cleared by LogWatcher faster than memory polls.
-        self._memory_in_draft_lobby: bool = False
         # Whether we have a valid arena player ID for auth.
         self._has_arena_player_id = has_arena_player_id
-        # Consecutive failed identity reads on an attached memory session.
-        self._identity_failure_count = 0
         # Events queued while set data is loading.
         # (event, replaying_at_emit_time). Snapshot lets _flush_pending_events
         # re-dispatch with the original replaying flag — otherwise the queued
@@ -180,28 +170,15 @@ class OverlayApp:
         self._auth_polling.login_succeeded.connect(self._on_login_succeeded)
         self._auth_polling.login_failed.connect(home.show_login_error)
 
-        # Ref-keeper for arena memory-poll workers. Same rationale as
-        # _inflight_set_workers above: the per-poll single-slot pointer can
-        # be cleared by the _on_..._done slot while the worker's run() is
-        # still finishing on macOS, dropping the last Python ref and
-        # triggering ~QThread on a still-running thread (qFatal → abort).
-        # Discard only when the QThread's own `finished` signal fires —
-        # that fires after run() has fully returned.
-        self._inflight_arena_workers: set[QThread] = set()
-
-        # If the overlay starts before Arena, keep trying once Arena appears.
-        self._arena_identity_worker: ArenaIdentityWorker | None = None
-        self._arena_identity_timer = QTimer()
-        self._arena_identity_timer.setInterval(5_000)
-        self._arena_identity_timer.timeout.connect(self._retry_arena_identity)
-        if not self._has_arena_player_id:
-            self._arena_identity_timer.start()
-
-        self._arena_current_event_worker: ArenaCurrentEventWorker | None = None
-        self._arena_current_event_timer = QTimer()
-        self._arena_current_event_timer.setInterval(5_000)
-        self._arena_current_event_timer.timeout.connect(self._poll_arena_current_event)
-        self._arena_current_event_timer.start()
+        # Arena memory polling: identity retry (until a player ID is
+        # found) + event-lobby enter/exit tracking, both on 5s ticks.
+        self._arena_poller = ArenaMemoryPoller(
+            has_player_id=lambda: self._has_arena_player_id,
+        )
+        self._arena_poller.identity_resolved.connect(self._on_identity_resolved)
+        self._arena_poller.lobby_entered.connect(self._on_memory_lobby_entered)
+        self._arena_poller.lobby_left.connect(self._on_memory_lobby_left)
+        self._arena_poller.start()
 
         # Start polling + set initial server status.
         self._auth_polling.start()
@@ -218,8 +195,7 @@ class OverlayApp:
     def stop(self) -> None:
         self._prediction.cancel()
         self._auth_polling.stop()
-        self._arena_identity_timer.stop()
-        self._arena_current_event_timer.stop()
+        self._arena_poller.stop()
         self.watcher.stop()
         if self.memory_watcher is not None:
             self.memory_watcher.stop()
@@ -232,135 +208,24 @@ class OverlayApp:
         """Return True if the user is authenticated with VIP status."""
         return self._auth_polling.is_vip()
 
-    # Number of consecutive failed identity reads on an attached session
-    # before forcing a re-attach. The cached image may be missing
-    # assemblies that loaded after our initial attach (Core loads before
-    # SharedClientCore where AccountInformation lives).
-    _IDENTITY_REATTACH_AFTER = 3
-
-    def _retry_arena_identity(self) -> None:
-        """Retry the Arena player ID lookup after Arena starts."""
-        if self._has_arena_player_id:
-            self._arena_identity_timer.stop()
-            return
-        if self._arena_identity_worker is not None and self._arena_identity_worker.isRunning():
-            return
-        if not is_arena_running():
-            return
-
-        worker = ArenaIdentityWorker()
-        worker.finished_identity.connect(self._on_arena_identity_retry_done)
-        worker.finished.connect(lambda w=worker: self._inflight_arena_workers.discard(w))
-        worker.finished.connect(worker.deleteLater)
-        self._inflight_arena_workers.add(worker)
-        self._arena_identity_worker = worker
-        worker.start()
-
-    def _on_arena_identity_retry_done(self, identity: object) -> None:
-        """Apply an Arena identity discovered after startup.
-
-        Args:
-            identity: Worker result, expected to be ``ArenaPlayerIdentity``.
-
-        Returns:
-            None.
-        """
-        self._arena_identity_worker = None
-        if not isinstance(identity, ArenaIdentityResolution):
-            self._on_identity_read_failed()
-            return
-
-        logger.info(
-            "Arena player ID discovered after startup from %s: %s%s",
-            identity.source,
-            identity.player_id,
-            (
-                f" (display={identity.display_name or 'unknown'})"
-                if identity.source == "memory"
-                else ""
-            ),
-        )
+    def _on_identity_resolved(self, identity: ArenaIdentityResolution) -> None:
+        """Apply an Arena identity discovered after startup."""
         self._has_arena_player_id = True
-        self._identity_failure_count = 0
-        self._arena_identity_timer.stop()
         save_arena_player_id(identity.player_id)
         self.auth_client.set_arena_player_id(identity.player_id)
         if self.auth_client.try_auto_login():
             logger.info("Auto-login succeeded after Arena identity retry")
         self._auth_polling.poll_now()
 
-    def _on_identity_read_failed(self) -> None:
-        """Handle a failed identity read — force a session re-attach after N tries.
+    def _on_memory_lobby_entered(self, context: str) -> None:
+        """Convert a memory-detected lobby entry into a DraftLobbyEvent."""
+        if context != self._in_lobby_context and not self.state.draft_active:
+            logger.info("Draft lobby detected from memory: %s", context)
+            self._on_event(DraftLobbyEvent(context=context), False)
 
-        The session may have been attached while MTGA was still loading
-        ``SharedClientCore`` (where AccountInformation lives). Detaching
-        forces the next ensure_attached to re-walk assemblies and pick up
-        anything that loaded since.
-        """
-        from client.overlay.memory.session import MemorySession
-
-        self._identity_failure_count += 1
-        if self._identity_failure_count >= self._IDENTITY_REATTACH_AFTER:
-            logger.info(
-                "Arena identity not found after %d attempts — "
-                "forcing memory session re-attach to refresh assemblies",
-                self._identity_failure_count,
-            )
-            MemorySession.instance().detach()
-            self._identity_failure_count = 0
-
-    def _poll_arena_current_event(self) -> None:
-        """Poll Arena memory for event lobby enter/exit state."""
-        if self._arena_current_event_worker is not None and self._arena_current_event_worker.isRunning():
-            return
-        if not is_arena_running():
-            return
-
-        worker = ArenaCurrentEventWorker()
-        worker.finished_event.connect(self._on_arena_current_event_done)
-        worker.finished.connect(lambda w=worker: self._inflight_arena_workers.discard(w))
-        worker.finished.connect(worker.deleteLater)
-        self._inflight_arena_workers.add(worker)
-        self._arena_current_event_worker = worker
-        worker.start()
-
-    def _on_arena_current_event_done(self, current_event: object) -> None:
-        """Apply current event memory state.
-
-        Args:
-            current_event: Worker result, expected to be ``ArenaCurrentEvent``.
-
-        Returns:
-            None.
-        """
-        self._arena_current_event_worker = None
-        if not isinstance(current_event, ArenaCurrentEvent):
-            return
-
-        # Reading current event implies the memory session is attached. If
-        # we still don't have an Arena player ID, retry that walk now —
-        # AccountInformation may have only just populated post sign-in.
-        if not self._has_arena_player_id:
-            self._retry_arena_identity()
-
-        if current_event.is_draft_lobby:
-            self._memory_in_draft_lobby = True
-            context = current_event.internal_event_name
-            if context != self._in_lobby_context and not self.state.draft_active:
-                logger.info("Draft lobby detected from memory: %s", context)
-                self._on_event(DraftLobbyEvent(context=context), False)
-            return
-
-        # Memory says we are NOT in a draft event lobby. Detect leave when
-        # we previously saw one — independent of `_in_lobby_context` so we
-        # also catch queue exits after Event_Join (which clears that field).
-        if self._memory_in_draft_lobby:
-            self._memory_in_draft_lobby = False
-            logger.info(
-                "Left draft lobby from memory: content=%s",
-                current_event.content_type or "unknown",
-            )
-            self._on_event(DraftLobbyEvent(context=""), False)
+    def _on_memory_lobby_left(self) -> None:
+        """Convert a memory-detected lobby exit into a DraftLobbyEvent."""
+        self._on_event(DraftLobbyEvent(context=""), False)
 
     # -- simulator detection -------------------------------------------------
 

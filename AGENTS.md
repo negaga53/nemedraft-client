@@ -47,6 +47,21 @@ python scripts/refresh_grpid_map.py
 Scryfall data is owned by this repo (`data/scryfall/`); the parent's `scripts/add_set.py`
 reaches into these paths when a new MTG set is added.
 
+## UI / Qt notes
+
+- **Frameless window move/resize must go through the window manager.** `OverlayWindow` is
+  `FramelessWindowHint | Tool`, so it has no native title bar or resize border. Dragging and
+  resizing use `windowHandle().startSystemMove()` / `startSystemResize(edges)`. Do **not** drag
+  via `self.move()` — it silently no-ops on Linux (X11 *and* Wayland) for `Qt.Tool` frameless
+  windows, which read as "the title bar doesn't drag." `mousePressEvent` hit-tests a 6px edge
+  zone (resize) then the header rect (move); the manual `_drag_pos` path is a fallback only.
+- **The look is token-driven.** Font sizes, spacing, radii, and colours live in
+  `ui/theme/tokens.py`; the stylesheet is generated in `ui/theme/qss.py`. Bump the `FONT_SIZE_*`
+  scale there rather than hardcoding px. Row/column pixel dimensions live in `ui/pack_widgets.py`
+  (and must stay in sync: `_W_BAR` == `ScoreBar._W`); the right-hand deck rail width is set in
+  `pack_tab.py` (`deck_rail.setFixedWidth`). Headless layout/size checks render via
+  `OverlayWindow(...).grab()` under `QT_QPA_PLATFORM=offscreen`.
+
 ## Releasing
 
 Version bumps, tagging, and GitHub Releases follow the parent repo's release flow

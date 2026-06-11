@@ -8,9 +8,9 @@ from PySide6.QtWidgets import QWidget
 
 from client.overlay.ui.theme import tokens
 
-_W = 78
-_H = 16
-_RADIUS = 3
+_W = 92
+_H = 22
+_RADIUS = 4
 
 
 class ScoreBar(QWidget):
@@ -69,7 +69,7 @@ class ScoreBar(QWidget):
 
         # label (score number, centered, white with shadow)
         font = QFont()
-        font.setPointSize(8)
+        font.setPointSize(11)
         font.setBold(True)
         p.setFont(font)
 

@@ -23,18 +23,18 @@ from client.overlay.mana_icons import get_mana_icon_cache, parse_mana_pips
 from client.overlay.ui.theme import set_prop
 from client.overlay.ui.theme import tokens
 
-# Column widths (v3 — bigger rows + thumbnails).
-_W_RANK    = 16
-_W_ART     = 40
-_W_MANA    = 42
-_W_NAME_MIN = 72  # stretches
-_W_BAR     = 78   # ScoreBar width
-_W_GIHWR   = 40
-_W_ATA     = 30
-_ROW_H     = 30
-_SPACING   = 4
-_MARGIN    = 6
-_ART_H     = 28
+# Column widths (v4 — larger, more readable rows + thumbnails).
+_W_RANK    = 20
+_W_ART     = 48
+_W_MANA    = 48
+_W_NAME_MIN = 96  # stretches
+_W_BAR     = 92   # ScoreBar width — must match ScoreBar._W
+_W_GIHWR   = 48
+_W_ATA     = 40
+_ROW_H     = 36
+_SPACING   = 5
+_MARGIN    = 8
+_ART_H     = 34
 
 
 class _ManaBar(QWidget):

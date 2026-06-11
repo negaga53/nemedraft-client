@@ -40,7 +40,7 @@ class _ArchetypeCard(QFrame):
         self._commit_widget = QWidget()
         self._commit_layout = QHBoxLayout(self._commit_widget)
         self._commit_layout.setContentsMargins(0, 0, 0, 0)
-        self._commit_layout.setSpacing(6)
+        self._commit_layout.setSpacing(3)
         self._commit_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
         self._pip_icons: dict[str, QLabel] = {}
@@ -50,7 +50,7 @@ class _ArchetypeCard(QFrame):
             cell = QWidget()
             cell_layout = QHBoxLayout(cell)
             cell_layout.setContentsMargins(0, 0, 0, 0)
-            cell_layout.setSpacing(2)
+            cell_layout.setSpacing(1)
 
             icon = QLabel()
             pm = cache.get_pixmap(c, 11)

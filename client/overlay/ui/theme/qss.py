@@ -111,7 +111,7 @@ QPushButton#windowBtn {{
     border: 1px solid transparent;
     border-radius: {t.RADIUS_CHIP}px;
     color: {t.TEXT_SECONDARY};
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 700;
     padding: 0;
 }}
@@ -132,6 +132,21 @@ QPushButton#windowBtnClose {{
 QPushButton#windowBtnClose:hover {{
     background: rgba(255, 93, 93, 0.85);
     color: #ffffff;
+}}
+
+/* Compact-view toggle — accent-tinted so it's discoverable during a draft. */
+QPushButton#compactToggle {{
+    background: {t.ACCENT_WASH};
+    border: 1px solid {t.ACCENT_DIM};
+    border-radius: {t.RADIUS_CHIP}px;
+    color: {t.ACCENT};
+    font-size: 14px;
+    font-weight: 700;
+    padding: 0;
+}}
+QPushButton#compactToggle:hover {{
+    background: {t.ACCENT};
+    color: {t.ACCENT_TEXT_ON};
 }}
 
 QLabel#status {{
@@ -402,25 +417,27 @@ QProgressBar#predictionLoading {{
 
 QPushButton#navBtn {{
     background: {t.L2_CARD};
-    color: {t.TEXT_SECONDARY};
+    color: {t.TEXT_PRIMARY};
     border: 1px solid {t.L2_STROKE};
     border-radius: {t.RADIUS_CHIP}px;
     padding: 2px 10px;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: bold;
 }}
 QPushButton#navBtn:hover {{
-    background: {t.L2_HOVER};
-    color: {t.TEXT_PRIMARY};
+    background: {t.ACCENT_WASH};
+    border-color: {t.ACCENT_DIM};
+    color: {t.ACCENT};
 }}
 QPushButton#navBtn:disabled {{
+    background: transparent;
     color: {t.TEXT_FAINT};
     border-color: {t.L1_STROKE};
 }}
 
 QLabel#navLabel {{
     color: {t.TEXT_SECONDARY};
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     letter-spacing: 0.06em;
     background: transparent;
@@ -446,7 +463,7 @@ QLabel#takenSeparator {{
 QLabel#rowRank {{
     color: {t.TEXT_SECONDARY};
     font-weight: 700;
-    font-size: 13px;
+    font-size: 15px;
     background: transparent;
     border: none;
 }}

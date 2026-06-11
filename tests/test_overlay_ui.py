@@ -55,8 +55,8 @@ def test_score_bar_renders_with_score(qapp):
     assert bar.fraction == 0.95
     assert bar.label_text == "95"
     # Size is fixed per design.
-    assert bar.sizeHint().width() == 78
-    assert bar.sizeHint().height() == 16
+    assert bar.sizeHint().width() == 92
+    assert bar.sizeHint().height() == 22
 
 
 def test_score_bar_clamps_and_rounds(qapp):
@@ -89,7 +89,7 @@ def test_card_row_has_art_and_scorebar(qapp):
     # art label exists (may be empty when show_art=False or no path)
     assert hasattr(row, "art_label")
     # row height per spec
-    assert row.height() == 30
+    assert row.height() == 36
 
 
 def test_card_row_medal_color_for_top_gihwr(qapp):
@@ -155,9 +155,9 @@ def test_compact_height_matches_spec(qapp):
     from client.overlay.ui.window import OverlayWindow
     from client.overlay.config import OverlayConfig
     w = OverlayWindow(OverlayConfig(), transparent=False, show_art=False)
-    # Per spec: drag row + pill + 3 rows + padding ≈ 110-160
+    # Per spec: drag row + pill + 3 rows + padding ≈ 160-200
     h = w._compact_height()
-    assert 110 <= h <= 160
+    assert 160 <= h <= 200
 
 
 def test_home_tab_has_brand_and_status_card(qapp):
@@ -285,3 +285,35 @@ def test_elevate_to_floating_is_noop_off_darwin():
             raise AssertionError("should not be called off-darwin")
 
     elevate_to_floating(_Dummy())
+
+
+def test_window_edge_resize_hit_testing(qapp):
+    """Frameless window exposes resize hot-zones at its border, not its centre."""
+    from client.overlay.ui.window import OverlayWindow
+    from client.overlay.config import OverlayConfig
+    from PySide6.QtCore import QPoint, Qt
+
+    w = OverlayWindow(OverlayConfig(), transparent=False, show_art=False)
+    w.resize(720, 900)
+    rect = w.rect()
+    # Centre is draggable territory, not a resize edge.
+    assert w._edges_at(rect.center()) is None
+    # Corners report both edges with the matching diagonal cursor.
+    tl = w._edges_at(QPoint(2, 2))
+    assert tl & Qt.Edge.TopEdge and tl & Qt.Edge.LeftEdge
+    assert w._cursor_for_edges(tl) == Qt.CursorShape.SizeFDiagCursor
+    br = w._edges_at(QPoint(rect.width() - 2, rect.height() - 2))
+    assert br & Qt.Edge.BottomEdge and br & Qt.Edge.RightEdge
+
+
+def test_compact_toggle_is_discoverable(qapp):
+    """The compact-view toggle carries its own objectName so the theme can
+    style it as an accent affordance (it was indistinguishable before)."""
+    from client.overlay.ui.window import OverlayWindow
+    from client.overlay.config import OverlayConfig
+
+    w = OverlayWindow(OverlayConfig(), transparent=False, show_art=False)
+    assert w._toggle_btn.objectName() == "compactToggle"
+    # The generated stylesheet must carry a rule for it.
+    from client.overlay.ui.theme.qss import build_stylesheet
+    assert "QPushButton#compactToggle" in build_stylesheet(False)

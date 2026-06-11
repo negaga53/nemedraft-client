@@ -120,10 +120,14 @@ class OverlayWindow(QWidget):
             self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
 
         self.setWindowFlags(flags)
-        self.setMinimumWidth(560)
-        self.setMaximumWidth(720)
-        self.resize(620, 820)
+        self.setMinimumWidth(600)
+        self.setMaximumWidth(1100)
+        self.resize(720, 900)
         self.setWindowOpacity(opacity)
+        # Frameless windows have no native resize border — track the mouse so
+        # the edge hot-zones in mousePressEvent can show resize cursors and
+        # hand off to the window manager via startSystemResize.
+        self.setMouseTracking(True)
         apply_theme(self, glass=transparent)
 
         self._build_ui()
@@ -161,7 +165,7 @@ class OverlayWindow(QWidget):
         drag_row.setSpacing(6)
 
         self._toggle_btn = QPushButton("▾")
-        self._toggle_btn.setObjectName("windowBtn")
+        self._toggle_btn.setObjectName("compactToggle")
         self._toggle_btn.setFixedSize(26, 22)
         self._toggle_btn.setToolTip(tr("toggle_compact_tooltip") + "  (Ctrl+M)")
         self._toggle_btn.clicked.connect(self._toggle_compact)
@@ -302,7 +306,7 @@ class OverlayWindow(QWidget):
         self._mini_pending_pos = QPoint()
         self._mini_hover_timer = QTimer(self)
         self._mini_hover_timer.setSingleShot(True)
-        self._mini_hover_timer.setInterval(200)
+        self._mini_hover_timer.setInterval(110)
         self._mini_hover_timer.timeout.connect(self._show_mini_preview)
 
 
@@ -333,9 +337,9 @@ class OverlayWindow(QWidget):
             # Restore position only — the full-size height is set below.
             self.restoreGeometry(QByteArray(saved))
             self._saved_geometry = None
-        self.resize(self.width(), 800)
+        self.resize(self.width(), 900)
         # Ensure the resize sticks after restoreGeometry.
-        self.setMinimumHeight(800)
+        self.setMinimumHeight(900)
         QTimer.singleShot(0, lambda: self.setMinimumHeight(0))
         # Geometry was re-applied — make sure the header stayed reachable.
         from client.overlay.ui.screen_utils import ensure_on_screen
@@ -598,18 +602,76 @@ class OverlayWindow(QWidget):
             if self._compact:
                 self._refresh_mini()
 
-    # -- drag support (frameless window — drag from header area) -------------
+    # -- drag + resize support (frameless window) ----------------------------
+    #
+    # A frameless window has no native title bar or resize border, so both
+    # moving and resizing must be driven explicitly. We hand both off to the
+    # window manager via QWindow.startSystemMove / startSystemResize — the
+    # manual ``self.move()`` approach silently fails on Linux (X11/Wayland)
+    # for ``Qt.Tool`` windows, which is why dragging from the header did
+    # nothing there. ``_drag_pos`` is kept only as a last-resort fallback.
+
+    _RESIZE_MARGIN = 6  # px hot-zone around the window edge for resizing
+
+    def _edges_at(self, pos):
+        """Return the ``Qt.Edge`` flags for a point near the border, else None."""
+        m = self._RESIZE_MARGIN
+        rect = self.rect()
+        edges = Qt.Edge(0)
+        if pos.x() <= m:
+            edges |= Qt.Edge.LeftEdge
+        elif pos.x() >= rect.width() - m:
+            edges |= Qt.Edge.RightEdge
+        if pos.y() <= m:
+            edges |= Qt.Edge.TopEdge
+        elif pos.y() >= rect.height() - m:
+            edges |= Qt.Edge.BottomEdge
+        return edges or None
+
+    @staticmethod
+    def _cursor_for_edges(edges):
+        if edges is None:
+            return Qt.CursorShape.ArrowCursor
+        left_right = edges & (Qt.Edge.LeftEdge | Qt.Edge.RightEdge)
+        top_bottom = edges & (Qt.Edge.TopEdge | Qt.Edge.BottomEdge)
+        if left_right and top_bottom:
+            tl_br = (edges & Qt.Edge.TopEdge and edges & Qt.Edge.LeftEdge) or (
+                edges & Qt.Edge.BottomEdge and edges & Qt.Edge.RightEdge
+            )
+            return (
+                Qt.CursorShape.SizeFDiagCursor if tl_br
+                else Qt.CursorShape.SizeBDiagCursor
+            )
+        if left_right:
+            return Qt.CursorShape.SizeHorCursor
+        return Qt.CursorShape.SizeVerCursor
 
     def mousePressEvent(self, event):  # noqa: N802
-        if event.button() == Qt.MouseButton.LeftButton:
-            # Only start drag if the click is within the header bar area.
-            header_rect = self._header_widget.geometry()
-            if header_rect.contains(event.position().toPoint()):
-                self._drag_pos = event.globalPosition().toPoint() - self.frameGeometry().topLeft()
-                self._header_widget.setCursor(Qt.CursorShape.ClosedHandCursor)
+        if event.button() != Qt.MouseButton.LeftButton:
+            return
+        handle = self.windowHandle()
+        pos = event.position().toPoint()
+        # Edge resize takes priority over the header drag (full mode only —
+        # compact is a fixed-height strip).
+        if not self._compact:
+            edges = self._edges_at(pos)
+            if edges is not None and handle is not None and handle.startSystemResize(edges):
                 event.accept()
+                return
+        # Header drag — hand off to the window manager.
+        if self._header_widget.geometry().contains(pos):
+            if handle is not None and handle.startSystemMove():
+                event.accept()
+                return
+            # Fallback for platforms without system move (e.g. offscreen).
+            self._drag_pos = event.globalPosition().toPoint() - self.frameGeometry().topLeft()
+            self._header_widget.setCursor(Qt.CursorShape.ClosedHandCursor)
+            event.accept()
 
     def mouseMoveEvent(self, event):  # noqa: N802
+        # Resize-cursor feedback while hovering an edge (no button held).
+        if not self._compact and not (event.buttons() & Qt.MouseButton.LeftButton):
+            self.setCursor(self._cursor_for_edges(self._edges_at(event.position().toPoint())))
         if self._drag_pos is not None and event.buttons() & Qt.MouseButton.LeftButton:
             self.move(event.globalPosition().toPoint() - self._drag_pos)
             event.accept()
@@ -821,13 +883,13 @@ class OverlayWindow(QWidget):
             self.pack_tab.set_compact(False)
             self.tabs.setVisible(True)
             self._toggle_btn.setText("▾")
-            self.setMinimumWidth(560)
-            self.setMaximumWidth(720)
+            self.setMinimumWidth(600)
+            self.setMaximumWidth(1100)
             stored = self._view_mode.geometry_for(new)
             if stored:
                 self.restoreGeometry(QByteArray.fromBase64(stored.encode()))
             else:
-                self.resize(620, 800)
+                self.resize(720, 900)
 
     def persist_geometry(self) -> None:
         """Save the active mode's geometry (called at app exit)."""
@@ -841,7 +903,7 @@ class OverlayWindow(QWidget):
         """Compact height = drag row + mini pill + N rows + padding."""
         _DRAG = 32       # drag row fixed height
         _PILL = 20       # mini pill + small margin
-        _ROW = 30        # CardRow fixed height
+        _ROW = 36        # CardRow fixed height
         _SPACING = 2 * 4 # inner spacing
         _PADDING = 8     # root padding
         rows = max(3, self._recommend_count)

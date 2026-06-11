@@ -165,7 +165,7 @@ class PackTab(QWidget):
 
         from client.overlay.ui.pack_rail import DeckRail
         self.deck_rail = DeckRail()
-        self.deck_rail.setFixedWidth(160)
+        self.deck_rail.setFixedWidth(210)
         content_split.addWidget(self.deck_rail)
 
         # Fill the remaining vertical space so the card list + rail reach
@@ -187,7 +187,7 @@ class PackTab(QWidget):
         self._preview: _CardPreview | None = None
         self._hover_timer = QTimer(self)
         self._hover_timer.setSingleShot(True)
-        self._hover_timer.setInterval(200)  # ms delay before showing
+        self._hover_timer.setInterval(110)  # ms delay before showing
         self._hover_timer.timeout.connect(self._show_preview)
         self._pending_preview_path: Path | None = None
         self._pending_pos = QPoint()

@@ -345,6 +345,9 @@ class OverlayWindow(QWidget):
         # Ensure the resize sticks after restoreGeometry.
         self.setMinimumHeight(800)
         QTimer.singleShot(0, lambda: self.setMinimumHeight(0))
+        # Geometry was re-applied — make sure the header stayed reachable.
+        from client.overlay.ui.screen_utils import ensure_on_screen
+        ensure_on_screen(self)
 
     def show_waiting(self) -> None:
         self._show_status(tr("waiting_for_draft"))
@@ -374,6 +377,45 @@ class OverlayWindow(QWidget):
     def show_draft_complete(self) -> None:
         """Thread-safe: emit signal to switch to the deck tab."""
         self.draft_complete_signal.emit()
+
+    # -- live-applied settings -------------------------------------------------
+
+    def set_show_art(self, enabled: bool) -> None:
+        """Apply the show-art toggle live, re-rendering cached results."""
+        self._show_art = enabled
+        self.pack_tab.set_show_art(enabled)
+        if self._last_results:
+            self.pack_tab.update_predictions(
+                self._last_results, self._last_art_paths,
+                pack_number=self._last_pack_number,
+                pick_number=self._last_pick_number,
+            )
+            if self._compact:
+                self._refresh_mini()
+
+    def set_transparent(self, enabled: bool) -> None:
+        """Apply transparent mode live by re-creating the native window.
+
+        ``WA_TranslucentBackground`` only takes effect at native window
+        creation, and ``setWindowFlags`` early-returns when the flags are
+        unchanged (ours never change). ``setParent(None, flags)`` is the
+        reliable way to force a re-create; ``show()`` re-runs the macOS
+        floating elevation via ``showEvent``.
+        """
+        if enabled == self._transparent:
+            return
+        self._transparent = enabled
+        geometry = self.geometry()
+        was_visible = self.isVisible()
+        self.hide()
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, enabled)
+        self.setParent(None, self.windowFlags())
+        self.setStyleSheet(
+            TRANSPARENT_STYLESHEET if enabled else OVERLAY_STYLESHEET
+        )
+        self.setGeometry(geometry)
+        if was_visible:
+            self.show()
 
     def show_prediction_loading(self, pack_number: int, pick_number: int) -> None:
         """Surface a loading indicator while a prediction is in flight.

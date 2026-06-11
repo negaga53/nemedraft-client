@@ -571,6 +571,10 @@ class PackTab(QWidget):
         self.deck_rail.setVisible(not compact)
         self._nav_container.setVisible(not compact)
 
+    def set_show_art(self, enabled: bool) -> None:
+        """Live-apply the show-art toggle; rows pick it up on next render."""
+        self._show_art = enabled
+
     def retranslate(self) -> None:
         """Refresh all static labels with the current language."""
         self.home_widget.retranslate()

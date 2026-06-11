@@ -103,6 +103,7 @@ hiddenimports = [
     "client.overlay.ui.stats_tab",
     "client.overlay.ui.settings_tab",
     "client.overlay.ui.toast",
+    "client.overlay.ui.screen_utils",
     "client.overlay.ui.styles",
     # --- Common: lightweight data/inference modules (no torch) ---
     "common",

@@ -145,6 +145,7 @@ class OverlayApp:
         if self.memory_watcher is not None:
             self.memory_watcher.add_callback(self._emit_memory_event)
         self.window.settings_tab.settings_changed.connect(self._on_settings_changed)
+        self.window.settings_tab.setting_changed.connect(self._on_setting_changed)
         self.window.settings_tab.opacity_preview.connect(self.window.setWindowOpacity)
         self.window.settings_tab.language_changed.connect(self._on_language_changed)
         self.window.pack_tab.set_scryfall(self.scryfall_cards)
@@ -1116,6 +1117,14 @@ class OverlayApp:
             suggestions, self.state.pool, self.scryfall_cards,
         )
 
+    def _on_setting_changed(self, key: str, value: object) -> None:
+        """Live-apply settings that don't need a restart."""
+        if key == "overlay.show_art":
+            self.art_cache.enabled = bool(value)
+            self.window.set_show_art(bool(value))
+        elif key == "overlay.transparent":
+            self.window.set_transparent(bool(value))
+
     def _on_settings_changed(self) -> None:
         """Persist settings and apply changes."""
         self.window.setWindowOpacity(self.config.overlay.opacity)
@@ -1253,6 +1262,22 @@ def main() -> None:
     if config.overlay.geometry:
         from PySide6.QtCore import QByteArray
         window.restoreGeometry(QByteArray.fromBase64(config.overlay.geometry.encode()))
+
+    # The persisted geometry may reference a monitor that is gone —
+    # rescue the window so the drag header stays reachable. Also
+    # re-validate when a screen is unplugged mid-session.
+    from client.overlay.ui.screen_utils import ensure_on_screen
+
+    def _rescue_offscreen(*_args: object) -> None:
+        if ensure_on_screen(window):
+            NotificationBus.instance().post(
+                "Overlay moved back to a visible screen",
+                key="offscreen-rescued",
+            )
+
+    _rescue_offscreen()
+    from PySide6.QtGui import QGuiApplication
+    QGuiApplication.instance().screenRemoved.connect(_rescue_offscreen)
 
     window.show_loading()
     window.show()

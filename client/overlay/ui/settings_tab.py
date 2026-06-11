@@ -28,6 +28,7 @@ class SettingsTab(QWidget):
     """
 
     settings_changed = Signal()
+    setting_changed = Signal(str, object)  # ("overlay.show_art", True) per changed key.
     language_changed = Signal(str)  # Emitted with new language code.
     opacity_preview = Signal(float)  # Live opacity during slider drag (0.0–1.0).
 
@@ -87,11 +88,6 @@ class SettingsTab(QWidget):
         self._transparent_checkbox.setChecked(config.overlay.transparent)
         self._transparent_checkbox.toggled.connect(self._sync)
         layout.addWidget(self._transparent_checkbox)
-
-        self._transparent_note = QLabel(tr("transparent_mode_note"))
-        self._transparent_note.setStyleSheet("color: #888; font-size: 10px; padding: 0 24px;")
-        self._transparent_note.setWordWrap(True)
-        layout.addWidget(self._transparent_note)
 
         # -- Language section ------------------------------------------------
         self._sec_language = self._section(tr("section_language"))
@@ -178,14 +174,34 @@ class SettingsTab(QWidget):
             self.settings_changed.emit()
 
     def _sync(self, *_args: object) -> None:
-        """Push all widget values into the config object."""
+        """Push all widget values into the config object.
+
+        Emits ``setting_changed`` for each key whose value actually
+        changed (live-apply hooks), then the legacy blob signal for
+        persistence + re-predict.
+        """
         c = self._cfg
+        new_values = {
+            "data.user_group": self._ug_combo.currentText(),
+            "overlay.opacity": self._opacity_slider.value() / 100.0,
+            "overlay.show_art": self._show_art_checkbox.isChecked(),
+            "overlay.transparent": self._transparent_checkbox.isChecked(),
+        }
+        old_values = {
+            "data.user_group": c.data.user_group,
+            "overlay.opacity": c.overlay.opacity,
+            "overlay.show_art": c.overlay.show_art,
+            "overlay.transparent": c.overlay.transparent,
+        }
 
-        c.data.user_group = self._ug_combo.currentText()
+        c.data.user_group = new_values["data.user_group"]
+        c.overlay.opacity = new_values["overlay.opacity"]
+        c.overlay.show_art = new_values["overlay.show_art"]
+        c.overlay.transparent = new_values["overlay.transparent"]
 
-        c.overlay.opacity = self._opacity_slider.value() / 100.0
-        c.overlay.show_art = self._show_art_checkbox.isChecked()
-        c.overlay.transparent = self._transparent_checkbox.isChecked()
+        for key, value in new_values.items():
+            if old_values[key] != value:
+                self.setting_changed.emit(key, value)
 
         self.settings_changed.emit()
 
@@ -241,7 +257,6 @@ class SettingsTab(QWidget):
         self._opacity_lbl.setToolTip(tr("opacity_tooltip"))
         self._show_art_checkbox.setText(tr("show_art_label"))
         self._transparent_checkbox.setText(tr("transparent_mode_label"))
-        self._transparent_note.setText(tr("transparent_mode_note"))
         self._sec_language.setText(tr("section_language"))
         self._lang_lbl.setText(tr("language_label"))
         self._lang_lbl.setToolTip(tr("language_tooltip"))

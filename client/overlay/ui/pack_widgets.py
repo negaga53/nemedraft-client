@@ -1,4 +1,9 @@
-"""Pack row widget primitives — moved from pack_tab.py."""
+"""Pack row widget primitives — moved from pack_tab.py.
+
+Visual states are expressed as dynamic properties (``tint``, ``top``,
+``dimmed``, ``medal``, ``skeleton``, …) resolved by the generated theme
+stylesheet — no per-widget setStyleSheet calls.
+"""
 
 from __future__ import annotations
 
@@ -10,13 +15,13 @@ from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
     QLabel,
-    QVBoxLayout,
     QWidget,
 )
 
-from client.overlay.api_client import Pick
 from client.overlay.i18n import tr
 from client.overlay.mana_icons import get_mana_icon_cache, parse_mana_pips
+from client.overlay.ui.theme import set_prop
+from client.overlay.ui.theme import tokens
 
 # Column widths (v3 — bigger rows + thumbnails).
 _W_RANK    = 16
@@ -61,9 +66,9 @@ class _ManaBar(QWidget):
             else:
                 # Fallback text.
                 lbl = QLabel(pip)
+                lbl.setObjectName("manaPipFallback")
                 lbl.setFixedSize(14, 14)
                 lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                lbl.setStyleSheet("color: #aaa; font-size: 10px;")
                 self._layout.addWidget(lbl)
 
 
@@ -80,6 +85,7 @@ class CardRow(QFrame):
         super().__init__(parent)
         self.setFixedHeight(_ROW_H)
         self.setMouseTracking(True)
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self._art_path: Path | None = None
         self._show_art = show_art
 
@@ -88,15 +94,13 @@ class CardRow(QFrame):
         layout.setSpacing(_SPACING)
 
         self.rank_label = QLabel()
+        self.rank_label.setObjectName("rowRank")
         self.rank_label.setFixedWidth(_W_RANK)
         self.rank_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.rank_label.setStyleSheet("font-weight: 700; font-size: 13px;")
 
         self.art_label = QLabel()
+        self.art_label.setObjectName("rowArt")
         self.art_label.setFixedSize(_W_ART, _ART_H)
-        self.art_label.setStyleSheet(
-            "border-radius: 2px; background: #1a1a28;"
-        )
         self.art_label.setScaledContents(True)
         if not show_art:
             self.art_label.hide()
@@ -105,8 +109,8 @@ class CardRow(QFrame):
         self.mana_bar.setFixedWidth(_W_MANA)
 
         self.name_label = QLabel()
+        self.name_label.setObjectName("rowName")
         self.name_label.setMinimumWidth(_W_NAME_MIN)
-        self.name_label.setStyleSheet("font-size: 12px;")
 
         from client.overlay.ui.widgets.score_bar import ScoreBar
         self.score_bar = ScoreBar()
@@ -115,17 +119,13 @@ class CardRow(QFrame):
         self.ata_label: QLabel | None = None
         if show_stats:
             self.gihwr_label = QLabel()
+            self.gihwr_label.setObjectName("rowStat")
             self.gihwr_label.setFixedWidth(_W_GIHWR)
             self.gihwr_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            self.gihwr_label.setStyleSheet(
-                "color: #aabbcc; font-size: 12px; font-weight: 600;"
-            )
             self.ata_label = QLabel()
+            self.ata_label.setObjectName("rowStat")
             self.ata_label.setFixedWidth(_W_ATA)
             self.ata_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            self.ata_label.setStyleSheet(
-                "color: #aabbcc; font-size: 12px; font-weight: 600;"
-            )
 
         layout.addWidget(self.rank_label)
         layout.addWidget(self.art_label)
@@ -138,15 +138,12 @@ class CardRow(QFrame):
             layout.addWidget(self.ata_label)
 
     @staticmethod
-    def _set_skeleton(label) -> None:
+    def _set_skeleton(label: QLabel) -> None:
         """Show a pulsing skeleton bar in a stat label to indicate loading."""
         from PySide6.QtCore import QEasingCurve, QPropertyAnimation
         from PySide6.QtWidgets import QGraphicsOpacityEffect
         label.setText("")
-        label.setStyleSheet(
-            "background: rgba(100, 100, 150, 0.3); border-radius: 3px; "
-            "min-height: 8px; max-height: 8px; margin: 6px 4px;"
-        )
+        set_prop(label, "skeleton", True)
         effect = QGraphicsOpacityEffect(label)
         label.setGraphicsEffect(effect)
         anim = QPropertyAnimation(effect, b"opacity", label)
@@ -158,6 +155,15 @@ class CardRow(QFrame):
         anim.setLoopCount(-1)
         anim.start()
 
+    @staticmethod
+    def _set_stat(label: QLabel, *, text: str, medal: int = 0,
+                  empty: bool = False) -> None:
+        label.setGraphicsEffect(None)
+        label.setText(text)
+        set_prop(label, "skeleton", False)
+        set_prop(label, "medal", medal)
+        set_prop(label, "empty", empty)
+
     def set_data(
         self,
         pick,                         # Pick
@@ -167,7 +173,6 @@ class CardRow(QFrame):
         *,
         dimmed: bool = False,
     ) -> None:
-        from client.overlay.ui.styles import card_row_bg, medal_color
         from client.overlay.i18n import card_name
 
         # Stored so the pack tab can find this row when art lands later.
@@ -176,42 +181,29 @@ class CardRow(QFrame):
         # Desaturate the thumbnail visually on wheeled rows, but still render it.
         self._apply_art(art_path, dimmed=dimmed)
 
-        if dimmed:
-            self.setStyleSheet(
-                "CardRow { background: rgba(40,40,60,.6); border-radius: 3px; }"
-            )
-            self.rank_label.setText("")
-            self.mana_bar.set_cost(pick.mana_cost)
-            self.name_label.setText(card_name(pick.card))
-            self.name_label.setStyleSheet(
-                "color: #777; font-style: italic; font-size: 12px;"
-            )
-            self.score_bar.set_score(0.0)
-            if self.gihwr_label:
-                self.gihwr_label.setText("")
-            if self.ata_label:
-                self.ata_label.setText("")
-            return
-
-        is_top = pick.rank == 1
-        bg = card_row_bg(pick.colors, is_top)
-        border = "border-left: 2px solid #4caf50;" if is_top else "border-left: 2px solid transparent;"
-        self.setStyleSheet(
-            f"CardRow {{ background: {bg}; {border} border-radius: 3px; }}"
-            "CardRow:hover { background: rgba(255,255,255,20); }"
-        )
-
-        rank_text = "★" if pick.is_elite else str(pick.rank)
-        self.rank_label.setText(rank_text)
-        self.rank_label.setStyleSheet(
-            f"color: {'#cfb53b' if is_top else '#aabbcc'}; font-weight: 700; font-size: 13px;"
-        )
+        is_top = pick.rank == 1 and not dimmed
+        set_prop(self, "dimmed", dimmed)
+        set_prop(self, "top", is_top)
+        set_prop(self, "tint", "" if dimmed else tokens.card_tint(pick.colors))
 
         self.mana_bar.set_cost(pick.mana_cost)
         self.name_label.setText(card_name(pick.card))
-        self.name_label.setStyleSheet(
-            f"color: {'#ffffff' if is_top else '#ccccdd'}; font-size: 12px;"
-        )
+        set_prop(self.name_label, "dimmed", dimmed)
+        set_prop(self.name_label, "top", is_top)
+
+        if dimmed:
+            self.rank_label.setText("")
+            set_prop(self.rank_label, "top", False)
+            self.score_bar.set_score(0.0)
+            if self.gihwr_label:
+                self._set_stat(self.gihwr_label, text="")
+            if self.ata_label:
+                self._set_stat(self.ata_label, text="")
+            self.setToolTip("")
+            return
+
+        self.rank_label.setText("★" if pick.is_elite else str(pick.rank))
+        set_prop(self.rank_label, "top", is_top)
 
         pct = pick.score / max_score if max_score > 0 else 0.0
         self.score_bar.set_score(pct)
@@ -221,30 +213,20 @@ class CardRow(QFrame):
                 self._set_skeleton(self.gihwr_label)
             elif pick.gihwr > 0:
                 # GIH shown without % suffix per spec
-                self.gihwr_label.setText(f"{pick.gihwr * 100:.1f}")
-                mc = medal_color(gihwr_rank)
-                if mc:
-                    self.gihwr_label.setStyleSheet(
-                        f"color: {mc}; font-size: 12px; font-weight: 700;"
-                    )
-                else:
-                    self.gihwr_label.setStyleSheet(
-                        "color: #aabbcc; font-size: 12px; font-weight: 600;"
-                    )
+                self._set_stat(
+                    self.gihwr_label,
+                    text=f"{pick.gihwr * 100:.1f}",
+                    medal=gihwr_rank if tokens.medal_color(gihwr_rank) else 0,
+                )
             else:
-                self.gihwr_label.setText("—")
-                self.gihwr_label.setStyleSheet("color: #888; font-size: 12px;")
+                self._set_stat(self.gihwr_label, text="—", empty=True)
         if self.ata_label:
             if not pick.stats_loaded:
                 self._set_skeleton(self.ata_label)
             elif pick.ata > 0:
-                self.ata_label.setText(f"{pick.ata:.1f}")
-                self.ata_label.setStyleSheet(
-                    "color: #aabbcc; font-size: 12px; font-weight: 600;"
-                )
+                self._set_stat(self.ata_label, text=f"{pick.ata:.1f}")
             else:
-                self.ata_label.setText("—")
-                self.ata_label.setStyleSheet("color: #888; font-size: 12px;")
+                self._set_stat(self.ata_label, text="—", empty=True)
 
         if pick.gihwr > 0:
             tip_parts = [f"GIH WR: {pick.gihwr:.1%}"]
@@ -282,9 +264,6 @@ class CardRow(QFrame):
         from PySide6.QtGui import QPainter, QPixmap
         if art_path is None or not Path(art_path).exists():
             self.art_label.clear()
-            self.art_label.setStyleSheet(
-                "border-radius: 2px; background: #1a1a28;"
-            )
             return
         pm = QPixmap(str(art_path))
         if pm.isNull():
@@ -323,17 +302,14 @@ class _ColumnHeader(QFrame):
     ) -> None:
         super().__init__(parent)
         self._show_stats = show_stats
+        self.setObjectName("columnHeader")
         self.setFixedHeight(18)
-        self.setStyleSheet("border-bottom: 1px solid #333355;")
         layout = QHBoxLayout(self)
         layout.setContentsMargins(_MARGIN, 0, _MARGIN, 0)
         layout.setSpacing(_SPACING)
 
-        _HEADER_STYLE = "color: #888; font-size: 10px; font-weight: bold;"
-
         def _lbl(text: str, width: int) -> QLabel:
             l = QLabel(text)
-            l.setStyleSheet(_HEADER_STYLE)
             l.setFixedWidth(width)
             l.setAlignment(Qt.AlignmentFlag.AlignCenter)
             return l
@@ -343,7 +319,6 @@ class _ColumnHeader(QFrame):
         layout.addWidget(_lbl("", _W_ART))   # art column spacer
         layout.addWidget(_lbl("", _W_MANA))  # mana column spacer
         self._name_lbl = QLabel(tr("col_card"))
-        self._name_lbl.setStyleSheet(_HEADER_STYLE)
         layout.addWidget(self._name_lbl, stretch=1)
         self._score_lbl = _lbl(tr("col_score"), _W_BAR)
         layout.addWidget(self._score_lbl)
@@ -367,7 +342,12 @@ class _ColumnHeader(QFrame):
 
 
 class _CardPreview(QLabel):
-    """Floating card art preview that follows the mouse."""
+    """Floating card art preview that follows the mouse.
+
+    A parentless ToolTip window — the application stylesheet does not
+    cascade into it, so its look is built from tokens here (one of the
+    two documented inline-style exceptions).
+    """
 
     _CARD_W = 200
     _CARD_H = 280
@@ -377,7 +357,9 @@ class _CardPreview(QLabel):
         self.setFixedSize(self._CARD_W, self._CARD_H)
         self.setScaledContents(True)
         self.setStyleSheet(
-            "background: #111; border: 1px solid #444; border-radius: 6px;"
+            f"background: {tokens.L0_WINDOW_OPAQUE};"
+            f" border: 1px solid {tokens.L3_STROKE};"
+            f" border-radius: {tokens.RADIUS_CARD}px;"
         )
         self.hide()
 

@@ -155,50 +155,34 @@ class OverlayWindow(QWidget):
         root.setContentsMargins(8, 8, 8, 8)
         root.setSpacing(4)
 
-        _BTN_STYLE = (
-            "QPushButton { background: rgba(60,60,90,0.8); border: 1px solid #444;"
-            " border-radius: 4px; color: #ccc; font-size: 12px; font-weight: bold; }"
-            "QPushButton:hover { background: rgba(80,80,120,0.9); }"
-        )
-
         # ------- Row 1: drag handle -------
         drag_row = QHBoxLayout()
         drag_row.setContentsMargins(8, 4, 8, 4)
         drag_row.setSpacing(6)
 
         self._toggle_btn = QPushButton("▾")
+        self._toggle_btn.setObjectName("windowBtn")
         self._toggle_btn.setFixedSize(26, 22)
-        self._toggle_btn.setToolTip(tr("toggle_compact_tooltip"))
-        self._toggle_btn.setStyleSheet(
-            "QPushButton { background: rgba(50,50,80,.5);"
-            " border: 1px solid #2a2a3e; border-radius: 3px; color: #e0e0e0;"
-            " font-size: 14px; font-weight: 700; padding: 0; }"
-            "QPushButton:hover { background: rgba(80,80,120,.9); color: #fff; }"
-        )
+        self._toggle_btn.setToolTip(tr("toggle_compact_tooltip") + "  (Ctrl+M)")
         self._toggle_btn.clicked.connect(self._toggle_compact)
         self._toggle_btn.setVisible(False)
         drag_row.addWidget(self._toggle_btn)
 
+        self._brand_tick = QLabel("◢")
+        self._brand_tick.setObjectName("brandTick")
         self._brand_label = QLabel("NEMEDRAFT")
-        self._brand_label.setStyleSheet(
-            "color: #cfb53b; font-weight: 700; font-size: 11px;"
-            " letter-spacing: .08em;"
-        )
+        self._brand_label.setObjectName("brandLabel")
         self._version_label = QLabel(f"v{__version__}")
-        self._version_label.setStyleSheet("color: #555; font-size: 10px;")
+        self._version_label.setObjectName("versionLabel")
+        drag_row.addWidget(self._brand_tick)
         drag_row.addWidget(self._brand_label)
         drag_row.addWidget(self._version_label)
         drag_row.addStretch()
 
         self._min_btn = QPushButton("‒")
+        self._min_btn.setObjectName("windowBtn")
         self._min_btn.setFixedSize(26, 22)
-        self._min_btn.setToolTip(tr("minimize_tooltip"))
-        self._min_btn.setStyleSheet(
-            "QPushButton { background: rgba(50,50,80,.5);"
-            " border: 1px solid #2a2a3e; border-radius: 3px; color: #e0e0e0;"
-            " font-size: 16px; font-weight: 700; padding: 0 0 4px 0; }"
-            "QPushButton:hover { background: rgba(80,80,120,.9); color: #fff; }"
-        )
+        self._min_btn.setToolTip(tr("minimize_tooltip") + "  (Ctrl+H)")
         # Hide-to-tray instead of showMinimized: on Windows, ``Qt.Tool +
         # FramelessWindowHint`` windows have no taskbar entry, so a normal
         # minimize disappears the window with no way to bring it back —
@@ -208,23 +192,16 @@ class OverlayWindow(QWidget):
         drag_row.addWidget(self._min_btn)
 
         self._close_btn = QPushButton("✕")
+        self._close_btn.setObjectName("windowBtnClose")
         self._close_btn.setFixedSize(26, 22)
         self._close_btn.setToolTip(tr("close_tooltip"))
-        self._close_btn.setStyleSheet(
-            "QPushButton { background: rgba(90,40,40,.5);"
-            " border: 1px solid #402a2a; border-radius: 3px; color: #f0cccc;"
-            " font-size: 13px; font-weight: 700; padding: 0; }"
-            "QPushButton:hover { background: rgba(180,55,55,.95); color: #fff; }"
-        )
         self._close_btn.clicked.connect(self.close)
         drag_row.addWidget(self._close_btn)
 
         self._drag_row_widget = QWidget()
+        self._drag_row_widget.setObjectName("dragHeader")
         self._drag_row_widget.setLayout(drag_row)
         self._drag_row_widget.setCursor(Qt.CursorShape.OpenHandCursor)
-        self._drag_row_widget.setStyleSheet(
-            "border-bottom: 1px solid #1f1f30;"
-        )
         # Pin the header height — without this, toggling compact mode lets
         # Qt redistribute vertical slack into the drag row and the title
         # bar visibly grows/shrinks on every toggle.
@@ -290,13 +267,6 @@ class OverlayWindow(QWidget):
         self._mini_pill = QLabel("")
         self._mini_pill.setObjectName("contextPill")
         self._mini_pill.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._mini_pill.setStyleSheet(
-            "QLabel#contextPill {"
-            "  background: #cfb53b; color: #12121f; font-weight: 700;"
-            "  padding: 2px 10px; border-radius: 10px; font-size: 10px;"
-            "  letter-spacing: .05em;"
-            "}"
-        )
         _mini_pill_row = QHBoxLayout()
         _mini_pill_row.addStretch()
         _mini_pill_row.addWidget(self._mini_pill)

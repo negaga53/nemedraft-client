@@ -29,6 +29,7 @@ from client.overlay.ui.pack_widgets import (
     _CardPreview,
     _ColumnHeader,
 )
+from client.overlay.ui.theme import set_prop
 
 
 class PackTab(QWidget):
@@ -74,13 +75,6 @@ class PackTab(QWidget):
         self.context_pill = QLabel("")
         self.context_pill.setObjectName("contextPill")
         self.context_pill.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.context_pill.setStyleSheet(
-            "QLabel#contextPill {"
-            "  background: #cfb53b; color: #12121f; font-weight: 700;"
-            "  padding: 2px 10px; border-radius: 10px; font-size: 10px;"
-            "  letter-spacing: .05em;"
-            "}"
-        )
         pill_row = QHBoxLayout()
         pill_row.addStretch()
         pill_row.addWidget(self.context_pill)
@@ -97,15 +91,6 @@ class PackTab(QWidget):
         self.loading_bar.setRange(0, 0)  # indeterminate — Qt animates it
         self.loading_bar.setTextVisible(False)
         self.loading_bar.setFixedHeight(3)
-        self.loading_bar.setStyleSheet(
-            "QProgressBar#predictionLoading {"
-            "  border: none; background-color: rgba(20, 20, 36, .6);"
-            "  border-radius: 1px; margin: 1px 8px 0 8px;"
-            "}"
-            "QProgressBar#predictionLoading::chunk {"
-            "  background-color: #cfb53b; border-radius: 1px;"
-            "}"
-        )
         self.loading_bar.setVisible(False)
         layout.addWidget(self.loading_bar)
 
@@ -124,12 +109,6 @@ class PackTab(QWidget):
         scroll.setWidget(self._card_container)
 
         # Pick history navigation bar — spans the full window width.
-        _BTN_STYLE = (
-            "QPushButton { background: #1a1a2e; color: #ddd; border: 1px solid #333; "
-            "border-radius: 4px; padding: 2px 10px; font-size: 16px; font-weight: bold; }"
-            "QPushButton:hover { background: #2a2a4e; color: #fff; }"
-            "QPushButton:disabled { color: #444; border-color: #222; }"
-        )
         nav_bar = QHBoxLayout()
         nav_bar.setContentsMargins(8, 4, 8, 4)
         nav_bar.setSpacing(8)
@@ -137,16 +116,14 @@ class PackTab(QWidget):
         self._nav_first = QPushButton("≪")
         self._nav_prev = QPushButton("◀")
         self._nav_label = QLabel("")
+        self._nav_label.setObjectName("navLabel")
         self._nav_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._nav_label.setStyleSheet(
-            "color: #cccccc; font-size: 14px; font-weight: 600; letter-spacing: .06em;"
-        )
         self._nav_next = QPushButton("▶")
         self._nav_last = QPushButton("≫")
 
         for btn in (self._nav_first, self._nav_prev, self._nav_next, self._nav_last):
+            btn.setObjectName("navBtn")
             btn.setFixedSize(44, 32)
-            btn.setStyleSheet(_BTN_STYLE)
             btn.setCursor(Qt.CursorShape.PointingHandCursor)
 
         self._nav_first.setToolTip("First pick of pack")
@@ -197,10 +174,8 @@ class PackTab(QWidget):
 
         # Pick-history nav: full-width strip at the very bottom of the tab.
         self._nav_container = QWidget()
+        self._nav_container.setObjectName("navBar")
         self._nav_container.setLayout(nav_bar)
-        self._nav_container.setStyleSheet(
-            "QWidget { border-top: 1px solid #1f1f30; }"
-        )
         layout.addWidget(self._nav_container)
 
         self._stack.addWidget(pack_page)  # index 1
@@ -269,10 +244,8 @@ class PackTab(QWidget):
         if taken_names and picks:
             max_score = picks[0].score if picks else 1.0
             sep = QLabel(tr("taken_separator", count=len(taken_names)))
+            sep.setObjectName("takenSeparator")
             sep.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            sep.setStyleSheet(
-                "color: #555; font-size: 10px; padding: 2px 0;"
-            )
             self._card_layout.insertWidget(self._card_layout.count() - 1, sep)
 
             scryfall = getattr(self, "_scryfall", {})
@@ -510,23 +483,13 @@ class PackTab(QWidget):
             art = self._art_paths.get(p.card)
             row.set_data(p, max_score, art_path=art, gihwr_rank=gihwr_ranks.get(p.card, 0))
 
-            # Highlight the player's actual pick(s) with a background tint and left border.
+            # Highlight the player's actual pick(s) (history view) and the
+            # live-view recommended rows (PickTwo flags 2) via properties —
+            # the theme stylesheet resolves the accent stroke + wash.
             if highlight_set and p.card in highlight_set:
-                row.setStyleSheet(
-                    row.styleSheet()
-                    + " CardRow { border-left: 3px solid #4fc3f7;"
-                    " background: rgba(79, 195, 247, 0.10); }"
-                )
-
-            # Live-view recommendation: tint the top rec_count rows (PickTwo
-            # highlights 2). Mutually exclusive with the actual-pick highlight
-            # above, which only fires in history view (highlight_card set).
+                set_prop(row, "picked", True)
             if idx < rec_count:
-                row.setStyleSheet(
-                    row.styleSheet()
-                    + " CardRow { border-left: 3px solid #4fc3f7;"
-                    " background: rgba(79, 195, 247, 0.10); }"
-                )
+                set_prop(row, "recommended", True)
 
             row.setMouseTracking(True)
             row.enterEvent = self._make_enter(p.card)

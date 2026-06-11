@@ -370,11 +370,135 @@ CardRow[top="true"] {{
     border-left: 2px solid {t.ACCENT};
 }}
 CardRow[picked="true"] {{
+    background-color: {t.ACCENT_WASH};
     border: 1px solid {t.ACCENT_DIM};
-    border-left: 2px solid {t.ACCENT};
+    border-left: 3px solid {t.ACCENT};
 }}
 CardRow[recommended="true"] {{
-    border-left: 2px solid {t.ACCENT};
+    background-color: {t.ACCENT_WASH};
+    border-left: 3px solid {t.ACCENT};
+}}
+
+/* ---- pack tab chrome ----------------------------------------------------------- */
+
+QProgressBar#predictionLoading {{
+    max-height: 3px;
+    min-height: 3px;
+    margin: 1px 8px 0 8px;
+    border-radius: 1px;
+}}
+
+QPushButton#navBtn {{
+    background: {t.L2_CARD};
+    color: {t.TEXT_SECONDARY};
+    border: 1px solid {t.L2_STROKE};
+    border-radius: {t.RADIUS_CHIP}px;
+    padding: 2px 10px;
+    font-size: 16px;
+    font-weight: bold;
+}}
+QPushButton#navBtn:hover {{
+    background: {t.L2_HOVER};
+    color: {t.TEXT_PRIMARY};
+}}
+QPushButton#navBtn:disabled {{
+    color: {t.TEXT_FAINT};
+    border-color: {t.L1_STROKE};
+}}
+
+QLabel#navLabel {{
+    color: {t.TEXT_SECONDARY};
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    background: transparent;
+    border: none;
+}}
+
+QWidget#navBar {{
+    background: {t.L1_PANEL};
+    border: none;
+    border-top: 1px solid {t.L1_STROKE};
+}}
+
+QLabel#takenSeparator {{
+    color: {t.TEXT_FAINT};
+    font-size: {t.FONT_SIZE_SMALL}px;
+    padding: 2px 0;
+    background: transparent;
+    border: none;
+}}
+
+/* ---- pack row internals ------------------------------------------------------ */
+
+QLabel#rowRank {{
+    color: {t.TEXT_SECONDARY};
+    font-weight: 700;
+    font-size: 13px;
+    background: transparent;
+    border: none;
+}}
+QLabel#rowRank[top="true"] {{ color: {t.ACCENT}; }}
+
+QLabel#rowArt {{
+    background: #141a26;
+    border: none;
+    border-radius: 2px;
+}}
+
+QLabel#rowName {{
+    color: {t.TEXT_SECONDARY};
+    font-size: {t.FONT_SIZE_BODY}px;
+    background: transparent;
+    border: none;
+}}
+QLabel#rowName[top="true"] {{
+    color: {t.TEXT_PRIMARY};
+    font-weight: 500;
+}}
+QLabel#rowName[dimmed="true"] {{
+    color: {t.TEXT_MUTED};
+    font-style: italic;
+}}
+
+QLabel#rowStat {{
+    color: {t.TEXT_SECONDARY};
+    font-size: {t.FONT_SIZE_BODY}px;
+    font-weight: 600;
+    background: transparent;
+    border: none;
+}}
+QLabel#rowStat[medal="1"] {{ color: {t.MEDAL_GOLD}; font-weight: 700; }}
+QLabel#rowStat[medal="2"] {{ color: {t.MEDAL_SILVER}; font-weight: 700; }}
+QLabel#rowStat[medal="3"] {{ color: {t.MEDAL_BRONZE}; font-weight: 700; }}
+QLabel#rowStat[empty="true"] {{ color: {t.TEXT_MUTED}; font-weight: 400; }}
+QLabel#rowStat[skeleton="true"] {{
+    background: rgba(120, 140, 180, 0.25);
+    border-radius: 3px;
+    min-height: 8px;
+    max-height: 8px;
+    margin: 6px 4px;
+}}
+
+QLabel#manaPipFallback {{
+    color: {t.TEXT_SECONDARY};
+    font-size: {t.FONT_SIZE_SMALL}px;
+    background: transparent;
+    border: none;
+}}
+
+QFrame#columnHeader {{
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid {t.L1_STROKE};
+}}
+QFrame#columnHeader QLabel {{
+    color: {t.TEXT_MUTED};
+    font-size: {t.FONT_SIZE_MICRO}px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    background: transparent;
+    border: none;
 }}
 
 /* ---- misc shared bits -------------------------------------------------------- */

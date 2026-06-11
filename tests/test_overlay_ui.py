@@ -111,8 +111,10 @@ def test_card_row_medal_color_for_top_gihwr(qapp):
     )
     row = CardRow(show_stats=True)
     row.set_data(pick, max_score=1.0, gihwr_rank=1)
-    from client.overlay.ui.theme import tokens
-    assert tokens.MEDAL_GOLD.lower().lstrip("#") in row.gihwr_label.styleSheet().lower()
+    # Medal styling is property-driven (QSS attribute selector).
+    assert row.gihwr_label.property("medal") == 1
+    assert row.property("tint") == "R"
+    assert row.property("top") is True
 
 
 def test_pack_tab_has_pill_and_no_column_header(qapp):

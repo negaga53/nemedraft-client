@@ -40,8 +40,8 @@ from client.overlay.ui._macos import elevate_to_floating
 from client.overlay.ui.deck_tab import DeckTab
 from client.overlay.ui.pack_tab import PackTab
 from client.overlay.ui.settings_tab import SettingsTab
-from client.overlay.ui.styles import OVERLAY_STYLESHEET, TRANSPARENT_STYLESHEET
 from client.overlay.ui.summary_tab import SummaryTab
+from client.overlay.ui.theme import apply_theme
 from client.overlay.ui.toast import ToastHost
 from client.overlay.ui.view_mode import ViewMode, ViewModeController
 
@@ -124,9 +124,7 @@ class OverlayWindow(QWidget):
         self.setMaximumWidth(720)
         self.resize(620, 820)
         self.setWindowOpacity(opacity)
-        self.setStyleSheet(
-            TRANSPARENT_STYLESHEET if transparent else OVERLAY_STYLESHEET
-        )
+        apply_theme(self, glass=transparent)
 
         self._build_ui()
         self.prediction_ready.connect(self._on_prediction)
@@ -454,9 +452,7 @@ class OverlayWindow(QWidget):
         self.hide()
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, enabled)
         self.setParent(None, self.windowFlags())
-        self.setStyleSheet(
-            TRANSPARENT_STYLESHEET if enabled else OVERLAY_STYLESHEET
-        )
+        apply_theme(self, glass=enabled)
         self.setGeometry(geometry)
         if was_visible:
             self.show()

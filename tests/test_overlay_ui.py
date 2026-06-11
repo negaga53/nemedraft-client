@@ -22,27 +22,38 @@ def qapp():
 
 
 def test_medal_color_gold_silver_bronze():
-    from client.overlay.ui.styles import medal_color
-    assert medal_color(1) == "#cfb53b"
-    assert medal_color(2) == "#f5f5f5"
-    assert medal_color(3) == "#cd7f32"
-    assert medal_color(0) is None
-    assert medal_color(4) is None
+    from client.overlay.ui.theme import tokens
+    assert tokens.medal_color(1) == tokens.MEDAL_GOLD
+    assert tokens.medal_color(2) == tokens.MEDAL_SILVER
+    assert tokens.medal_color(3) == tokens.MEDAL_BRONZE
+    assert tokens.medal_color(0) is None
+    assert tokens.medal_color(4) is None
 
 
-def test_score_fill_gradient_thresholds():
-    from client.overlay.ui.styles import score_fill_gradient
-    assert "4caf50" in score_fill_gradient(0.80)
-    assert "ffc107" in score_fill_gradient(0.50)
-    assert "f44336" in score_fill_gradient(0.20)
+def test_score_gradient_thresholds(qapp):
+    from client.overlay.ui.theme import tokens
+    assert tokens.score_gradient(0.80)[1] == tokens.qcolor(tokens.SCORE_HIGH)
+    assert tokens.score_gradient(0.50)[1] == tokens.qcolor(tokens.SCORE_MID)
+    assert tokens.score_gradient(0.20)[1] == tokens.qcolor(tokens.SCORE_LOW)
 
 
-def test_palette_constants_exist():
+def test_palette_tokens_exist():
+    from client.overlay.ui.theme import tokens
+    # Layered glass palette — assert the load-bearing tokens exist and
+    # keep their semantic shapes (hex window, rgba layers, cyan accent).
+    assert tokens.L0_WINDOW_OPAQUE.startswith("#")
+    assert tokens.L1_PANEL.startswith("rgba")
+    assert tokens.L2_CARD.startswith("rgba")
+    assert tokens.ACCENT == "#3BD2FF"
+    assert tokens.MEDAL_GOLD == "#E8C268"
+
+
+def test_legacy_styles_shim_resolves_to_tokens():
     from client.overlay.ui import styles
-    assert styles.BG_PRIMARY == "#0f0f1c"
-    assert styles.BG_ELEVATED == "rgba(20,20,36,.6)"
-    assert styles.BORDER_SUBTLE == "#1f1f30"
-    assert styles.ACCENT_GOLD == "#cfb53b"
+    from client.overlay.ui.theme import tokens
+    assert styles.BG_PRIMARY == tokens.L0_WINDOW_OPAQUE
+    assert styles.ACCENT_GOLD == tokens.ACCENT
+    assert styles.medal_color is tokens.medal_color
 
 
 def test_score_bar_renders_with_score(qapp):
@@ -100,7 +111,8 @@ def test_card_row_medal_color_for_top_gihwr(qapp):
     )
     row = CardRow(show_stats=True)
     row.set_data(pick, max_score=1.0, gihwr_rank=1)
-    assert "cfb53b" in row.gihwr_label.styleSheet()  # gold medal
+    from client.overlay.ui.theme import tokens
+    assert tokens.MEDAL_GOLD.lower().lstrip("#") in row.gihwr_label.styleSheet().lower()
 
 
 def test_pack_tab_has_pill_and_no_column_header(qapp):
@@ -199,18 +211,31 @@ def test_settings_toggle_syncs_config(qapp):
     assert cfg.overlay.transparent is True
 
 
-def test_overlay_stylesheet_uses_new_bg(qapp):
-    from client.overlay.ui.styles import OVERLAY_STYLESHEET, TRANSPARENT_STYLESHEET
-    assert "#0f0f1c" in OVERLAY_STYLESHEET
-    # Transparent stylesheet allows flexible spacing in the rgba string.
-    assert (
-        "rgba(15, 15, 28" in TRANSPARENT_STYLESHEET
-        or "rgba(15,15,28" in TRANSPARENT_STYLESHEET
-    )
+def test_generated_stylesheets_use_layer_tokens(qapp):
+    from client.overlay.ui.theme import tokens
+    from client.overlay.ui.theme.qss import build_stylesheet
+
+    opaque = build_stylesheet(glass=False)
+    glass = build_stylesheet(glass=True)
+    assert tokens.L0_WINDOW_OPAQUE in opaque
+    assert tokens.L0_WINDOW_GLASS in glass
+    assert tokens.ACCENT in opaque and tokens.ACCENT in glass
     # Old selectors we removed shouldn't be present
-    assert "QLabel#poolLabel" not in OVERLAY_STYLESHEET
-    assert "QLabel#cardName" not in OVERLAY_STYLESHEET
-    assert "QFrame#cardRow" not in OVERLAY_STYLESHEET
+    assert "QLabel#poolLabel" not in opaque
+    assert "QLabel#cardName" not in opaque
+    assert "QFrame#cardRow" not in opaque
+
+
+def test_generated_stylesheet_parses_without_warnings(qapp):
+    """Applying the generated QSS must not blow up Qt's parser."""
+    from PySide6.QtWidgets import QWidget
+
+    from client.overlay.ui.theme.qss import build_stylesheet
+
+    for glass in (False, True):
+        w = QWidget()
+        w.setStyleSheet(build_stylesheet(glass))
+        w.ensurePolished()
 
 
 def test_compact_mode_shows_context_pill(qapp):

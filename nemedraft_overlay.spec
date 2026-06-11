@@ -24,6 +24,13 @@ _mana_icons = ROOT / "data" / "mana_icons"
 if _mana_icons.is_dir() and any(_mana_icons.iterdir()):
     datas.append((str(_mana_icons), "data/mana_icons"))
 
+# Bundled Inter fonts (OFL) — loaded via QFontDatabase at startup.
+# Without this datas entry the frozen build silently falls back to
+# system fonts (package-data isn't honored here).
+_fonts_dir = ROOT / "assets" / "fonts"
+if _fonts_dir.is_dir() and any(_fonts_dir.glob("*.ttf")):
+    datas.append((str(_fonts_dir), "assets/fonts"))
+
 # App icon — needed at runtime for the window icon AND the system-tray
 # icon (used by minimize-to-tray on Windows where Qt.Tool windows have no
 # taskbar entry). The PyInstaller `icon=` argument below sets the .exe /
@@ -109,6 +116,10 @@ hiddenimports = [
     "client.overlay.ui.summary_tab",
     "client.overlay.ui.view_mode",
     "client.overlay.ui.styles",
+    "client.overlay.ui.theme",
+    "client.overlay.ui.theme.tokens",
+    "client.overlay.ui.theme.qss",
+    "client.overlay.ui.theme.fonts",
     # --- Common: lightweight data/inference modules (no torch) ---
     "common",
     "common.data",

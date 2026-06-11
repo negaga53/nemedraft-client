@@ -1261,6 +1261,10 @@ def main() -> None:
     translator = Translator.instance()
     translator.set_language(config.display.language)
 
+    # Register the bundled Inter fonts before any widget is styled.
+    from client.overlay.ui.theme import fonts as theme_fonts
+    theme_fonts.load_fonts()
+
     # --- Show window immediately (Home tab is visible) ---
     window = OverlayWindow(
         config,

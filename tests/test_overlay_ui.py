@@ -392,3 +392,15 @@ def test_column_header_gutter_tracks_vertical_scrollbar(qapp):
     # Range collapses -> padding is removed again.
     tab._on_scroll_range_changed(0, 0)
     assert tab._column_header.layout().contentsMargins().right() == _MARGIN
+
+
+def test_scroll_range_signal_is_wired_to_header_gutter(qapp):
+    # Offscreen Qt never emits rangeChanged organically, so drive the real
+    # scrollbar's signal to pin the __init__ connection itself.
+    from client.overlay.ui.pack_tab import PackTab
+    from client.overlay.ui.pack_widgets import _MARGIN
+    tab = PackTab(show_art=False)
+    tab._scroll.verticalScrollBar().rangeChanged.emit(0, 120)
+    assert tab._column_header.layout().contentsMargins().right() > _MARGIN
+    tab._scroll.verticalScrollBar().rangeChanged.emit(0, 0)
+    assert tab._column_header.layout().contentsMargins().right() == _MARGIN

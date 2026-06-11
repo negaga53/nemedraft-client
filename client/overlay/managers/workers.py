@@ -100,6 +100,92 @@ class ArenaCurrentEventWorker(QThread):
             self.finished_event.emit(None)
 
 
+class SignalsWorker(QThread):
+    """Fetches signal scores from the server off the UI thread."""
+
+    finished_ok = Signal(object)  # SignalResult | None
+
+    def __init__(
+        self,
+        api_client: NemeDraftClient,
+        *,
+        seen_items: list[dict],
+        set_code: str,
+        draft_format: str,
+    ) -> None:
+        super().__init__()
+        self._api_client = api_client
+        self._seen_items = list(seen_items)
+        self._set_code = set_code
+        self._draft_format = draft_format
+
+    def run(self) -> None:  # noqa: D401
+        try:
+            scores = self._api_client.compute_signals(
+                self._seen_items, self._set_code,
+                draft_format=self._draft_format,
+            )
+            if scores:
+                from common.inference.signals import SignalResult
+                self.finished_ok.emit(SignalResult(scores=scores))
+                return
+        except Exception:
+            logger.exception("Signal fetch failed")
+        self.finished_ok.emit(None)
+
+
+class DeckSuggestionsWorker(QThread):
+    """Fetches deck suggestions from the server off the UI thread."""
+
+    finished_ok = Signal(object)  # dict[str, DeckSuggestion] | None
+
+    def __init__(
+        self,
+        api_client: NemeDraftClient,
+        *,
+        pool_cards: list[str],
+        set_code: str,
+        draft_format: str,
+    ) -> None:
+        super().__init__()
+        self._api_client = api_client
+        self._pool_cards = list(pool_cards)
+        self._set_code = set_code
+        self._draft_format = draft_format
+
+    def run(self) -> None:  # noqa: D401
+        try:
+            raw = self._api_client.deck_suggestions(
+                pool_cards=self._pool_cards,
+                set_code=self._set_code,
+                draft_format=self._draft_format,
+            )
+            if not raw:
+                self.finished_ok.emit(None)
+                return
+
+            from common.inference.deck_builder import DeckSuggestion
+
+            suggestions: dict[str, DeckSuggestion] = {}
+            for key, s in raw.items():
+                suggestions[key] = DeckSuggestion(
+                    archetype=s["archetype"],
+                    main_deck=s["main_deck"],
+                    main_deck_cmc=s["main_deck_cmc"],
+                    lands=s["lands"],
+                    nonbasic_lands=s["nonbasic_lands"],
+                    score=s["score"],
+                    creature_count=s["creature_count"],
+                    spell_count=s["spell_count"],
+                    land_count=s["land_count"],
+                    avg_cmc=s["avg_cmc"],
+                )
+            self.finished_ok.emit(suggestions)
+        except Exception:
+            logger.exception("Deck suggestion failed")
+            self.finished_ok.emit(None)
+
+
 class PredictionWorker(QThread):
     """Background worker that calls ``api_client.predict`` off the UI thread.
 

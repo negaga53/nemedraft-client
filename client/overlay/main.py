@@ -7,7 +7,6 @@ import json
 import logging
 import signal
 import sys
-import time
 from pathlib import Path
 
 from PySide6.QtCore import QThread, QTimer, Signal
@@ -43,10 +42,10 @@ from client.overlay.log_watcher import (
     ReplayDoneEvent,
     is_arena_running,
 )
+from client.overlay.managers.prediction import PredictionManager, PredictionRequest
 from client.overlay.managers.workers import (
     ArenaCurrentEventWorker,
     ArenaIdentityWorker,
-    PredictionWorker,
     SetDataResult,
     SetDataWorker,
 )
@@ -59,12 +58,6 @@ logger = logging.getLogger("overlay")
 
 class OverlayApp:
     """Orchestrates all overlay components (thin client)."""
-
-    # Retry configuration for server API calls during a draft.
-    _RETRY_TIMEOUT_S = 60       # total window to keep retrying
-    _RETRY_INTERVALS_MS = [     # delay before each successive retry
-        2_000, 3_000, 5_000, 5_000, 10_000, 10_000, 15_000, 15_000,
-    ]
 
     def __init__(
         self,
@@ -132,12 +125,23 @@ class OverlayApp:
         # to drop. Applied on the next _on_set_data_ready.
         self._deferred_deck_pool: DeckPoolDetectedEvent | None = None
 
-        # Server retry state.
-        self._retry_timer = QTimer()
-        self._retry_timer.setSingleShot(True)
-        self._retry_timer.timeout.connect(self._retry_prediction)
-        self._retry_attempt = 0
-        self._retry_start: float = 0.0
+        # Prediction lifecycle: dispatch, retry backoff, signals fetch,
+        # deck suggestions — all on background workers, results delivered
+        # via main-thread signals.
+        self._prediction = PredictionManager(
+            api_client,
+            request_provider=self._prediction_request,
+            is_active=lambda: (
+                self.state.draft_active and bool(self.state.current_pack)
+            ),
+        )
+        self._prediction.loading.connect(self._on_prediction_loading)
+        self._prediction.results_ready.connect(self._on_prediction_results)
+        self._prediction.gave_up.connect(self._on_server_failure)
+        self._prediction.signals_ready.connect(self._on_signals_ready)
+        self._prediction.deck_suggestions_ready.connect(
+            self._on_deck_suggestions_ready,
+        )
 
         # Marshal watcher-thread callbacks onto the Qt main thread.
         # See UiMarshaler — registering _on_event directly on the watchers
@@ -181,13 +185,6 @@ class OverlayApp:
         # that fires after run() has fully returned.
         self._inflight_arena_workers: set[QThread] = set()
 
-        # Ref-keeper for prediction workers; same rationale as above.
-        # ``_current_predict_worker`` tracks the latest dispatch so that
-        # results from a worker started for a now-stale pack can be
-        # discarded without disturbing the in-flight one.
-        self._inflight_predict_workers: set[QThread] = set()
-        self._current_predict_worker: PredictionWorker | None = None
-
         # If the overlay starts before Arena, keep trying once Arena appears.
         self._arena_identity_worker: ArenaIdentityWorker | None = None
         self._arena_identity_timer = QTimer()
@@ -215,7 +212,7 @@ class OverlayApp:
         self.window.show()
 
     def stop(self) -> None:
-        self._retry_timer.stop()
+        self._prediction.cancel()
         self._arena_identity_timer.stop()
         self._arena_current_event_timer.stop()
         self.watcher.stop()
@@ -1171,11 +1168,25 @@ class OverlayApp:
             self.window.show_vip_required()
             return
 
-        # Reset retry state for a fresh prediction attempt.
-        self._retry_timer.stop()
-        self._retry_attempt = 0
-        self._retry_start = time.monotonic()
-        self._attempt_prediction()
+        self._prediction.request_prediction()
+
+    def _prediction_request(self) -> PredictionRequest:
+        """Snapshot the current draft state for a prediction dispatch.
+
+        Called by ``PredictionManager`` at every attempt — including
+        retries, which must pick up the *current* pack if the draft has
+        advanced since the failed attempt.
+        """
+        return PredictionRequest(
+            pack_cards=tuple(self.state.current_pack),
+            pool_cards=tuple(self.state.pool),
+            set_code=self.state.set_code,
+            pack_number=self.state.pack_number,
+            pick_number=self.state.pick_number,
+            draft_format=self._draft_format(),
+            arena_format=self.state.arena_format,
+            last_pick=self.state.last_pick,
+        )
 
     def _draft_format(self) -> str:
         """Return the 17Lands format the player is currently drafting.
@@ -1188,68 +1199,18 @@ class OverlayApp:
         """
         return extract_draft_format(self.state.event_name) or ""
 
-    def _attempt_prediction(self) -> None:
-        """Dispatch a prediction attempt to a background worker.
-
-        The HTTP call runs off the Qt main thread; results land on
-        ``_on_prediction_finished`` (success) or ``_on_prediction_failed``
-        (network/exception). A loading indicator is shown until the
-        worker completes — preventing the new-pack stutter that came
-        from blocking the Qt event loop for the full 5s timeout.
-        """
-        # Surface a spinner immediately so the user gets feedback while
-        # the network call is in flight.
-        self.window.show_prediction_loading(
-            self.state.pack_number, self.state.pick_number,
-        )
+    def _on_prediction_loading(self, pack_number: int, pick_number: int) -> None:
+        """Surface a spinner while a prediction call is in flight."""
+        self.window.show_prediction_loading(pack_number, pick_number)
         self.window.pack_tab.set_recommend_count(self.state.recommend_count)
 
-        worker = PredictionWorker(
-            self.api_client,
-            pack_cards=self.state.current_pack,
-            pool_cards=self.state.pool,
-            set_code=self.state.set_code,
-            pack_number=self.state.pack_number,
-            pick_number=self.state.pick_number,
-            draft_format=self._draft_format(),
-            arena_format=self.state.arena_format,
-            last_pick=self.state.last_pick,
-        )
-        # Capture the worker ref so the slot can compare against the
-        # current-dispatch token. OverlayApp isn't a QObject, so QObject.sender()
-        # is not available here — the closure carries the identity instead.
-        worker.finished_ok.connect(
-            lambda results, pn, pk, w=worker: self._on_prediction_finished(
-                w, results, pn, pk,
-            ),
-        )
-        worker.failed.connect(
-            lambda err, pn, pk, w=worker: self._on_prediction_failed(w, err, pn, pk),
-        )
-        worker.finished.connect(worker.deleteLater)
-        worker.finished.connect(
-            lambda w=worker: self._inflight_predict_workers.discard(w),
-        )
-        self._inflight_predict_workers.add(worker)
-        # Newest dispatch wins — older workers' results get discarded by
-        # the slot when ``worker is not self._current_predict_worker``.
-        self._current_predict_worker = worker
-        worker.start()
-
-    def _on_prediction_finished(
+    def _on_prediction_results(
         self,
-        worker: PredictionWorker,
         results: list,
         pack_number: int,
         pick_number: int,
     ) -> None:
-        """Apply prediction results delivered from a ``PredictionWorker``."""
-        if worker is not self._current_predict_worker:
-            logger.debug(
-                "Discarding stale prediction worker result for P%dP%d",
-                pack_number + 1, pick_number + 1,
-            )
-            return
+        """Apply prediction results delivered by ``PredictionManager``."""
         if (
             pack_number != self.state.pack_number
             or pick_number != self.state.pick_number
@@ -1261,20 +1222,6 @@ class OverlayApp:
                 self.state.pack_number + 1, self.state.pick_number + 1,
             )
             return
-
-        self._current_predict_worker = None
-
-        if not results:
-            logger.warning(
-                "No prediction results from server (attempt %d)",
-                self._retry_attempt + 1,
-            )
-            self._schedule_retry()
-            return
-
-        # Success — clear retry state and push results.
-        self._retry_attempt = 0
-        self._retry_start = 0.0
 
         art_paths: dict[str, Path | None] = {}
         if self.art_cache.enabled:
@@ -1331,55 +1278,9 @@ class OverlayApp:
         if self.config.features.deck_builder_enabled:
             self._update_deck_suggestions()
 
-    def _on_prediction_failed(
-        self,
-        worker: PredictionWorker,
-        error: str,
-        pack_number: int,
-        pick_number: int,
-    ) -> None:
-        """Handle a failed prediction call from ``PredictionWorker``."""
-        if worker is not self._current_predict_worker:
-            return
-        self._current_predict_worker = None
-        logger.warning(
-            "Prediction failed for P%dP%d (attempt %d): %s",
-            pack_number + 1, pick_number + 1, self._retry_attempt + 1, error,
-        )
-        self._schedule_retry()
-
-    def _schedule_retry(self) -> None:
-        """Schedule the next retry, or give up after ``_RETRY_TIMEOUT_S``."""
-        elapsed = time.monotonic() - self._retry_start
-        if elapsed >= self._RETRY_TIMEOUT_S:
-            logger.error(
-                "Server unreachable after %ds — giving up", int(elapsed),
-            )
-            self._on_server_failure()
-            return
-
-        idx = min(self._retry_attempt, len(self._RETRY_INTERVALS_MS) - 1)
-        delay = self._RETRY_INTERVALS_MS[idx]
-        self._retry_attempt += 1
-        logger.info(
-            "Retrying prediction in %dms (attempt %d, %.0fs elapsed)",
-            delay, self._retry_attempt, elapsed,
-        )
-        self._retry_timer.start(delay)
-
-    def _retry_prediction(self) -> None:
-        """Timer callback — re-attempt prediction if still in draft."""
-        if not self.state.draft_active or not self.state.current_pack:
-            logger.info("Draft no longer active — cancelling retry")
-            return
-        self._attempt_prediction()
-
     def _on_server_failure(self) -> None:
         """Handle persistent server failure: switch to home, show status."""
-        self._retry_timer.stop()
-        self._retry_attempt = 0
-        self._retry_start = 0.0
-        self._current_predict_worker = None
+        self._prediction.cancel()
         self.window.pack_tab.hide_loading()
 
         # Mark server as unreachable on the home tab.
@@ -1389,70 +1290,44 @@ class OverlayApp:
         self.window.show_draft_ended()
 
     def _update_signals(self) -> None:
-        """Fetch signal scores from server and push to UI."""
-        try:
-            if not self.state.set_code or not self.state.seen_cards:
-                return
+        """Fetch signal scores from server (background) and push to UI."""
+        if not self.state.set_code or not self.state.seen_cards:
+            return
 
-            seen_items = [
-                {
-                    "card_name": entry.card_name,
-                    "colors": [],
-                    "gihwr": 0.0,
-                    "ata": 0.0,
-                    "pack_number": entry.pack_number,
-                    "pick_number": entry.pick_number,
-                }
-                for entry in self.state.seen_cards
-            ]
+        seen_items = [
+            {
+                "card_name": entry.card_name,
+                "colors": [],
+                "gihwr": 0.0,
+                "ata": 0.0,
+                "pack_number": entry.pack_number,
+                "pick_number": entry.pick_number,
+            }
+            for entry in self.state.seen_cards
+        ]
+        self._prediction.update_signals(
+            seen_items=seen_items,
+            set_code=self.state.set_code,
+            draft_format=self._draft_format(),
+        )
 
-            scores = self.api_client.compute_signals(
-                seen_items, self.state.set_code,
-                draft_format=self._draft_format(),
-            )
-            if scores:
-                from common.inference.signals import SignalResult
-                result = SignalResult(scores=scores)
-                self.window.update_signals(result)
-        except Exception:
-            logger.exception("Signal fetch failed")
+    def _on_signals_ready(self, result: object) -> None:
+        self.window.update_signals(result)
 
     def _update_deck_suggestions(self) -> None:
-        """Fetch deck suggestions from the server and push to the UI."""
-        try:
-            if len(self.state.pool) < 15:
-                return
+        """Fetch deck suggestions from the server (background) and push to UI."""
+        if len(self.state.pool) < 15:
+            return
+        self._prediction.update_deck_suggestions(
+            pool_cards=self.state.pool,
+            set_code=self.state.set_code,
+            draft_format=self._draft_format(),
+        )
 
-            raw = self.api_client.deck_suggestions(
-                pool_cards=self.state.pool,
-                set_code=self.state.set_code,
-                draft_format=self._draft_format(),
-            )
-            if not raw:
-                return
-
-            from common.inference.deck_builder import DeckSuggestion
-
-            suggestions: dict[str, DeckSuggestion] = {}
-            for key, s in raw.items():
-                suggestions[key] = DeckSuggestion(
-                    archetype=s["archetype"],
-                    main_deck=s["main_deck"],
-                    main_deck_cmc=s["main_deck_cmc"],
-                    lands=s["lands"],
-                    nonbasic_lands=s["nonbasic_lands"],
-                    score=s["score"],
-                    creature_count=s["creature_count"],
-                    spell_count=s["spell_count"],
-                    land_count=s["land_count"],
-                    avg_cmc=s["avg_cmc"],
-                )
-
-            self.window.update_deck_suggestions(
-                suggestions, self.state.pool, self.scryfall_cards,
-            )
-        except Exception:
-            logger.exception("Deck suggestion failed")
+    def _on_deck_suggestions_ready(self, suggestions: object) -> None:
+        self.window.update_deck_suggestions(
+            suggestions, self.state.pool, self.scryfall_cards,
+        )
 
     def _on_settings_changed(self) -> None:
         """Persist settings and apply changes."""

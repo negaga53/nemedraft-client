@@ -25,12 +25,14 @@ from common.inference.deck_builder import DeckSuggestion
 from common.inference.pool_analyzer import PoolAnalysis
 from client.overlay.config import OverlayConfig
 from client.overlay.i18n import Translator, card_name, tr
+from client.overlay.notifications import NotificationBus
 from common.inference.signals import SignalResult
 from client.overlay.ui._macos import elevate_to_floating
 from client.overlay.ui.deck_tab import DeckTab
 from client.overlay.ui.pack_tab import PackTab
 from client.overlay.ui.settings_tab import SettingsTab
 from client.overlay.ui.styles import OVERLAY_STYLESHEET, TRANSPARENT_STYLESHEET
+from client.overlay.ui.toast import ToastHost
 
 
 class _CardTranslationWorker(QThread):
@@ -216,6 +218,14 @@ class OverlayWindow(QWidget):
         # Legacy attribute kept so callers that did `self.header.setText(...)` compile;
         # it now points at the brand label which doesn't change per pick.
         self.header = self._brand_label
+
+        # Toast banners — visible in both full and compact modes; fed by
+        # the NotificationBus (thread-safe post from anywhere).
+        self.toast_host = ToastHost()
+        root.addWidget(self.toast_host)
+        NotificationBus.instance().posted.connect(
+            self.toast_host.show_notification,
+        )
 
         # Status line.
         self.status = QLabel("")

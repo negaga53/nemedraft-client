@@ -46,6 +46,7 @@ from client.overlay.managers.prediction import PredictionManager, PredictionRequ
 from client.overlay.managers.set_data import SetDataManager
 from client.overlay.managers.workers import SetDataResult
 from client.overlay.memory_watcher import MemoryWatcher
+from client.overlay.notifications import NotificationBus, Severity
 from client.overlay.single_instance import SingleInstance
 from client.overlay.ui.window import OverlayWindow
 
@@ -124,6 +125,7 @@ class OverlayApp:
         )
         self._prediction.loading.connect(self._on_prediction_loading)
         self._prediction.results_ready.connect(self._on_prediction_results)
+        self._prediction.retrying.connect(self._on_prediction_retrying)
         self._prediction.gave_up.connect(self._on_server_failure)
         self._prediction.signals_ready.connect(self._on_signals_ready)
         self._prediction.deck_suggestions_ready.connect(
@@ -190,6 +192,11 @@ class OverlayApp:
                 self.memory_watcher.start()
             except Exception:
                 logger.exception("MemoryWatcher failed to start; continuing log-only")
+                NotificationBus.instance().post(
+                    "Memory reader unavailable — using log-only mode",
+                    severity=Severity.WARNING,
+                    key="memwatch-start-failed",
+                )
         self.window.show()
 
     def stop(self) -> None:
@@ -376,6 +383,12 @@ class OverlayApp:
         """Handle set data loading failure (manager already degraded to ready)."""
         home = self.window.pack_tab.home_widget
         home.set_draft_loading(f"Data load error: {msg}")
+        NotificationBus.instance().post(
+            f"Loading {set_code} card data failed ({msg}) — "
+            "predictions may be incomplete",
+            severity=Severity.ERROR,
+            key=f"setdata-{set_code}",
+        )
         self._flush_pending_events()
 
     def _flush_pending_events(self) -> None:
@@ -455,6 +468,11 @@ class OverlayApp:
             logger.warning(
                 "DeckPoolDetectedEvent: no grpIds mapped to names "
                 "(event=%s, ids=%d)", event.event_name, len(event.card_grpids),
+            )
+            NotificationBus.instance().post(
+                "Couldn't restore your draft pool — card data is missing",
+                severity=Severity.WARNING,
+                key="deck-pool-restore-failed",
             )
             return
         logger.info(
@@ -806,6 +824,12 @@ class OverlayApp:
             card_names = self.mapper.grpids_to_names(event.card_grpids)
             if not card_names:
                 logger.warning("Could not map any grpIds to names for pack")
+                NotificationBus.instance().post(
+                    f"Card data missing for {self.state.set_code or 'this set'}"
+                    " — picks can't be shown",
+                    severity=Severity.ERROR,
+                    key=f"card-data-missing-{self.state.set_code}",
+                )
                 return
 
             if not self.state.draft_active:
@@ -1027,9 +1051,23 @@ class OverlayApp:
         if self.config.features.deck_builder_enabled:
             self._update_deck_suggestions()
 
+    def _on_prediction_retrying(self, attempt: int, delay_ms: int) -> None:
+        """Surface persistent retries (first retry is silent to avoid noise)."""
+        if attempt >= 2:
+            NotificationBus.instance().post(
+                f"Server error — retrying prediction (attempt {attempt})",
+                severity=Severity.WARNING,
+                key="predict-retry",
+            )
+
     def _on_server_failure(self) -> None:
         """Handle persistent server failure: switch to home, show status."""
         self._prediction.cancel()
+        NotificationBus.instance().post(
+            "Couldn't reach the prediction server — predictions paused",
+            severity=Severity.ERROR,
+            key="predict-failed",
+        )
         self.window.pack_tab.hide_loading()
 
         # Mark server as unreachable on the home tab.
@@ -1284,6 +1322,10 @@ def main() -> None:
 
     def _on_update_failed(msg: str) -> None:
         logger.warning("Update failed, continuing normally: %s", msg)
+        NotificationBus.instance().post(
+            "Auto-update failed — continuing with the current version",
+            key="update-failed",
+        )
         _start_boot()
 
     update_worker = UpdateWorker()

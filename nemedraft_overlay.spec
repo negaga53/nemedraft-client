@@ -89,6 +89,7 @@ hiddenimports = [
     "client.overlay.card_mapper",
     "client.overlay.card_art",
     "client.overlay.mana_icons",
+    "client.overlay.notifications",
     "client.overlay.api_client",
     "client.overlay.auth_client",
     "client.overlay.updater",
@@ -101,6 +102,7 @@ hiddenimports = [
     "client.overlay.ui.deck_tab",
     "client.overlay.ui.stats_tab",
     "client.overlay.ui.settings_tab",
+    "client.overlay.ui.toast",
     "client.overlay.ui.styles",
     # --- Common: lightweight data/inference modules (no torch) ---
     "common",

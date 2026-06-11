@@ -129,11 +129,24 @@ class MemoryWatcher:
     def _run(self) -> None:
         session = MemorySession.instance()
         logger.info("MemoryWatcher started (poll=%.0f ms)", self._poll_interval * 1000)
+        consecutive_failures = 0
         while not self._stop.is_set():
             try:
                 self._tick(session)
+                consecutive_failures = 0
             except Exception:
                 logger.warning("MemoryWatcher tick failed", exc_info=True)
+                consecutive_failures += 1
+                if consecutive_failures == 5:
+                    # post() is thread-safe; Qt queues delivery to the UI.
+                    from client.overlay.notifications import (
+                        NotificationBus, Severity,
+                    )
+                    NotificationBus.instance().post(
+                        "Memory reader is failing — running in log-only mode",
+                        severity=Severity.WARNING,
+                        key="memwatch-degraded",
+                    )
             self._stop.wait(self._poll_interval)
         logger.info("MemoryWatcher stopped")
 

@@ -131,6 +131,12 @@ class SignalsWorker(QThread):
                 return
         except Exception:
             logger.exception("Signal fetch failed")
+            from client.overlay.notifications import NotificationBus, Severity
+            NotificationBus.instance().post(
+                "Couldn't fetch lane signals from the server",
+                severity=Severity.WARNING,
+                key="signals-failed",
+            )
         self.finished_ok.emit(None)
 
 
@@ -183,6 +189,12 @@ class DeckSuggestionsWorker(QThread):
             self.finished_ok.emit(suggestions)
         except Exception:
             logger.exception("Deck suggestion failed")
+            from client.overlay.notifications import NotificationBus, Severity
+            NotificationBus.instance().post(
+                "Couldn't fetch deck suggestions from the server",
+                severity=Severity.WARNING,
+                key="deck-sugg-failed",
+            )
             self.finished_ok.emit(None)
 
 

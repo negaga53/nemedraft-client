@@ -195,6 +195,29 @@ def score_fill_gradient(fraction: float) -> str:
 # ---------------------------------------------------------------------------
 
 _SHARED_WIDGET_STYLES = """
+QFrame#toast {
+    background: rgba(40,40,60,.92);
+    border: 1px solid #44445e;
+    border-radius: 4px;
+}
+QFrame#toast[severity="warning"] { border-color: #c9a04a; }
+QFrame#toast[severity="error"] { border-color: #b34a4a; }
+QFrame#toast QLabel#toastLabel {
+    color: #e0e0e0;
+    font-size: 11px;
+    background: transparent;
+    border: none;
+}
+QFrame#toast QPushButton#toastClose {
+    background: transparent;
+    border: none;
+    color: #aaaaaa;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 0;
+}
+QFrame#toast QPushButton#toastClose:hover { color: #ffffff; }
+
 QTabWidget::pane {
     border: none;
     padding: 0;

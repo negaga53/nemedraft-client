@@ -107,6 +107,7 @@ class PackTab(QWidget):
         self._card_layout.setSpacing(1)
         self._card_layout.addStretch()
         scroll.setWidget(self._card_container)
+        self._scroll = scroll
 
         # Pick history navigation bar — spans the full window width.
         nav_bar = QHBoxLayout()
@@ -148,29 +149,14 @@ class PackTab(QWidget):
         self._live_pack_number: int = 0
         self._live_pick_number: int = 0
 
-        # Content split: pack list (left) + deck rail (right).
-        content_split = QHBoxLayout()
-        content_split.setContentsMargins(0, 0, 0, 0)
-        content_split.setSpacing(4)
+        # Full-width table: header directly above the scrolling card list.
+        layout.addWidget(self._column_header)
+        layout.addWidget(self._scroll, stretch=1)
 
-        left_col = QVBoxLayout()
-        left_col.setContentsMargins(0, 0, 0, 0)
-        left_col.setSpacing(1)
-        left_col.addWidget(self._column_header)
-        left_col.addWidget(scroll, stretch=1)
-        left_container = QWidget()
-        left_container.setLayout(left_col)
-        # Bias more space to the pack list — deck rail is a sidebar, not a peer.
-        content_split.addWidget(left_container, stretch=5)
-
+        # Deck strip — archetype, curve, lanes side by side below the table.
         from client.overlay.ui.pack_rail import DeckRail
         self.deck_rail = DeckRail()
-        self.deck_rail.setFixedWidth(210)
-        content_split.addWidget(self.deck_rail)
-
-        # Fill the remaining vertical space so the card list + rail reach
-        # the bottom of the tab instead of leaving a big gap below them.
-        layout.addLayout(content_split, 1)
+        layout.addWidget(self.deck_rail)
 
         # Pick-history nav: full-width strip at the very bottom of the tab.
         self._nav_container = QWidget()

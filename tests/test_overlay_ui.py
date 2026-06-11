@@ -337,3 +337,28 @@ def test_deck_rail_api_smoke_after_flip(qapp):
     rail.retranslate()
     assert rail.archetype_card._pip_counts["U"].text() == "9"
     assert "14/40" in rail.archetype_card.count_label.text()
+
+
+def test_pack_tab_strip_below_full_width_table(qapp):
+    from client.overlay.ui.pack_tab import PackTab
+    tab = PackTab(show_art=False)
+    page_layout = tab.deck_rail.parentWidget().layout()
+    header_idx = page_layout.indexOf(tab._column_header)
+    scroll_idx = page_layout.indexOf(tab._scroll)
+    rail_idx = page_layout.indexOf(tab.deck_rail)
+    nav_idx = page_layout.indexOf(tab._nav_container)
+    # Vertical order: header, card list, deck strip, nav bar.
+    assert -1 < header_idx < scroll_idx < rail_idx < nav_idx
+    # The strip is no longer width-capped at 210px.
+    assert tab.deck_rail.maximumWidth() > 210
+
+
+def test_compact_hides_deck_strip_and_nav(qapp):
+    from client.overlay.ui.pack_tab import PackTab
+    tab = PackTab(show_art=False)
+    tab.set_compact(True)
+    assert tab.deck_rail.isHidden()
+    assert tab._nav_container.isHidden()
+    tab.set_compact(False)
+    assert not tab.deck_rail.isHidden()
+    assert not tab._nav_container.isHidden()

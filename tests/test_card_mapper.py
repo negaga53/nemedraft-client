@@ -77,7 +77,7 @@ def test_bundled_data_file_is_well_formed() -> None:
     """The committed bundled file must parse and have the expected shape."""
     from importlib.resources import files
 
-    raw = (files("client.overlay.data") / "grpid_to_name.json").read_text()
+    raw = (files("client.overlay.data") / "grpid_to_name.json").read_text(encoding="utf-8")
     data = json.loads(raw)
     assert set(data.keys()) == {"_meta", "grpid_to_name"}
     m = data["grpid_to_name"]

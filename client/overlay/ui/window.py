@@ -4,8 +4,17 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from PySide6.QtCore import QPoint, QThread, QTimer, Qt, Signal, Slot
-from PySide6.QtGui import QAction, QCloseEvent, QCursor, QIcon, QPixmap, QShowEvent
+from PySide6.QtCore import QByteArray, QPoint, QThread, QTimer, Qt, Signal, Slot
+from PySide6.QtGui import (
+    QAction,
+    QCloseEvent,
+    QCursor,
+    QIcon,
+    QKeySequence,
+    QPixmap,
+    QShortcut,
+    QShowEvent,
+)
 from PySide6.QtWidgets import (
     QApplication,
     QHBoxLayout,
@@ -34,6 +43,7 @@ from client.overlay.ui.settings_tab import SettingsTab
 from client.overlay.ui.styles import OVERLAY_STYLESHEET, TRANSPARENT_STYLESHEET
 from client.overlay.ui.summary_tab import SummaryTab
 from client.overlay.ui.toast import ToastHost
+from client.overlay.ui.view_mode import ViewMode, ViewModeController
 
 
 class _CardTranslationWorker(QThread):
@@ -92,6 +102,10 @@ class OverlayWindow(QWidget):
         self._transparent = transparent
         self._show_art = show_art
         self._config = config
+        self._recommend_count = 1
+        # View-mode state machine (FULL tabbed view vs COMPACT pin strip).
+        self._view_mode = ViewModeController(config, parent=self)
+        self._view_mode.mode_changed.connect(self._apply_view_mode)
         from client.overlay.env import bundle_root
         self._scryfall_dir = scryfall_dir or (bundle_root() / "data" / "scryfall")
         self._draft_set_code: str | None = None
@@ -127,6 +141,9 @@ class OverlayWindow(QWidget):
 
         # Drag support — always enabled (frameless window).
         self._drag_pos = None
+
+        # Window-scoped keyboard shortcuts (no global hooks).
+        self._init_shortcuts()
 
         # System tray icon for minimize-to-tray. Built lazily-but-eagerly:
         # the icon must exist before the minimize button can use it.
@@ -310,7 +327,6 @@ class OverlayWindow(QWidget):
         self._last_set_code: str = ""
         self._last_pack_number: int = 0
         self._last_pick_number: int = 0
-        self._compact = False
 
         # Compact-view hover preview state.
         self._mini_preview = None
@@ -371,6 +387,10 @@ class OverlayWindow(QWidget):
         self.tabs.setCurrentIndex(self._tab_pack_idx)
         self._toggle_btn.setVisible(True)
         self._toggle_btn.setEnabled(True)
+        # Restore the user's preferred view mode now that a draft is live
+        # (the overlay always boots FULL so the home tab is reachable).
+        if self._view_mode.persisted_mode() is ViewMode.COMPACT:
+            self._view_mode.set_mode(ViewMode.COMPACT, persist=False)
 
     def show_draft_ended(self) -> None:
         """Switch back to the home page when the draft / Arena session ends."""
@@ -378,9 +398,8 @@ class OverlayWindow(QWidget):
         self.pack_tab.show_home()
         self._toggle_btn.setEnabled(False)
         self._toggle_btn.setVisible(False)
-        # Exit compact mode if active.
-        if self._compact:
-            self._toggle_compact()
+        # System-driven exit — keep the user's preferred mode for next draft.
+        self._view_mode.set_mode(ViewMode.FULL, persist=False)
 
     def show_draft_complete(self) -> None:
         """Thread-safe: emit signal to switch to the deck tab."""
@@ -398,8 +417,7 @@ class OverlayWindow(QWidget):
     @Slot(object)
     def _on_draft_summary(self, summary: object) -> None:
         """Reveal the summary tab and focus it (runs on UI thread)."""
-        if self._compact:
-            self._toggle_compact()
+        self._view_mode.set_mode(ViewMode.FULL, persist=False)
         self.summary_tab.set_summary(summary)
         self.tabs.setTabVisible(self._tab_summary_idx, True)
         self.tabs.setCurrentIndex(self._tab_summary_idx)
@@ -540,8 +558,7 @@ class OverlayWindow(QWidget):
     def _on_draft_complete(self) -> None:
         """Switch to the deck tab (runs on UI thread)."""
         # Exit compact mode so the full deck tab is visible.
-        if self._compact:
-            self._toggle_compact()
+        self._view_mode.set_mode(ViewMode.FULL, persist=False)
         self.tabs.setCurrentIndex(self._tab_deck_idx)
 
     @Slot(str)
@@ -798,11 +815,25 @@ class OverlayWindow(QWidget):
 
     # -- compact / full toggle -----------------------------------------------
 
+    @property
+    def _compact(self) -> bool:
+        return self._view_mode.is_compact
+
+    def set_recommend_count(self, count: int) -> None:
+        """Track the format's recommendation count (PickTwo recommends 2)."""
+        self._recommend_count = max(1, count)
+        self.pack_tab.set_recommend_count(count)
+
     def _toggle_compact(self) -> None:
-        """Switch between full tabbed view and compact top-3 view."""
-        self._compact = not self._compact
-        if self._compact:
-            self._full_size = self.size()
+        """User-initiated toggle between full view and the compact strip."""
+        self._view_mode.toggle()
+
+    def _apply_view_mode(self, old: ViewMode, new: ViewMode) -> None:
+        """Visually switch modes; per-mode geometry is saved and restored."""
+        self._view_mode.save_geometry(
+            old, bytes(self.saveGeometry().toBase64()).decode(),
+        )
+        if new is ViewMode.COMPACT:
             self.tabs.setVisible(False)
             self.status.setVisible(False)
             self._mini_container.setVisible(True)
@@ -811,7 +842,11 @@ class OverlayWindow(QWidget):
             self._refresh_mini()
             self.setMinimumWidth(460)
             self.setMaximumWidth(720)
-            self.resize(self._full_size.width(), self._compact_height())
+            stored = self._view_mode.geometry_for(new)
+            if stored:
+                self.restoreGeometry(QByteArray.fromBase64(stored.encode()))
+            else:
+                self.resize(self.width(), self._compact_height())
             self.setFixedHeight(self._compact_height())
         else:
             self.setMinimumHeight(0)
@@ -822,16 +857,72 @@ class OverlayWindow(QWidget):
             self._toggle_btn.setText("▾")
             self.setMinimumWidth(560)
             self.setMaximumWidth(720)
-            self.resize(self._full_size)
+            stored = self._view_mode.geometry_for(new)
+            if stored:
+                self.restoreGeometry(QByteArray.fromBase64(stored.encode()))
+            else:
+                self.resize(620, 800)
+
+    def persist_geometry(self) -> None:
+        """Save the active mode's geometry (called at app exit)."""
+        geometry = bytes(self.saveGeometry().toBase64()).decode()
+        self._view_mode.save_geometry(self._view_mode.mode, geometry)
+        if not self._compact:
+            # Keep the legacy single slot in sync for config downgrades.
+            self._config.overlay.geometry = geometry
 
     def _compact_height(self) -> int:
-        """Minimum height for compact view = drag row + mini pill + 3 rows + padding."""
+        """Compact height = drag row + mini pill + N rows + padding."""
         _DRAG = 32       # drag row fixed height
         _PILL = 20       # mini pill + small margin
         _ROW = 30        # CardRow fixed height
         _SPACING = 2 * 4 # inner spacing
         _PADDING = 8     # root padding
-        return _DRAG + _PILL + 3 * _ROW + _SPACING + _PADDING
+        rows = max(3, self._recommend_count)
+        return _DRAG + _PILL + rows * _ROW + _SPACING + _PADDING
+
+    # -- keyboard shortcuts (window-scope only) --------------------------------
+
+    def _init_shortcuts(self) -> None:
+        self._shortcuts: list[QShortcut] = []
+
+        def add(sequence: str, handler) -> None:
+            shortcut = QShortcut(QKeySequence(sequence), self)
+            shortcut.activated.connect(handler)
+            self._shortcuts.append(shortcut)
+
+        add("Ctrl+M", self._shortcut_toggle_compact)
+        add("Ctrl+H", self._minimize_to_tray)
+        for number, idx_attr in enumerate(
+            ("_tab_pack_idx", "_tab_deck_idx", "_tab_summary_idx",
+             "_tab_settings_idx"),
+            start=1,
+        ):
+            add(f"Ctrl+{number}",
+                lambda attr=idx_attr: self._shortcut_goto_tab(attr))
+        add("Esc", self._shortcut_exit_compact)
+
+    def _shortcut_toggle_compact(self) -> None:
+        # Compact mode is gated on an active draft (same as the button).
+        # isVisibleTo: the button's own flag, independent of whether the
+        # window itself is currently shown.
+        if (
+            not self._toggle_btn.isVisibleTo(self)
+            or not self._toggle_btn.isEnabled()
+        ):
+            return
+        self._view_mode.toggle()
+
+    def _shortcut_goto_tab(self, idx_attr: str) -> None:
+        if self._compact or not self.tabs.isVisibleTo(self):
+            return
+        index = getattr(self, idx_attr)
+        if self.tabs.isTabVisible(index):
+            self.tabs.setCurrentIndex(index)
+
+    def _shortcut_exit_compact(self) -> None:
+        if self._view_mode.is_compact:
+            self._view_mode.set_mode(ViewMode.FULL)
 
     def _refresh_mini_pill(self) -> None:
         """Sync the compact-mode context pill with the current pack/pick context."""
@@ -845,7 +936,12 @@ class OverlayWindow(QWidget):
         self._mini_pill.setText(text)
 
     def _refresh_mini(self) -> None:
-        """Populate the mini container with the top-3 picks."""
+        """Populate the mini container with the top picks.
+
+        Shows ``max(3, recommend_count)`` rows so PickTwo (which
+        recommends 2 cards) never hides a recommended pick; the first
+        ``recommend_count`` rows carry the ``recommended`` property.
+        """
         from client.overlay.ui.pack_tab import CardRow
 
         self._refresh_mini_pill()
@@ -857,20 +953,21 @@ class OverlayWindow(QWidget):
             if w:
                 w.deleteLater()
 
-        top3 = self._last_results[:3]
-        if not top3:
+        row_count = max(3, self._recommend_count)
+        top_picks = self._last_results[:row_count]
+        if not top_picks:
             return
 
-        max_score = top3[0].score if top3 else 1.0
+        max_score = top_picks[0].score if top_picks else 1.0
 
-        # GIH% medal ranks (computed from full results, not just top 3).
+        # GIH% medal ranks (computed from full results, not just the top rows).
         gihwr_ranks: dict[str, int] = {}
         valid_gihwr = [(p.card, p.gihwr) for p in self._last_results if p.gihwr > 0]
         valid_gihwr.sort(key=lambda x: x[1], reverse=True)
         for rank_idx, (card_name, _) in enumerate(valid_gihwr[:3], start=1):
             gihwr_ranks[card_name] = rank_idx
 
-        for p in top3:
+        for index, p in enumerate(top_picks):
             row = CardRow(self._mini_rows_widget, show_stats=True, show_art=self._show_art)
             art = self._last_art_paths.get(p.card)
             row.set_data(
@@ -878,6 +975,7 @@ class OverlayWindow(QWidget):
                 art_path=art,
                 gihwr_rank=gihwr_ranks.get(p.card, 0),
             )
+            row.setProperty("recommended", index < self._recommend_count)
             row.setMouseTracking(True)
             row.enterEvent = self._make_mini_enter(p.card)
             row.leaveEvent = self._make_mini_leave()

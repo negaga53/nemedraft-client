@@ -107,6 +107,7 @@ hiddenimports = [
     "client.overlay.ui.toast",
     "client.overlay.ui.screen_utils",
     "client.overlay.ui.summary_tab",
+    "client.overlay.ui.view_mode",
     "client.overlay.ui.styles",
     # --- Common: lightweight data/inference modules (no torch) ---
     "common",

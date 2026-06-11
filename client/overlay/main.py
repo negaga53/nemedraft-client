@@ -988,7 +988,7 @@ class OverlayApp:
     def _on_prediction_loading(self, pack_number: int, pick_number: int) -> None:
         """Surface a spinner while a prediction call is in flight."""
         self.window.show_prediction_loading(pack_number, pick_number)
-        self.window.pack_tab.set_recommend_count(self.state.recommend_count)
+        self.window.set_recommend_count(self.state.recommend_count)
 
     def _on_prediction_results(
         self,
@@ -1270,10 +1270,12 @@ def main() -> None:
         scryfall_dir=Path(args.scryfall_dir),
     )
     # Restore persisted window geometry before show_loading so it can be
-    # saved and re-applied after boot completes.
-    if config.overlay.geometry:
+    # saved and re-applied after boot completes. The per-mode FULL slot
+    # wins; the legacy single slot covers pre-0.6 configs.
+    _stored_geometry = config.overlay.geometry_full or config.overlay.geometry
+    if _stored_geometry:
         from PySide6.QtCore import QByteArray
-        window.restoreGeometry(QByteArray.fromBase64(config.overlay.geometry.encode()))
+        window.restoreGeometry(QByteArray.fromBase64(_stored_geometry.encode()))
 
     # The persisted geometry may reference a monitor that is gone —
     # rescue the window so the drag header stays reachable. Also
@@ -1376,8 +1378,8 @@ def main() -> None:
 
     exit_code = app.exec()
 
-    # Persist window geometry before exit.
-    config.overlay.geometry = bytes(window.saveGeometry().toBase64()).decode()
+    # Persist window geometry (per view mode) before exit.
+    window.persist_geometry()
     save_config(config)
 
     if overlay_holder[0] is not None:

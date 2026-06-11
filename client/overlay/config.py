@@ -56,7 +56,10 @@ class OverlaySettings:
     transparent: bool = False
     opacity: float = 0.85
     show_art: bool = True
-    geometry: str = ""  # persisted window geometry
+    geometry: str = ""  # legacy single-geometry slot (pre-0.6 fallback)
+    view_mode: str = "full"      # "full" | "compact" — restored per draft
+    geometry_full: str = ""      # persisted geometry per view mode
+    geometry_compact: str = ""
 
 
 @dataclass

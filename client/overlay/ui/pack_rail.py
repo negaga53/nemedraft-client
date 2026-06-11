@@ -1,7 +1,7 @@
 """Right-hand deck rail for the Pack tab's full view.
 
-Stacks four small cards: archetype, curve, lanes, wheel.
-Replaces the old charts/meters rows and bottom wheel tracker.
+Stacks small glass cards: archetype, curve, lanes. Visual states are
+objectNames + dynamic properties resolved by the theme stylesheet.
 """
 
 from __future__ import annotations
@@ -11,33 +11,16 @@ from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout, QWidget
 
 from client.overlay.i18n import tr
 from client.overlay.mana_icons import get_mana_icon_cache
-from client.overlay.ui.styles import BG_CARD
+from client.overlay.ui.theme import set_prop
 
 _MANA_LETTERS = ("W", "U", "B", "R", "G")
-
-_SECTION_LABEL_STYLE = (
-    "color: #888888; font-size: 9px; text-transform: uppercase; "
-    "letter-spacing: .08em; font-weight: 700;"
-)
-_CARD_STYLE = (
-    f"QFrame[railCard='true'] {{ background: {BG_CARD}; border-radius: 4px; }}"
-)
-
-
-def _pip_html(color: str) -> str:
-    colors = {"W": "#f5e6a3", "U": "#3b8fd4", "B": "#9b8e82", "R": "#e74c3c", "G": "#2ecc71"}
-    return f'<span style="color:{colors.get(color, "#aaa")}">●</span>'
 
 
 class _ArchetypeCard(QFrame):
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
-        self.setProperty("railCard", True)
-        self.setStyleSheet(
-            "QFrame { background: qlineargradient(x1:0,y1:0,x2:1,y2:1, "
-            "stop:0 rgba(207,181,59,.16), stop:1 rgba(20,20,36,.5)); "
-            "border-radius: 4px; }"
-        )
+        self.setObjectName("archetypeCard")
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         layout = QVBoxLayout(self)
         layout.setContentsMargins(8, 6, 8, 6)
         layout.setSpacing(4)
@@ -45,12 +28,10 @@ class _ArchetypeCard(QFrame):
         top = QHBoxLayout()
         top.setSpacing(4)
         self.name_label = QLabel("—")
-        self.name_label.setStyleSheet(
-            'font-family: Georgia, serif; color: #cfb53b; font-weight: 700; font-size: 13px;'
-        )
+        self.name_label.setObjectName("archetypeName")
         self.name_label.setWordWrap(False)
         self.count_label = QLabel("0/40")
-        self.count_label.setStyleSheet("color: #888; font-size: 10px;")
+        self.count_label.setObjectName("railDetail")
         top.addWidget(self.name_label, 1)
         top.addWidget(self.count_label, 0, Qt.AlignmentFlag.AlignRight)
         layout.addLayout(top)
@@ -79,7 +60,7 @@ class _ArchetypeCard(QFrame):
             icon.setFixedSize(14, 14)
             icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
             count = QLabel("0")
-            count.setStyleSheet("color: #777; font-size: 11px;")
+            count.setObjectName("pipCount")
             cell_layout.addWidget(icon)
             cell_layout.addWidget(count)
             self._pip_icons[c] = icon
@@ -106,34 +87,25 @@ class _ArchetypeCard(QFrame):
         )
         top = {c for c in ranked[:2] if pip_totals.get(c, 0) > 0}
         for c in _MANA_LETTERS:
-            is_top = c in top
-            self._pip_counts[c].setStyleSheet(
-                f"color: {'#ffffff' if is_top else '#666'};"
-                f" font-size: 11px;"
-                f" font-weight: {'700' if is_top else '400'};"
-            )
-            # Dim icons for non-top colours without hiding them entirely.
-            self._pip_icons[c].setStyleSheet(
-                "" if is_top else "opacity: 0.35;"
-            )
+            set_prop(self._pip_counts[c], "top", c in top)
 
 
 class _CurveCard(QFrame):
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
-        self.setProperty("railCard", True)
-        self.setStyleSheet(_CARD_STYLE)
+        self.setObjectName("railCard")
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         layout = QVBoxLayout(self)
         layout.setContentsMargins(8, 6, 8, 6)
         layout.setSpacing(2)
 
         header = QHBoxLayout()
         self._title_label = QLabel(tr("mana_curve_label"))
-        self._title_label.setStyleSheet(_SECTION_LABEL_STYLE)
+        self._title_label.setObjectName("railTitle")
         header.addWidget(self._title_label)
         header.addStretch()
         self.verdict_label = QLabel("")
-        self.verdict_label.setStyleSheet("color: #888; font-size: 9px;")
+        self.verdict_label.setObjectName("railDetail")
         header.addWidget(self.verdict_label)
         layout.addLayout(header)
 
@@ -148,14 +120,14 @@ class _CurveCard(QFrame):
 class _LanesCard(QFrame):
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
-        self.setProperty("railCard", True)
-        self.setStyleSheet(_CARD_STYLE)
+        self.setObjectName("railCard")
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         layout = QVBoxLayout(self)
         layout.setContentsMargins(8, 6, 8, 6)
         layout.setSpacing(2)
 
         self._title_label = QLabel(tr("open_lanes_label"))
-        self._title_label.setStyleSheet(_SECTION_LABEL_STYLE)
+        self._title_label.setObjectName("railTitle")
         layout.addWidget(self._title_label)
 
         self.rows_layout = QVBoxLayout()
@@ -172,7 +144,6 @@ class _LanesCard(QFrame):
             w = item.widget()
             if w:
                 w.deleteLater()
-        color_map = {"open": "#4caf50", "closing": "#cd7f32", "closed": "#888"}
         cache = get_mana_icon_cache()
         for color, state in lanes[:5]:
             row = QWidget()
@@ -188,9 +159,8 @@ class _LanesCard(QFrame):
             row_layout.addWidget(icon)
 
             state_label = QLabel(state)
-            state_label.setStyleSheet(
-                f'color: {color_map.get(state, "#888")}; font-size: 10px;'
-            )
+            state_label.setObjectName("laneState")
+            state_label.setProperty("lane", state)
             row_layout.addWidget(state_label)
             row_layout.addStretch()
             self.rows_layout.addWidget(row)

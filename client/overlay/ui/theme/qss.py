@@ -29,6 +29,18 @@ CardRow[tint="{key}"] {{
     return "\n".join(rules)
 
 
+def _deck_tint_rules() -> str:
+    """Deck-row variant of the per-color tint rules."""
+    rules: list[str] = []
+    for key in ("W", "U", "B", "R", "G", "M", "C"):
+        rules.append(f"""
+_DeckCardRow[tint="{key}"] {{
+    background-color: {t.TINT_WASHES[key]};
+    border-left: 2px solid {t.TINT_STROKES[key]};
+}}""")
+    return "\n".join(rules)
+
+
 def build_stylesheet(glass: bool) -> str:
     """Render the full application stylesheet for the given window mode."""
     if glass:
@@ -499,6 +511,317 @@ QFrame#columnHeader QLabel {{
     letter-spacing: 0.06em;
     background: transparent;
     border: none;
+}}
+
+/* ---- deck rail -------------------------------------------------------------- */
+
+QFrame#railCard {{
+    background: {t.L2_CARD};
+    border: 1px solid {t.L1_STROKE};
+    border-radius: {t.RADIUS_CARD}px;
+}}
+
+QFrame#archetypeCard {{
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+        stop:0 {t.ACCENT_WASH}, stop:1 {t.L2_CARD});
+    border: 1px solid {t.ACCENT_DIM};
+    border-radius: {t.RADIUS_CARD}px;
+}}
+
+QLabel#archetypeName {{
+    color: {t.TEXT_PRIMARY};
+    font-weight: 600;
+    font-size: {t.FONT_SIZE_TITLE}px;
+    background: transparent;
+    border: none;
+}}
+
+QLabel#railTitle {{
+    color: {t.TEXT_MUTED};
+    font-size: {t.FONT_SIZE_MICRO}px;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    background: transparent;
+    border: none;
+}}
+
+QLabel#railDetail {{
+    color: {t.TEXT_MUTED};
+    font-size: {t.FONT_SIZE_MICRO}px;
+    background: transparent;
+    border: none;
+}}
+
+QLabel#pipCount {{
+    color: {t.TEXT_FAINT};
+    font-size: {t.FONT_SIZE_DENSE}px;
+    background: transparent;
+    border: none;
+}}
+QLabel#pipCount[top="true"] {{
+    color: {t.TEXT_PRIMARY};
+    font-weight: 700;
+}}
+
+QLabel#laneState {{
+    font-size: {t.FONT_SIZE_SMALL}px;
+    background: transparent;
+    border: none;
+    color: {t.TEXT_MUTED};
+}}
+QLabel#laneState[lane="open"] {{ color: {t.OK}; }}
+QLabel#laneState[lane="closing"] {{ color: {t.WARN}; }}
+QLabel#laneState[lane="closed"] {{ color: {t.TEXT_MUTED}; }}
+
+/* ---- home tab ----------------------------------------------------------------- */
+
+QLabel#homeWordmark {{
+    color: {t.TEXT_PRIMARY};
+    font-size: {t.FONT_SIZE_WORDMARK}px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 14px 0 2px 0;
+    background: transparent;
+    border: none;
+}}
+
+QLabel#homeSubtitle {{
+    font-size: {t.FONT_SIZE_DENSE}px;
+    color: {t.TEXT_MUTED};
+    padding: 0 0 14px 0;
+    background: transparent;
+    border: none;
+}}
+
+QFrame#statusCard {{
+    background: {t.L1_PANEL};
+    border: 1px solid {t.L1_STROKE};
+    border-radius: {t.RADIUS_PANEL}px;
+}}
+
+QLabel#statusDot {{
+    font-size: 14px;
+    background: transparent;
+    border: none;
+    color: {t.ERR};
+}}
+QLabel#statusDot[status="ok"] {{ color: {t.OK}; }}
+QLabel#statusDot[status="warn"] {{ color: {t.WARN}; }}
+QLabel#statusDot[status="err"] {{ color: {t.ERR}; }}
+
+QLabel#statusRowLabel {{
+    font-size: {t.FONT_SIZE_TITLE}px;
+    color: {t.TEXT_SECONDARY};
+    background: transparent;
+    border: none;
+}}
+
+QLabel#statusRowDetail {{
+    font-size: {t.FONT_SIZE_BODY}px;
+    color: {t.TEXT_MUTED};
+    background: transparent;
+    border: none;
+}}
+
+QLabel#loginPrompt {{
+    font-size: {t.FONT_SIZE_TITLE}px;
+    color: {t.TEXT_SECONDARY};
+    padding: 4px 0;
+    background: transparent;
+    border: none;
+}}
+
+QPushButton#oauthGoogle, QPushButton#oauthMicrosoft, QPushButton#oauthDiscord {{
+    font-size: {t.FONT_SIZE_TITLE}px;
+    padding: 8px 16px;
+    min-height: 20px;
+    border-radius: {t.RADIUS_CHIP}px;
+    border: 1px solid {t.L2_STROKE};
+    color: #ffffff;
+}}
+QPushButton#oauthGoogle {{ background: #4285F4; }}
+QPushButton#oauthGoogle:hover {{ background: #3367D6; }}
+QPushButton#oauthMicrosoft {{ background: #2F2F2F; }}
+QPushButton#oauthMicrosoft:hover {{ background: #444444; }}
+QPushButton#oauthDiscord {{ background: #5865F2; }}
+QPushButton#oauthDiscord:hover {{ background: #4752C4; }}
+
+QLabel#loginError {{
+    font-size: {t.FONT_SIZE_DENSE}px;
+    color: {t.ERR};
+    background: transparent;
+    border: none;
+}}
+
+QLabel#loggedInLabel {{
+    font-size: {t.FONT_SIZE_BODY}px;
+    color: {t.OK};
+    background: transparent;
+    border: none;
+}}
+
+QLabel#vipBadge {{
+    font-size: {t.FONT_SIZE_BODY}px;
+    font-weight: bold;
+    color: {t.MEDAL_GOLD};
+    padding: 2px 0;
+    background: transparent;
+    border: none;
+}}
+
+QPushButton#logoutBtn {{
+    font-size: {t.FONT_SIZE_DENSE}px;
+    padding: 4px 12px;
+    border-radius: {t.RADIUS_ROW}px;
+    border: 1px solid {t.L3_STROKE};
+    background: transparent;
+    color: {t.TEXT_MUTED};
+}}
+QPushButton#logoutBtn:hover {{
+    color: {t.ERR};
+    border-color: {t.ERR};
+}}
+
+QLabel#homeHint {{
+    font-size: {t.FONT_SIZE_DENSE}px;
+    color: {t.TEXT_FAINT};
+    padding: 8px 0;
+    background: transparent;
+    border: none;
+}}
+
+/* ---- summary tab ----------------------------------------------------------------- */
+
+QLabel#summaryHeader {{
+    color: {t.TEXT_PRIMARY};
+    font-size: {t.FONT_SIZE_HEADLINE}px;
+    font-weight: 600;
+    background: transparent;
+    border: none;
+}}
+
+QLabel#summaryStats {{
+    color: {t.TEXT_SECONDARY};
+    font-size: {t.FONT_SIZE_BODY}px;
+    background: transparent;
+    border: none;
+}}
+
+QLabel#summaryBuild {{
+    color: {t.TEXT_SECONDARY};
+    font-size: {t.FONT_SIZE_BODY}px;
+    background: transparent;
+    border: none;
+}}
+
+QLabel#summaryRecapRow {{
+    color: {t.TEXT_SECONDARY};
+    font-size: {t.FONT_SIZE_BODY}px;
+    background: transparent;
+    border: none;
+}}
+
+QPushButton#summaryCopyDeck {{
+    border: 1px solid {t.ACCENT_DIM};
+    color: {t.ACCENT};
+}}
+QPushButton#summaryCopyDeck:hover {{
+    background-color: {t.ACCENT_WASH};
+}}
+QPushButton#summaryCopyDeck:disabled {{
+    border-color: {t.L1_STROKE};
+    color: {t.TEXT_FAINT};
+}}
+
+/* ---- settings tab --------------------------------------------------------------- */
+
+QLabel#settingsNote {{
+    color: {t.TEXT_MUTED};
+    font-size: {t.FONT_SIZE_SMALL}px;
+    padding: 0 24px;
+    background: transparent;
+    border: none;
+}}
+
+QLabel#settingsCaption {{
+    color: {t.TEXT_SECONDARY};
+    font-size: {t.FONT_SIZE_DENSE}px;
+    background: transparent;
+    border: none;
+}}
+
+/* ---- deck tab ----------------------------------------------------------------- */
+
+QLabel#deckArchetypeName {{
+    color: {t.TEXT_PRIMARY};
+    font-size: {t.FONT_SIZE_HEADLINE}px;
+    font-weight: 600;
+    background: transparent;
+    border: none;
+}}
+
+QLabel#deckStatsLine {{
+    color: {t.TEXT_SECONDARY};
+    font-size: {t.FONT_SIZE_DENSE}px;
+    background: transparent;
+    border: none;
+}}
+
+_DeckCardRow {{
+    background-color: transparent;
+    border: none;
+    border-left: 2px solid transparent;
+    border-radius: 2px;
+}}
+{_deck_tint_rules()}
+_DeckCardRow:hover {{
+    background-color: {t.HOVER_WASH};
+}}
+_DeckCardRow[dimmed="true"] {{
+    background-color: rgba(20, 26, 38, 0.55);
+    border-left: 2px solid transparent;
+}}
+
+QLabel#deckCount {{
+    font-size: {t.FONT_SIZE_BODY}px;
+    color: {t.TEXT_SECONDARY};
+    background: transparent;
+    border: none;
+}}
+QLabel#deckCount[dimmed="true"] {{ color: {t.TEXT_FAINT}; }}
+
+QLabel#deckName {{
+    font-size: {t.FONT_SIZE_BODY}px;
+    color: {t.TEXT_PRIMARY};
+    background: transparent;
+    border: none;
+}}
+QLabel#deckName[dimmed="true"] {{
+    color: {t.TEXT_MUTED};
+    font-style: italic;
+}}
+
+QLabel#deckType {{
+    color: {t.TEXT_MUTED};
+    font-size: {t.FONT_SIZE_DENSE}px;
+    background: transparent;
+    border: none;
+}}
+QLabel#deckType[dimmed="true"] {{ color: {t.TEXT_FAINT}; }}
+
+QPushButton#sideboardToggle {{
+    background: transparent;
+    border: none;
+    border-top: 1px solid {t.L1_STROKE};
+    color: {t.TEXT_SECONDARY};
+    font-size: {t.FONT_SIZE_DENSE}px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-align: left;
+    padding: 8px 6px;
+}}
+QPushButton#sideboardToggle:hover {{
+    color: {t.TEXT_PRIMARY};
 }}
 
 /* ---- misc shared bits -------------------------------------------------------- */

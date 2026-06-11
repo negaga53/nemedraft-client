@@ -113,7 +113,7 @@ class SettingsTab(QWidget):
 
         cache_row = QHBoxLayout()
         self._cache_info = QLabel()
-        self._cache_info.setStyleSheet("color: #aaa; font-size: 11px;")
+        self._cache_info.setObjectName("settingsCaption")
         cache_row.addWidget(self._cache_info, stretch=1)
         self._clear_cache_btn = QPushButton(tr("clear_cache_btn"))
         self._clear_cache_btn.setMinimumWidth(110)
@@ -124,7 +124,7 @@ class SettingsTab(QWidget):
 
         logs_row = QHBoxLayout()
         logs_lbl = QLabel(tr("export_logs_label"))
-        logs_lbl.setStyleSheet("color: #aaa; font-size: 11px;")
+        logs_lbl.setObjectName("settingsCaption")
         logs_row.addWidget(logs_lbl, stretch=1)
         self._export_logs_btn = QPushButton(tr("export_logs_btn"))
         self._export_logs_btn.setMinimumWidth(110)

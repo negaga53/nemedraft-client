@@ -96,12 +96,6 @@ def _detailed_logs_enabled() -> bool | None:
 class _StatusRow(QWidget):
     """A single status indicator: coloured dot + label."""
 
-    _DOT_STYLES = {
-        "ok":   "color: #4CAF50; font-size: 14px; background: transparent;",
-        "warn": "color: #FFC107; font-size: 14px; background: transparent;",
-        "err":  "color: #F44336; font-size: 14px; background: transparent;",
-    }
-
     def __init__(self, label_key: str, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         row = QHBoxLayout(self)
@@ -109,18 +103,18 @@ class _StatusRow(QWidget):
         row.setSpacing(10)
 
         self._dot = QLabel("●")
+        self._dot.setObjectName("statusDot")
         self._dot.setFixedWidth(20)
         self._dot.setAlignment(Qt.AlignmentFlag.AlignCenter)
         row.addWidget(self._dot)
 
         self._label = QLabel(tr(label_key))
         self._label.setObjectName("statusRowLabel")
-        self._label.setStyleSheet("font-size: 13px; color: #ccccdd;")
         self._label_key = label_key
         row.addWidget(self._label, stretch=1)
 
         self._status_label = QLabel("")
-        self._status_label.setStyleSheet("font-size: 12px; color: #888888;")
+        self._status_label.setObjectName("statusRowDetail")
         self._status_label.setAlignment(Qt.AlignmentFlag.AlignRight)
         row.addWidget(self._status_label)
 
@@ -133,7 +127,8 @@ class _StatusRow(QWidget):
             status: One of ``"ok"``, ``"warn"``, ``"err"``.
             detail: Short text shown to the right (e.g. "Running").
         """
-        self._dot.setStyleSheet(self._DOT_STYLES.get(status, self._DOT_STYLES["err"]))
+        from client.overlay.ui.theme import set_prop
+        set_prop(self._dot, "status", status if status in ("ok", "warn", "err") else "err")
         self._status_label.setText(detail)
 
     def retranslate(self) -> None:
@@ -167,30 +162,23 @@ class HomeTab(QWidget):
         layout.setContentsMargins(12, 12, 12, 12)
         layout.setSpacing(6)
 
-        # Brand lockup (serif wordmark).
+        # Brand wordmark.
         self._brand_label = QLabel(tr("home_title"))
+        self._brand_label.setObjectName("homeWordmark")
         self._brand_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._brand_label.setStyleSheet(
-            "font-family: Georgia, serif; color: #cfb53b;"
-            " font-size: 22px; font-weight: 700; letter-spacing: 1px;"
-            " padding: 14px 0 2px 0;"
-        )
         layout.addWidget(self._brand_label)
 
         self._subtitle = QLabel(tr("home_subtitle"))
+        self._subtitle.setObjectName("homeSubtitle")
         self._subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._subtitle.setStyleSheet(
-            "font-size: 11px; color: #888888; padding: 0 0 14px 0;"
-        )
         self._subtitle.setWordWrap(True)
         layout.addWidget(self._subtitle)
 
         # Status card — rounded container with 4 rows.
         from PySide6.QtWidgets import QFrame
         self._status_card = QFrame()
-        self._status_card.setStyleSheet(
-            "QFrame { background: rgba(20,20,36,.6); border-radius: 6px; }"
-        )
+        self._status_card.setObjectName("statusCard")
+        self._status_card.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         sc_layout = QVBoxLayout(self._status_card)
         sc_layout.setContentsMargins(0, 4, 0, 4)
         sc_layout.setSpacing(0)
@@ -210,37 +198,33 @@ class HomeTab(QWidget):
         login_layout.setSpacing(8)
 
         self._login_prompt = QLabel(tr("home_login_prompt"))
+        self._login_prompt.setObjectName("loginPrompt")
         self._login_prompt.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._login_prompt.setStyleSheet("font-size: 13px; color: #ccccdd; padding: 4px 0;")
         login_layout.addWidget(self._login_prompt)
 
-        _BTN_STYLE = (
-            "QPushButton { font-size: 13px; padding: 8px 16px; border-radius: 4px; "
-            "border: 1px solid #444466; background: %s; color: #ffffff; } "
-            "QPushButton:hover { background: %s; }"
-        )
-
+        # OAuth buttons keep their providers' brand fills (a brand
+        # requirement) — normalized geometry comes from the theme QSS.
         self._google_btn = QPushButton("  " + tr("home_login_google"))
-        self._google_btn.setStyleSheet(_BTN_STYLE % ("#4285F4", "#3367D6"))
+        self._google_btn.setObjectName("oauthGoogle")
         self._google_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._google_btn.clicked.connect(self.login_google_requested.emit)
         login_layout.addWidget(self._google_btn)
 
         self._microsoft_btn = QPushButton("  " + tr("home_login_microsoft"))
-        self._microsoft_btn.setStyleSheet(_BTN_STYLE % ("#2F2F2F", "#444444"))
+        self._microsoft_btn.setObjectName("oauthMicrosoft")
         self._microsoft_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._microsoft_btn.clicked.connect(self.login_microsoft_requested.emit)
         login_layout.addWidget(self._microsoft_btn)
 
         self._discord_btn = QPushButton("  " + tr("home_login_discord"))
-        self._discord_btn.setStyleSheet(_BTN_STYLE % ("#5865F2", "#4752C4"))
+        self._discord_btn.setObjectName("oauthDiscord")
         self._discord_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._discord_btn.clicked.connect(self.login_discord_requested.emit)
         login_layout.addWidget(self._discord_btn)
 
         self._login_error = QLabel("")
+        self._login_error.setObjectName("loginError")
         self._login_error.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._login_error.setStyleSheet("font-size: 11px; color: #F44336;")
         self._login_error.setWordWrap(True)
         self._login_error.hide()
         login_layout.addWidget(self._login_error)
@@ -254,24 +238,18 @@ class HomeTab(QWidget):
         loggedin_layout.setSpacing(6)
 
         self._user_label = QLabel("")
+        self._user_label.setObjectName("loggedInLabel")
         self._user_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._user_label.setStyleSheet("font-size: 12px; color: #4CAF50;")
         loggedin_layout.addWidget(self._user_label)
 
         self._vip_badge = QLabel("")
+        self._vip_badge.setObjectName("vipBadge")
         self._vip_badge.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._vip_badge.setStyleSheet(
-            "font-size: 12px; font-weight: bold; color: #cfb53b; padding: 2px 0;"
-        )
         self._vip_badge.hide()
         loggedin_layout.addWidget(self._vip_badge)
 
         self._logout_btn = QPushButton(tr("home_logout_btn"))
-        self._logout_btn.setStyleSheet(
-            "QPushButton { font-size: 11px; padding: 4px 12px; border-radius: 3px; "
-            "border: 1px solid #555; background: transparent; color: #888888; } "
-            "QPushButton:hover { color: #F44336; border-color: #F44336; }"
-        )
+        self._logout_btn.setObjectName("logoutBtn")
         self._logout_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._logout_btn.clicked.connect(self.logout_requested.emit)
         logout_row = QHBoxLayout()
@@ -287,8 +265,8 @@ class HomeTab(QWidget):
 
         # Waiting hint at the bottom.
         self._hint = QLabel(tr("home_hint"))
+        self._hint.setObjectName("homeHint")
         self._hint.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._hint.setStyleSheet("font-size: 11px; color: #666688; padding: 8px 0;")
         self._hint.setWordWrap(True)
         layout.addWidget(self._hint)
 

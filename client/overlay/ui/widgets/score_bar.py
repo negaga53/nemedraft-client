@@ -6,9 +6,11 @@ from PySide6.QtCore import QRectF, QSize, Qt
 from PySide6.QtGui import QBrush, QColor, QFont, QLinearGradient, QPainter, QPen
 from PySide6.QtWidgets import QWidget
 
+from client.overlay.ui.theme import tokens
+
 _W = 78
 _H = 16
-_RADIUS = 2
+_RADIUS = 3
 
 
 class ScoreBar(QWidget):
@@ -48,25 +50,20 @@ class ScoreBar(QWidget):
 
         rect = QRectF(0, 0, _W, _H)
 
-        # background
+        # track well + inner hairline
+        p.setPen(QPen(tokens.qcolor(tokens.L1_STROKE)))
+        p.setBrush(tokens.qcolor(tokens.L0_WELL))
+        p.drawRoundedRect(rect.adjusted(0.5, 0.5, -0.5, -0.5), _RADIUS, _RADIUS)
         p.setPen(Qt.PenStyle.NoPen)
-        p.setBrush(QColor("#0b0b18"))
-        p.drawRoundedRect(rect, _RADIUS, _RADIUS)
 
         # fill
         fill_w = _W * self._fraction
         if fill_w > 0:
             fill_rect = QRectF(0, 0, fill_w, _H)
             grad = QLinearGradient(0, 0, _W, 0)
-            if self._fraction > 0.7:
-                grad.setColorAt(0, QColor("#2e7d32"))
-                grad.setColorAt(1, QColor("#4caf50"))
-            elif self._fraction > 0.35:
-                grad.setColorAt(0, QColor("#b4811c"))
-                grad.setColorAt(1, QColor("#ffc107"))
-            else:
-                grad.setColorAt(0, QColor("#852a25"))
-                grad.setColorAt(1, QColor("#f44336"))
+            deep, bright = tokens.score_gradient(self._fraction)
+            grad.setColorAt(0, deep)
+            grad.setColorAt(1, bright)
             p.setBrush(QBrush(grad))
             p.drawRoundedRect(fill_rect, _RADIUS, _RADIUS)
 

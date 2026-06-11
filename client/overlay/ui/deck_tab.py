@@ -23,7 +23,8 @@ from common.inference.pool_analyzer import ScryfallCard
 from client.overlay.i18n import card_name, tr
 from client.overlay.mana_icons import get_mana_icon_cache, parse_mana_pips
 from client.overlay.ui.pack_widgets import _CardPreview
-from client.overlay.ui.styles import card_row_bg, short_type
+from client.overlay.ui.theme import set_prop
+from client.overlay.ui.theme.tokens import card_tint, short_type
 
 # Row constants.
 _ROW_H = 24
@@ -69,9 +70,9 @@ class _DeckManaBar(QWidget):
                 self._layout.addWidget(lbl)
             else:
                 lbl = QLabel(pip)
+                lbl.setObjectName("manaPipFallback")
                 lbl.setFixedSize(_ICON_SZ, _ICON_SZ)
                 lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                lbl.setStyleSheet("color: #aaa; font-size: 10px;")
                 self._layout.addWidget(lbl)
 
 
@@ -85,6 +86,7 @@ class _DeckCardRow(QFrame):
         super().__init__(parent)
         self.setFixedHeight(_ROW_H)
         self.setMouseTracking(True)
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self._card_name: str = ""
 
         layout = QHBoxLayout(self)
@@ -92,26 +94,25 @@ class _DeckCardRow(QFrame):
         layout.setSpacing(_SPACING)
 
         self.art_label = QLabel()
+        self.art_label.setObjectName("rowArt")
         self.art_label.setFixedSize(_W_ART, _ART_H)
-        self.art_label.setStyleSheet(
-            "border-radius: 2px; background: #1a1a28;"
-        )
         self.art_label.setScaledContents(True)
 
         self.count_label = QLabel()
+        self.count_label.setObjectName("deckCount")
         self.count_label.setFixedWidth(_W_COUNT)
         self.count_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.count_label.setStyleSheet("font-size: 12px;")
 
         self.mana_bar = _DeckManaBar()
         self.mana_bar.setFixedWidth(_W_MANA)
 
         self.name_label = QLabel()
+        self.name_label.setObjectName("deckName")
 
         self.type_label = QLabel()
+        self.type_label.setObjectName("deckType")
         self.type_label.setFixedWidth(_W_TYPE)
         self.type_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.type_label.setStyleSheet("color: #888; font-size: 11px;")
 
         layout.addWidget(self.art_label)
         layout.addWidget(self.count_label)
@@ -123,9 +124,6 @@ class _DeckCardRow(QFrame):
         """Render a cropped thumbnail on the left of the row, or clear it."""
         if art_path is None or not Path(art_path).exists():
             self.art_label.clear()
-            self.art_label.setStyleSheet(
-                "border-radius: 2px; background: #1a1a28;"
-            )
             return
         pm = QPixmap(str(art_path))
         if pm.isNull():
@@ -150,24 +148,11 @@ class _DeckCardRow(QFrame):
         dimmed: bool = False,
     ) -> None:
         self._card_name = name
-        if dimmed:
-            self.setStyleSheet(
-                "_DeckCardRow { background: rgba(40,40,60,0.6); border-radius: 2px; }"
-            )
-            self.name_label.setStyleSheet(
-                'font-size: 12px; color: #777; font-style: italic;'
-            )
-            self.count_label.setStyleSheet("color: #555; font-size: 12px;")
-            self.type_label.setStyleSheet("color: #555; font-size: 11px;")
-        else:
-            bg = card_row_bg(colors)
-            self.setStyleSheet(
-                f"_DeckCardRow {{ background: {bg}; border-radius: 2px; }}"
-                f"_DeckCardRow:hover {{ background: rgba(255,255,255,20); }}"
-            )
-            self.name_label.setStyleSheet(
-                'font-size: 12px; color: #e0e0e0;'
-            )
+        set_prop(self, "dimmed", dimmed)
+        set_prop(self, "tint", "" if dimmed else card_tint(colors))
+        set_prop(self.name_label, "dimmed", dimmed)
+        set_prop(self.count_label, "dimmed", dimmed)
+        set_prop(self.type_label, "dimmed", dimmed)
         self.count_label.setText(f"{count}x" if count > 1 else "")
         self.mana_bar.set_cost(mana_cost)
         self.name_label.setText(card_name(name))
@@ -185,11 +170,6 @@ class _CategorySection(QFrame):
 
         self._header = QLabel(title)
         self._header.setObjectName("sectionTitle")
-        self._header.setStyleSheet(
-            "color: #cfb53b; font-size: 11px; font-weight: 700;"
-            " text-transform: uppercase; letter-spacing: 1px; padding: 6px 6px 4px 6px;"
-            " border-bottom: 1px solid #1f1f30;"
-        )
         self._layout.addWidget(self._header)
 
     def add_card(self, row: _DeckCardRow) -> None:
@@ -209,13 +189,10 @@ class DeckTab(QWidget):
         layout.setContentsMargins(4, 4, 4, 4)
         layout.setSpacing(4)
 
-        # Archetype strip — gold-tinted gradient pill with stats inline.
+        # Archetype strip — glass header panel with stats inline.
         self._archetype_strip = QFrame()
-        self._archetype_strip.setStyleSheet(
-            "QFrame { background: qlineargradient(x1:0,y1:0,x2:1,y2:1, "
-            "stop:0 rgba(207,181,59,.14), stop:1 rgba(20,20,36,.5)); "
-            "border-radius: 6px; }"
-        )
+        self._archetype_strip.setObjectName("archetypeCard")
+        self._archetype_strip.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         strip_layout = QHBoxLayout(self._archetype_strip)
         strip_layout.setContentsMargins(10, 6, 8, 6)
         strip_layout.setSpacing(8)
@@ -223,17 +200,16 @@ class DeckTab(QWidget):
         arch_col = QVBoxLayout()
         arch_col.setSpacing(2)
         self._arch_name_label = QLabel("—")
-        self._arch_name_label.setStyleSheet(
-            "color: #cfb53b; font-size: 15px; font-weight: 700;"
-        )
+        self._arch_name_label.setObjectName("deckArchetypeName")
         self._stats_label = QLabel("")
-        self._stats_label.setStyleSheet("color: #aaa; font-size: 11px;")
+        self._stats_label.setObjectName("deckStatsLine")
         self._stats_label.setWordWrap(True)
         arch_col.addWidget(self._arch_name_label)
         arch_col.addWidget(self._stats_label)
         strip_layout.addLayout(arch_col, stretch=1)
 
         self._copy_btn = QPushButton(tr("copy_deck_btn"))
+        self._copy_btn.setObjectName("accentBtn")
         self._copy_btn.setMinimumWidth(80)
         strip_layout.addWidget(self._copy_btn)
 
@@ -261,13 +237,7 @@ class DeckTab(QWidget):
         self._sideboard_toggle = QPushButton(tr("sideboard_header"))
         self._sideboard_toggle.setCheckable(True)
         self._sideboard_toggle.setChecked(False)
-        self._sideboard_toggle.setStyleSheet(
-            "QPushButton { background: transparent; border: none;"
-            " color: #aaaaaa; font-size: 11px; font-weight: 700;"
-            " text-transform: uppercase; letter-spacing: 1px; text-align: left;"
-            " padding: 8px 6px; border-top: 1px solid #1f1f30; }"
-            "QPushButton:hover { color: #e0e0e0; }"
-        )
+        self._sideboard_toggle.setObjectName("sideboardToggle")
         layout.addWidget(self._sideboard_toggle)
 
         self._sb_scroll = QScrollArea()

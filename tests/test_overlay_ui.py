@@ -172,10 +172,10 @@ def test_home_tab_has_brand_and_status_card(qapp):
     from client.overlay.ui.home_tab import HomeTab
     t = HomeTab()
     assert hasattr(t, "_brand_label")
-    # Brand uses serif styling per spec
-    assert "georgia" in t._brand_label.styleSheet().lower()
-    # Status card groups the 4 rows
+    # Wordmark + status card are theme-styled via objectNames.
+    assert t._brand_label.objectName() == "homeWordmark"
     assert hasattr(t, "_status_card")
+    assert t._status_card.objectName() == "statusCard"
 
 
 def test_deck_tab_has_archetype_strip(qapp):

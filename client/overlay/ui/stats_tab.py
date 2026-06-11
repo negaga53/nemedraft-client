@@ -7,6 +7,7 @@ from PySide6.QtGui import QColor, QPainter, QPen, QBrush, QFont
 from PySide6.QtWidgets import QWidget
 
 from client.overlay.i18n import tr
+from client.overlay.ui.theme import tokens
 
 # Ideal mana curve target for 23 spells (index = CMC 0, 1, 2, 3, 4, 5, 6, 7+).
 _IDEAL_CURVE = [0, 2, 5, 5, 4, 3, 2, 2]  # sum = 23
@@ -48,11 +49,11 @@ class ManaCurvePlot(QWidget):
 
             # Bar colour: green on target, yellow below, red excess.
             if val > ideal and ideal > 0:
-                color = QColor("#e74c3c")
+                color = tokens.qcolor(tokens.SCORE_LOW)
             elif val < ideal and ideal > 0:
-                color = QColor("#FFC107")
+                color = tokens.qcolor(tokens.WARN)
             else:
-                color = QColor("#4CAF50")
+                color = tokens.qcolor(tokens.OK)
 
             # Draw bar.
             painter.setPen(Qt.PenStyle.NoPen)
@@ -63,27 +64,27 @@ class ManaCurvePlot(QWidget):
 
             # Ideal marker — horizontal line.
             if ideal > 0:
-                painter.setPen(QPen(QColor("#00bcd4"), 1.5, Qt.PenStyle.SolidLine))
+                painter.setPen(QPen(tokens.qcolor(tokens.ACCENT), 1.5, Qt.PenStyle.SolidLine))
                 painter.drawLine(bar_x - 1, ideal_y, bar_x + bw + 1, ideal_y)
 
             # CMC label below.
-            painter.setPen(QPen(QColor("#aaaaaa")))
-            painter.setFont(QFont("Segoe UI", 7))
+            painter.setPen(QPen(tokens.qcolor(tokens.TEXT_MUTED)))
+            painter.setFont(QFont("Inter", 7))
             label = f"{i}" if i < 7 else "7+"
             rect = QRectF(bar_x - 2, bottom + 1, bw + 4, 12)
             painter.drawText(rect, Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop, label)
 
             # Count label on top of bar.
             if val > 0:
-                painter.setPen(QPen(QColor("#e0e0e0")))
-                painter.setFont(QFont("Segoe UI", 7, QFont.Weight.Bold))
+                painter.setPen(QPen(tokens.qcolor(tokens.TEXT_PRIMARY)))
+                painter.setFont(QFont("Inter", 7, QFont.Weight.Bold))
                 rect = QRectF(bar_x - 2, bottom - bar_h - 12, bw + 4, 11)
                 painter.drawText(rect, Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignBottom, str(val))
 
         # Sum label in top-right.
         total = sum(self._curve)
-        painter.setPen(QPen(QColor("#888888")))
-        painter.setFont(QFont("Segoe UI", 7))
+        painter.setPen(QPen(tokens.qcolor(tokens.TEXT_MUTED)))
+        painter.setFont(QFont("Inter", 7))
         painter.drawText(QRectF(w - 60, 1, 56, 12), Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop, tr("spells_count", total=total))
 
         painter.end()

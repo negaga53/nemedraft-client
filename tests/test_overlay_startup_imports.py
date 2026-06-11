@@ -56,6 +56,10 @@ def test_overlay_main_imports_without_excluded_modules() -> None:
 
     try:
         importlib.import_module("client.overlay.main")
+        importlib.import_module("client.overlay.boot")
+        importlib.import_module("client.overlay.events")
+        importlib.import_module("client.overlay.managers.worker_pool")
+        importlib.import_module("client.overlay.managers.workers")
     except ModuleNotFoundError as exc:
         pytest.fail(
             f"client.overlay.main triggered a forbidden import at startup: "

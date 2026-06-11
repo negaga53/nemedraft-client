@@ -5,31 +5,29 @@ from __future__ import annotations
 import argparse
 import json
 import logging
-import os
 import signal
 import sys
 import time
-from dataclasses import dataclass
 from pathlib import Path
 
-from typing import Callable
-
-from PySide6.QtCore import QObject, QThread, QTimer, Signal, Slot
+from PySide6.QtCore import QThread, QTimer, Signal
 from PySide6.QtWidgets import QApplication
 
 from client.overlay.api_client import NemeDraftClient
-from client.overlay.arena_memory import (
-    ArenaCurrentEvent,
-    ArenaPlayerIdentity,
-    get_arena_current_event,
-    get_arena_player_identity,
-)
+from client.overlay.arena_memory import ArenaCurrentEvent
 from client.overlay.auth_client import AuthClient
+from client.overlay.boot import (
+    ArenaIdentityResolution,
+    BootResult,
+    BootWorker,
+    UpdateWorker,
+)
 from client.overlay.card_art import CardArtCache
 from client.overlay.card_mapper import ArenaCardMapper
 from client.overlay.config import OverlayConfig, load_config, save_config, LOG_FILE
 from client.overlay.draft_state import DraftState, PickHistoryEntry, extract_draft_format
 from client.overlay.env import ClientEnv, load_client_env, save_arena_player_id
+from client.overlay.events import UiMarshaler, event_signature, should_drop_duplicate
 from client.overlay.i18n import Translator, tr
 from client.overlay.log_watcher import (
     DeckPoolDetectedEvent,
@@ -43,465 +41,20 @@ from client.overlay.log_watcher import (
     PackEvent,
     PickEvent,
     ReplayDoneEvent,
-    extract_arena_player_id,
     is_arena_running,
 )
-from client.overlay.memory.platform import is_memory_supported
+from client.overlay.managers.workers import (
+    ArenaCurrentEventWorker,
+    ArenaIdentityWorker,
+    PredictionWorker,
+    SetDataResult,
+    SetDataWorker,
+)
 from client.overlay.memory_watcher import MemoryWatcher
 from client.overlay.single_instance import SingleInstance
 from client.overlay.ui.window import OverlayWindow
 
 logger = logging.getLogger("overlay")
-
-
-# ---------------------------------------------------------------------------
-# Auto-update worker — runs before boot to check / apply updates
-# ---------------------------------------------------------------------------
-
-class _UpdateWorker(QThread):
-    """Checks for a newer release on GitHub and downloads it if found.
-
-    Emits ``progress`` with human-readable status strings, then either
-    ``update_ready`` (with the path to the new binary) or ``no_update``
-    when no action is needed.
-    """
-
-    progress = Signal(str)
-    update_ready = Signal(object)   # Path to downloaded binary
-    no_update = Signal()
-    update_failed = Signal(str)
-
-    def run(self) -> None:  # noqa: D401
-        from client.overlay.updater import check_for_update, download_update
-        from client.overlay.i18n import tr
-
-        self.progress.emit(tr("update_checking"))
-        try:
-            result = check_for_update()
-        except Exception as exc:
-            logger.warning("Update check failed: %s", exc)
-            self.no_update.emit()
-            return
-
-        if result is None:
-            self.no_update.emit()
-            return
-
-        latest_version, download_url = result
-        self.progress.emit(tr("update_downloading", version=latest_version))
-
-        try:
-            new_binary = download_update(
-                download_url,
-                progress_callback=self._on_download_progress,
-            )
-        except Exception as exc:
-            logger.error("Update download failed: %s", exc, exc_info=True)
-            self.update_failed.emit(str(exc))
-            return
-
-        self.update_ready.emit(new_binary)
-
-    def _on_download_progress(self, downloaded: int, total: int) -> None:
-        from client.overlay.i18n import tr
-        pct = int(downloaded / total * 100)
-        self.progress.emit(tr("update_download_progress", pct=pct))
-
-
-# ---------------------------------------------------------------------------
-# Dataclass to bundle results from the background boot worker
-# ---------------------------------------------------------------------------
-
-@dataclass
-class _BootResult:
-    """Components built during background startup."""
-
-    mapper: ArenaCardMapper
-    auth_client: AuthClient
-    api_client: NemeDraftClient
-    art_cache: CardArtCache
-    watcher: LogWatcher
-    memory_watcher: "MemoryWatcher | None"
-    server_supported_sets: list[str]
-    has_arena_player_id: bool
-
-
-@dataclass(frozen=True)
-class _ArenaIdentityResolution:
-    """Arena player identity resolved from memory or Player.log."""
-
-    player_id: str
-    source: str
-    display_name: str = ""
-
-
-def _resolve_arena_identity() -> _ArenaIdentityResolution | None:
-    """Resolve the Arena player ID from the best available local source."""
-    arena_identity = get_arena_player_identity()
-    if arena_identity is not None:
-        player_id = arena_identity.player_id.strip()
-        if player_id:
-            return _ArenaIdentityResolution(
-                player_id=player_id,
-                source="memory",
-                display_name=arena_identity.display_name.strip(),
-            )
-
-    log_player_id = (extract_arena_player_id() or "").strip()
-    if log_player_id:
-        return _ArenaIdentityResolution(player_id=log_player_id, source="log")
-
-    return None
-
-
-class _BootWorker(QThread):
-    """Loads minimal resources off the UI thread.
-
-    Card mappings and Scryfall data are **not** loaded here — they are
-    deferred to :class:`_SetDataWorker` once a draft set is detected.
-    """
-
-    progress = Signal(str)          # status message for the home tab
-    finished_ok = Signal(object)    # _BootResult
-    finished_err = Signal(str)      # error message
-
-    def __init__(
-        self,
-        args: argparse.Namespace,
-        config: OverlayConfig,
-        env: ClientEnv,
-    ) -> None:
-        super().__init__()
-        self._args = args
-        self._config = config
-        self._env = env
-
-    def run(self) -> None:  # noqa: D401 — Qt override
-        try:
-            args = self._args
-
-            # 1. Scryfall refresh (optional) --------------------------------
-            if args.update_scryfall:
-                self.progress.emit("Updating Scryfall data...")
-                from client.overlay.card_mapper import update_scryfall
-                update_scryfall(Path(args.scryfall_dir))
-
-            # 2. Card ID map only (lightweight) -----------------------------
-            self.progress.emit("Loading card ID map...")
-            mapper = ArenaCardMapper(
-                scryfall_dir=Path(args.scryfall_dir),
-                card_id_map_path=Path(args.card_id_map),
-                lazy=True,
-            )
-
-            # Card translations for the active language.
-            translator = Translator.instance()
-            translator.load_card_translations(Path(args.scryfall_dir))
-
-            # 3. Auth + API client ------------------------------------------
-            self.progress.emit("Connecting to server...")
-            arena_player_id = ""
-            arena_identity = _resolve_arena_identity()
-            if arena_identity:
-                arena_player_id = arena_identity.player_id
-                if arena_identity.source == "memory":
-                    logger.info(
-                        "Arena player ID from memory: %s (display=%s)",
-                        arena_player_id,
-                        arena_identity.display_name or "unknown",
-                    )
-                else:
-                    logger.info("Arena player ID from Player.log: %s", arena_player_id)
-                save_arena_player_id(arena_player_id)
-            else:
-                arena_player_id = os.getenv("ARENA_PLAYER_ID", "") or ""
-                if arena_player_id:
-                    logger.warning(
-                        "Using cached Arena player ID because memory reader is unavailable: %s",
-                        arena_player_id,
-                    )
-                else:
-                    logger.warning(
-                        "Arena player ID not found via MTGA memory or Player.log "
-                        "- sign-in will be unavailable"
-                    )
-            auth_client = AuthClient(self._env, arena_player_id=arena_player_id)
-            api_client = NemeDraftClient(self._env, auth_client)
-
-            # Only attempt auto-login when we have a player ID to send
-            if arena_player_id and auth_client.try_auto_login():
-                logger.info("Auto-login succeeded for %s", auth_client.user_email)
-            elif arena_player_id and auth_client.session:
-                logger.info(
-                    "Session restored but expired — will retry refresh "
-                    "(email=%s)", auth_client.user_email,
-                )
-            elif not arena_player_id:
-                logger.info("Skipping auto-login — no arena player ID")
-            else:
-                logger.info("No stored session — user will need to sign in")
-
-            # Query server for supported sets.
-            server_supported_sets: list[str] = []
-            health = api_client.health()
-            if health:
-                server_supported_sets = health.get("supported_sets", [])
-                logger.info("Server supported sets: %s", server_supported_sets)
-
-            # 4. Remaining light components ----------------------------------
-            art_cache = CardArtCache(enabled=self._config.overlay.show_art)
-            log_path = Path(args.log_file) if args.log_file else None
-            watcher = LogWatcher(log_path=log_path)
-            memory_watcher = MemoryWatcher() if is_memory_supported() else None
-
-            self.finished_ok.emit(_BootResult(
-                mapper=mapper,
-                auth_client=auth_client,
-                api_client=api_client,
-                art_cache=art_cache,
-                watcher=watcher,
-                memory_watcher=memory_watcher,
-                server_supported_sets=server_supported_sets,
-                has_arena_player_id=bool(arena_player_id),
-            ))
-
-        except Exception as exc:
-            logger.exception("Boot worker failed")
-            self.finished_err.emit(str(exc))
-
-
-@dataclass
-class _SetDataResult:
-    """Data loaded for a specific set."""
-
-    set_code: str
-    scryfall_cards: dict
-    mappings_added: int
-
-
-class _SetDataWorker(QThread):
-    """Loads set-specific card data in the background.
-
-    Emits progress messages so the UI can show loading steps.
-    """
-
-    progress = Signal(str)
-    finished_ok = Signal(object)   # _SetDataResult
-    finished_err = Signal(str)
-
-    def __init__(
-        self,
-        set_code: str,
-        mapper: ArenaCardMapper,
-        scryfall_dir: Path,
-    ) -> None:
-        super().__init__()
-        self._set_code = set_code
-        self._mapper = mapper
-        self._scryfall_dir = scryfall_dir
-
-    def run(self) -> None:  # noqa: D401
-        try:
-            sc = self._set_code
-            self.progress.emit(f"Loading {sc} card mappings...")
-            added = self._mapper.load_set(sc)
-            logger.info("Loaded %d arena mappings for %s", added, sc)
-
-            self.progress.emit(f"Loading {sc} Scryfall data...")
-            from common.inference.pool_analyzer import load_scryfall_cards_for_set
-            scryfall_cards = load_scryfall_cards_for_set(self._scryfall_dir, sc)
-
-            self.progress.emit(f"Loading MTGA fallback DB...")
-            self._mapper.ensure_mtga_fallback()
-
-            self.finished_ok.emit(_SetDataResult(
-                set_code=sc,
-                scryfall_cards=scryfall_cards,
-                mappings_added=added,
-            ))
-        except Exception as exc:
-            logger.exception("Set data worker failed for %s", self._set_code)
-            self.finished_err.emit(str(exc))
-
-
-class _ArenaIdentityWorker(QThread):
-    """Reads Arena identity from local sources without blocking the UI thread."""
-
-    finished_identity = Signal(object)  # ArenaPlayerIdentity | None
-
-    def run(self) -> None:  # noqa: D401
-        try:
-            self.finished_identity.emit(_resolve_arena_identity())
-        except Exception:
-            logger.debug("Arena memory identity retry failed", exc_info=True)
-            self.finished_identity.emit(None)
-
-
-class _ArenaCurrentEventWorker(QThread):
-    """Reads Arena current event state without blocking the UI thread."""
-
-    finished_event = Signal(object)  # ArenaCurrentEvent | None
-
-    def run(self) -> None:  # noqa: D401
-        try:
-            self.finished_event.emit(get_arena_current_event())
-        except Exception:
-            logger.debug("Arena current event memory poll failed", exc_info=True)
-            self.finished_event.emit(None)
-
-
-class _PredictionWorker(QThread):
-    """Background worker that calls ``api_client.predict`` off the UI thread.
-
-    The HTTP round-trip can take a few seconds; running it synchronously
-    on the Qt main thread freezes the overlay (the dreaded new-pack
-    stutter). Emits ``finished_ok`` with the picks or ``failed`` with an
-    error string. The dispatching call also remembers the pack/pick the
-    worker was started for so stale results from a previous pack can be
-    discarded.
-    """
-
-    finished_ok = Signal(object, int, int)  # list[Pick], pack_number, pick_number
-    failed = Signal(str, int, int)          # error, pack_number, pick_number
-
-    def __init__(
-        self,
-        api_client: NemeDraftClient,
-        *,
-        pack_cards: list[str],
-        pool_cards: list[str],
-        set_code: str,
-        pack_number: int,
-        pick_number: int,
-        draft_format: str,
-        arena_format: str,
-        last_pick: str | None,
-        parent: QObject | None = None,
-    ) -> None:
-        super().__init__(parent)
-        self._api_client = api_client
-        self._pack_cards = list(pack_cards)
-        self._pool_cards = list(pool_cards)
-        self._set_code = set_code
-        self._pack_number = pack_number
-        self._pick_number = pick_number
-        self._draft_format = draft_format
-        self._arena_format = arena_format
-        self._last_pick = last_pick
-
-    def run(self) -> None:  # noqa: D401
-        try:
-            results = self._api_client.predict(
-                pack_cards=self._pack_cards,
-                pool_cards=self._pool_cards,
-                set_code=self._set_code,
-                pack_number=self._pack_number,
-                pick_number=self._pick_number,
-                draft_format=self._draft_format,
-                arena_format=self._arena_format,
-                last_pick=self._last_pick,
-            )
-        except Exception as exc:  # noqa: BLE001
-            self.failed.emit(str(exc), self._pack_number, self._pick_number)
-            return
-        self.finished_ok.emit(
-            list(results or []), self._pack_number, self._pick_number,
-        )
-
-
-_DEDUPE_WINDOW_S = 2.0
-
-
-def _event_signature(event: DraftEvent) -> tuple | None:
-    """Build a stable identity for cross-source duplicate detection.
-
-    Returns ``None`` for events that are inherently unique to one source
-    (``ReplayDoneEvent`` and ``LogRotatedEvent`` only LogWatcher emits) —
-    those bypass dedupe.
-    """
-    if isinstance(event, PackEvent):
-        return ("pack", event.pack_number, event.pick_number,
-                tuple(event.card_grpids))
-    if isinstance(event, PickEvent):
-        return ("pick", event.pack_number, event.pick_number,
-                tuple(event.card_grpids))
-    if isinstance(event, DraftStartEvent):
-        return ("start", event.event_name)
-    if isinstance(event, DraftLobbyEvent):
-        return ("lobby", event.context)
-    if isinstance(event, DraftEndEvent):
-        return ("end",)
-    if isinstance(event, DraftCompleteEvent):
-        return ("complete",)
-    return None
-
-
-def _should_drop_duplicate(
-    event: DraftEvent, recent: dict[tuple, float]
-) -> bool:
-    sig = _event_signature(event)
-    if sig is None:
-        return False
-    now = time.monotonic()
-    cutoff = now - _DEDUPE_WINDOW_S
-    # Opportunistic GC of stale entries.
-    if len(recent) > 16:
-        for k in [k for k, t in recent.items() if t < cutoff]:
-            recent.pop(k, None)
-    last = recent.get(sig)
-    if last is not None and last >= cutoff:
-        return True
-    recent[sig] = now
-    return False
-
-
-class _UiMarshaler(QObject):
-    """Marshal watcher-thread callbacks onto the Qt main thread.
-
-    LogWatcher and MemoryWatcher run on plain ``threading.Thread``s and
-    invoke registered callbacks inline. Mutating Qt widgets off the GUI
-    thread is undefined behaviour — symptom is "Could not parse stylesheet
-    of QLabel" warnings escalating to a silent C++ segfault (observed on
-    leave-then-rejoin where both watchers race to deliver lobby events).
-
-    The marshaler lives on whichever thread created it (the main thread in
-    ``OverlayApp.__init__``). Cross-thread ``emit`` is queued by Qt, so the
-    ``_dispatch_*`` slots always run on the GUI thread.
-
-    The bool argument on ``event_received`` is the watcher's ``replaying``
-    flag captured AT EMIT TIME. Reading it at dispatch time gives stale
-    values: the watcher flips to live mode just before emitting
-    ReplayDoneEvent, so queued replay events would be treated as live and
-    ``show_draft_started()`` would fire while the user is on home.
-    """
-
-    event_received = Signal(object, bool)   # DraftEvent, replaying
-    set_load_requested = Signal(str)         # set_code — from ensure-set-data
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._on_event_handler: Callable[[DraftEvent, bool], None] | None = None
-        self._on_set_load_handler: Callable[[str], None] | None = None
-        self.event_received.connect(self._dispatch_event)
-        self.set_load_requested.connect(self._dispatch_set_load)
-
-    def bind(
-        self,
-        on_event: Callable[[DraftEvent, bool], None],
-        on_set_load: Callable[[str], None],
-    ) -> None:
-        self._on_event_handler = on_event
-        self._on_set_load_handler = on_set_load
-
-    @Slot(object, bool)
-    def _dispatch_event(self, event: object, replaying: bool) -> None:
-        if self._on_event_handler is not None and isinstance(event, DraftEvent):
-            self._on_event_handler(event, replaying)
-
-    @Slot(str)
-    def _dispatch_set_load(self, set_code: str) -> None:
-        if self._on_set_load_handler is not None:
-            self._on_set_load_handler(set_code)
 
 
 class OverlayApp:
@@ -551,12 +104,12 @@ class OverlayApp:
         # Set code whose data is currently loaded (or loading).
         self._loaded_set: str = ""
         self._set_data_ready = False
-        self._set_data_worker: _SetDataWorker | None = None
+        self._set_data_worker: SetDataWorker | None = None
         # Workers still running. self._set_data_worker only points at the
         # latest one; without this set, replacing the pointer drops the
         # Python ref while QThread.run is still active and Python GCs it →
         # "QThread: Destroyed while thread is still running".
-        self._inflight_set_workers: set[_SetDataWorker] = set()
+        self._inflight_set_workers: set[SetDataWorker] = set()
         # Whether the current set is untrained (no model support).
         self._set_untrained = False
         # Current lobby context (e.g. "TMT_Quick_Draft"), empty when not in a lobby.
@@ -587,9 +140,9 @@ class OverlayApp:
         self._retry_start: float = 0.0
 
         # Marshal watcher-thread callbacks onto the Qt main thread.
-        # See _UiMarshaler — registering _on_event directly on the watchers
+        # See UiMarshaler — registering _on_event directly on the watchers
         # mutates Qt widgets off the GUI thread and racey-crashes.
-        self._marshaler = _UiMarshaler()
+        self._marshaler = UiMarshaler()
         self._marshaler.bind(
             on_event=self._on_event,
             on_set_load=self._ensure_set_data_on_main,
@@ -633,17 +186,17 @@ class OverlayApp:
         # results from a worker started for a now-stale pack can be
         # discarded without disturbing the in-flight one.
         self._inflight_predict_workers: set[QThread] = set()
-        self._current_predict_worker: _PredictionWorker | None = None
+        self._current_predict_worker: PredictionWorker | None = None
 
         # If the overlay starts before Arena, keep trying once Arena appears.
-        self._arena_identity_worker: _ArenaIdentityWorker | None = None
+        self._arena_identity_worker: ArenaIdentityWorker | None = None
         self._arena_identity_timer = QTimer()
         self._arena_identity_timer.setInterval(5_000)
         self._arena_identity_timer.timeout.connect(self._retry_arena_identity)
         if not self._has_arena_player_id:
             self._arena_identity_timer.start()
 
-        self._arena_current_event_worker: _ArenaCurrentEventWorker | None = None
+        self._arena_current_event_worker: ArenaCurrentEventWorker | None = None
         self._arena_current_event_timer = QTimer()
         self._arena_current_event_timer.setInterval(5_000)
         self._arena_current_event_timer.timeout.connect(self._poll_arena_current_event)
@@ -696,7 +249,7 @@ class OverlayApp:
         if not is_arena_running():
             return
 
-        worker = _ArenaIdentityWorker()
+        worker = ArenaIdentityWorker()
         worker.finished_identity.connect(self._on_arena_identity_retry_done)
         worker.finished.connect(lambda w=worker: self._inflight_arena_workers.discard(w))
         worker.finished.connect(worker.deleteLater)
@@ -714,7 +267,7 @@ class OverlayApp:
             None.
         """
         self._arena_identity_worker = None
-        if not isinstance(identity, _ArenaIdentityResolution):
+        if not isinstance(identity, ArenaIdentityResolution):
             self._on_identity_read_failed()
             return
 
@@ -764,7 +317,7 @@ class OverlayApp:
         if not is_arena_running():
             return
 
-        worker = _ArenaCurrentEventWorker()
+        worker = ArenaCurrentEventWorker()
         worker.finished_event.connect(self._on_arena_current_event_done)
         worker.finished.connect(lambda w=worker: self._inflight_arena_workers.discard(w))
         worker.finished.connect(worker.deleteLater)
@@ -926,7 +479,7 @@ class OverlayApp:
         """Request loading of set-specific data, safe to call from any thread.
 
         Off-thread calls are marshalled to the Qt main thread via
-        ``_UiMarshaler.set_load_requested`` (queued signal → slot on the
+        ``UiMarshaler.set_load_requested`` (queued signal → slot on the
         QObject living on the main thread).
         """
         if not set_code:
@@ -943,7 +496,7 @@ class OverlayApp:
         """Start loading set-specific data (must be called on the main thread).
 
         If data for *set_code* is already loaded (or loading), this is a
-        no-op.  Otherwise it spawns a :class:`_SetDataWorker` and sets the
+        no-op.  Otherwise it spawns a :class:`SetDataWorker` and sets the
         draft row to yellow with loading steps.
         """
         if not set_code:
@@ -971,7 +524,7 @@ class OverlayApp:
         home = self.window.pack_tab.home_widget
         home.set_draft_loading(f"Detected {set_code} — loading data...")
 
-        worker = _SetDataWorker(set_code, self.mapper, self._scryfall_dir)
+        worker = SetDataWorker(set_code, self.mapper, self._scryfall_dir)
         worker.progress.connect(self._on_set_data_progress)
         worker.finished_ok.connect(self._on_set_data_ready)
         worker.finished_err.connect(self._on_set_data_error)
@@ -984,7 +537,7 @@ class OverlayApp:
         """Update the draft row with the current loading step."""
         self.window.pack_tab.home_widget.set_draft_loading(msg)
 
-    def _on_set_data_ready(self, result: _SetDataResult) -> None:
+    def _on_set_data_ready(self, result: SetDataResult) -> None:
         """Set-specific data loaded — update mapper and scryfall cards."""
         self.scryfall_cards = result.scryfall_cards
         self.window.pack_tab.set_scryfall(self.scryfall_cards)
@@ -1041,7 +594,7 @@ class OverlayApp:
         pending = list(self._pending_events)
         self._pending_events.clear()
         for event, replaying in pending:
-            sig = _event_signature(event)
+            sig = event_signature(event)
             if sig is not None:
                 self._recent_event_signatures.pop(sig, None)
             self._on_event(event, replaying)
@@ -1240,7 +793,7 @@ class OverlayApp:
         signature with a 2 s window — first source wins.
 
         ``replaying`` is the snapshot captured at emit time when the event
-        was queued by ``_UiMarshaler``. For direct (synchronous) calls from
+        was queued by ``UiMarshaler``. For direct (synchronous) calls from
         within this method or from main-thread slots, pass it explicitly or
         leave None to read the watcher's current flag.
         """
@@ -1253,7 +806,7 @@ class OverlayApp:
         # handler) records ("end",) in the dict, which then silently drops
         # every real DraftEnd that follows within 2 s — leaving the overlay
         # in the pick view after replay.
-        if not replaying and _should_drop_duplicate(
+        if not replaying and should_drop_duplicate(
             event, self._recent_event_signatures,
         ):
             logger.debug("Dropping duplicate event %s", type(event).__name__)
@@ -1651,7 +1204,7 @@ class OverlayApp:
         )
         self.window.pack_tab.set_recommend_count(self.state.recommend_count)
 
-        worker = _PredictionWorker(
+        worker = PredictionWorker(
             self.api_client,
             pack_cards=self.state.current_pack,
             pool_cards=self.state.pool,
@@ -1685,12 +1238,12 @@ class OverlayApp:
 
     def _on_prediction_finished(
         self,
-        worker: _PredictionWorker,
+        worker: PredictionWorker,
         results: list,
         pack_number: int,
         pick_number: int,
     ) -> None:
-        """Apply prediction results delivered from a ``_PredictionWorker``."""
+        """Apply prediction results delivered from a ``PredictionWorker``."""
         if worker is not self._current_predict_worker:
             logger.debug(
                 "Discarding stale prediction worker result for P%dP%d",
@@ -1780,12 +1333,12 @@ class OverlayApp:
 
     def _on_prediction_failed(
         self,
-        worker: _PredictionWorker,
+        worker: PredictionWorker,
         error: str,
         pack_number: int,
         pick_number: int,
     ) -> None:
-        """Handle a failed prediction call from ``_PredictionWorker``."""
+        """Handle a failed prediction call from ``PredictionWorker``."""
         if worker is not self._current_predict_worker:
             return
         self._current_predict_worker = None
@@ -2056,7 +1609,7 @@ def main() -> None:
 
     def _start_boot() -> None:
         """Kick off the normal boot sequence (called after update check)."""
-        boot_worker = _BootWorker(args, config, env)
+        boot_worker = BootWorker(args, config, env)
         boot_worker.progress.connect(_on_boot_progress)
         boot_worker.finished_ok.connect(_on_boot_done)
         boot_worker.finished_err.connect(_on_boot_error)
@@ -2067,7 +1620,7 @@ def main() -> None:
     def _on_boot_progress(msg: str) -> None:
         window.status.setText(msg)
 
-    def _on_boot_done(result: _BootResult) -> None:
+    def _on_boot_done(result: BootResult) -> None:
         overlay = OverlayApp(
             mapper=result.mapper,
             api_client=result.api_client,
@@ -2109,7 +1662,7 @@ def main() -> None:
         logger.warning("Update failed, continuing normally: %s", msg)
         _start_boot()
 
-    update_worker = _UpdateWorker()
+    update_worker = UpdateWorker()
     update_worker.progress.connect(_on_update_progress)
     update_worker.no_update.connect(_on_no_update)
     update_worker.update_ready.connect(_on_update_ready)

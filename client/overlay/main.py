@@ -43,11 +43,11 @@ from client.overlay.log_watcher import (
     is_arena_running,
 )
 from client.overlay.managers.prediction import PredictionManager, PredictionRequest
+from client.overlay.managers.set_data import SetDataManager
 from client.overlay.managers.workers import (
     ArenaCurrentEventWorker,
     ArenaIdentityWorker,
     SetDataResult,
-    SetDataWorker,
 )
 from client.overlay.memory_watcher import MemoryWatcher
 from client.overlay.single_instance import SingleInstance
@@ -94,15 +94,11 @@ class OverlayApp:
 
         # Server-supported sets (queried at boot).
         self._server_supported_sets: list[str] = server_supported_sets or []
-        # Set code whose data is currently loaded (or loading).
-        self._loaded_set: str = ""
-        self._set_data_ready = False
-        self._set_data_worker: SetDataWorker | None = None
-        # Workers still running. self._set_data_worker only points at the
-        # latest one; without this set, replacing the pointer drops the
-        # Python ref while QThread.run is still active and Python GCs it →
-        # "QThread: Destroyed while thread is still running".
-        self._inflight_set_workers: set[SetDataWorker] = set()
+        # Lazy per-set data loading (worker + 90s watchdog), signal-driven.
+        self._set_data = SetDataManager(mapper, self._scryfall_dir)
+        self._set_data.progress.connect(self._on_set_data_progress)
+        self._set_data.ready.connect(self._on_set_data_ready)
+        self._set_data.failed.connect(self._on_set_data_error)
         # Whether the current set is untrained (no model support).
         self._set_untrained = False
         # Current lobby context (e.g. "TMT_Quick_Draft"), empty when not in a lobby.
@@ -493,42 +489,23 @@ class OverlayApp:
         """Start loading set-specific data (must be called on the main thread).
 
         If data for *set_code* is already loaded (or loading), this is a
-        no-op.  Otherwise it spawns a :class:`SetDataWorker` and sets the
-        draft row to yellow with loading steps.
+        no-op.  Otherwise the SetDataManager spawns a worker and the
+        draft row goes yellow with loading steps.
         """
         if not set_code:
             return
-        if self._loaded_set == set_code and self._set_data_ready:
-            return
-        if (
-            self._set_data_worker is not None
-            and self._set_data_worker.isRunning()
-            and self._loaded_set == set_code
-        ):
-            return  # already loading this set
-
         # Only drop pending events when switching sets — otherwise we race
         # with the watcher thread, which may have queued events for this
         # same set between emitting set_load_requested and this handler
         # running.
-        if self._loaded_set and self._loaded_set != set_code:
+        if self._set_data.loaded_set and self._set_data.loaded_set != set_code:
             self._pending_events.clear()
 
-        self._loaded_set = set_code
-        self._set_data_ready = False
-        self._set_untrained = False
-
-        home = self.window.pack_tab.home_widget
-        home.set_draft_loading(f"Detected {set_code} — loading data...")
-
-        worker = SetDataWorker(set_code, self.mapper, self._scryfall_dir)
-        worker.progress.connect(self._on_set_data_progress)
-        worker.finished_ok.connect(self._on_set_data_ready)
-        worker.finished_err.connect(self._on_set_data_error)
-        worker.finished.connect(lambda w=worker: self._inflight_set_workers.discard(w))
-        self._inflight_set_workers.add(worker)
-        self._set_data_worker = worker
-        worker.start()
+        if self._set_data.ensure(set_code):
+            self._set_untrained = False
+            self.window.pack_tab.home_widget.set_draft_loading(
+                f"Detected {set_code} — loading data...",
+            )
 
     def _on_set_data_progress(self, msg: str) -> None:
         """Update the draft row with the current loading step."""
@@ -538,7 +515,6 @@ class OverlayApp:
         """Set-specific data loaded — update mapper and scryfall cards."""
         self.scryfall_cards = result.scryfall_cards
         self.window.pack_tab.set_scryfall(self.scryfall_cards)
-        self._set_data_ready = True
 
         home = self.window.pack_tab.home_widget
         home.set_draft_loading("")  # clear loading message
@@ -572,13 +548,10 @@ class OverlayApp:
 
         self._flush_pending_events()
 
-    def _on_set_data_error(self, msg: str) -> None:
-        """Handle set data loading failure."""
-        logger.error("Failed to load set data: %s", msg)
+    def _on_set_data_error(self, set_code: str, msg: str) -> None:
+        """Handle set data loading failure (manager already degraded to ready)."""
         home = self.window.pack_tab.home_widget
         home.set_draft_loading(f"Data load error: {msg}")
-        # Allow draft to proceed anyway — predictions may partially work.
-        self._set_data_ready = True
         self._flush_pending_events()
 
     def _flush_pending_events(self) -> None:
@@ -630,13 +603,13 @@ class OverlayApp:
         # Kick off (or pre-kick) set data load using the event name when
         # nothing else has triggered it yet — typical at overlay startup
         # straight into the deck-builder.
-        if event.event_name and not self._loaded_set:
+        if event.event_name and not self._set_data.loaded_set:
             from client.overlay.draft_state import extract_set_code
             code = extract_set_code(event.event_name)
             if code:
                 self._ensure_set_data(code)
 
-        if not self._set_data_ready:
+        if not self._set_data.is_ready:
             self._deferred_deck_pool = event
             logger.info(
                 "Deferred DeckPoolDetectedEvent (event=%s, ids=%d) — "
@@ -813,8 +786,7 @@ class OverlayApp:
             logger.info("Log rotated — resetting draft state, showing home")
             self.state = DraftState()
             self._draft_completed = False
-            self._loaded_set = ""
-            self._set_data_ready = False
+            self._set_data.reset()
             self._set_untrained = False
             self._in_lobby_context = ""
             self._pending_events.clear()
@@ -902,7 +874,7 @@ class OverlayApp:
                     self.window.pack_tab.home_widget.set_draft_active(True)
                 if self.state.set_code:
                     self.window.load_card_translations_async(self.state.set_code)
-                if self.state.current_pack and self._set_data_ready:
+                if self.state.current_pack and self._set_data.is_ready:
                     self._run_prediction()
                 elif self.state.current_pack:
                     # Data still loading — prediction will run once data is ready.
@@ -976,7 +948,7 @@ class OverlayApp:
             code = extract_set_code(event.context)
             if code:
                 # If data is already loaded for this set, just show ready.
-                if self._loaded_set == code and self._set_data_ready:
+                if self._set_data.loaded_set == code and self._set_data.is_ready:
                     logger.info("Set data already loaded for %s — lobby ready", code)
                     # Re-apply the untrained warning from cached state —
                     # leaving the lobby cleared the home-tab flag, so we
@@ -1039,9 +1011,9 @@ class OverlayApp:
 
         elif isinstance(event, PackEvent):
             # If set data is not ready yet, queue the event for replay.
-            if not self._set_data_ready:
+            if not self._set_data.is_ready:
                 # Try to extract set code from the event to start loading.
-                if not self._loaded_set and event.event_name:
+                if not self._set_data.loaded_set and event.event_name:
                     from client.overlay.draft_state import extract_set_code
                     code = extract_set_code(event.event_name)
                     if code:
@@ -1099,7 +1071,7 @@ class OverlayApp:
 
         elif isinstance(event, PickEvent):
             # Queue pick events while set data is loading.
-            if not self._set_data_ready:
+            if not self._set_data.is_ready:
                 self._pending_events.append((event, replaying))
                 return
             if event.card_grpids:

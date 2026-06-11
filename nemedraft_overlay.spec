@@ -115,7 +115,6 @@ hiddenimports = [
     "client.overlay.ui.screen_utils",
     "client.overlay.ui.summary_tab",
     "client.overlay.ui.view_mode",
-    "client.overlay.ui.styles",
     "client.overlay.ui.theme",
     "client.overlay.ui.theme.tokens",
     "client.overlay.ui.theme.qss",

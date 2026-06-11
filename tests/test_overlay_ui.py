@@ -48,14 +48,6 @@ def test_palette_tokens_exist():
     assert tokens.MEDAL_GOLD == "#E8C268"
 
 
-def test_legacy_styles_shim_resolves_to_tokens():
-    from client.overlay.ui import styles
-    from client.overlay.ui.theme import tokens
-    assert styles.BG_PRIMARY == tokens.L0_WINDOW_OPAQUE
-    assert styles.ACCENT_GOLD == tokens.ACCENT
-    assert styles.medal_color is tokens.medal_color
-
-
 def test_score_bar_renders_with_score(qapp):
     from client.overlay.ui.widgets.score_bar import ScoreBar
     bar = ScoreBar()

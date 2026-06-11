@@ -9,12 +9,10 @@
     "no_predictions": "No predictions available",
     "pool_count": "Pool: {count} cards",
     "pack_pick": "{set_code} — Pack {pack}, Pick {pick}",
-
     "tab_home": "Home",
     "tab_pack": "Pack",
     "tab_deck": "Deck",
     "tab_settings": "Settings",
-
     "home_title": "Welcome to NemeDraft",
     "home_subtitle": "Launch MTG Arena and start a draft — the overlay will activate automatically.",
     "home_arena_status": "MTG Arena Client",
@@ -43,54 +41,43 @@
     "home_login_microsoft": "Sign in with Microsoft",
     "home_login_discord": "Sign in with Discord",
     "home_logout_btn": "Log out",
-
     "col_rank": "#",
     "col_card": "Card",
     "col_type": "Type",
     "col_score": "Score",
     "col_gihwr": "GIH%",
     "col_ata": "ATA",
-
     "taken_separator": "— Taken ({count}) —",
     "wheel_title": "Seen Cards (Wheel)",
-
     "mana_curve_label": "Mana Curve",
     "deck_balance_label": "Deck Balance",
     "commitment_label": "Commitment",
     "open_lanes_label": "Open Lanes",
     "spells_count": "{total}/23 spells",
-
     "pie_creatures": "Cre",
     "pie_spells": "Spl",
     "pie_lands": "Lnd",
-
     "section_data": "17Lands Data",
     "player_group_label": "Player Group:",
     "player_group_tooltip": "Filter 17Lands statistics by player skill bracket.\nHigher brackets give data from stronger drafters.",
-
     "section_overlay": "Overlay",
     "opacity_label": "Opacity:",
     "opacity_tooltip": "Window transparency level.\nLower values make the overlay more see-through.",
-
     "section_language": "Language",
     "language_label": "Language:",
     "language_tooltip": "Display language for the overlay UI and card names.\nCard names are translated using Scryfall data.",
-
     "section_cache": "Cache",
     "clear_cache_btn": "Clear Image Cache",
     "cache_cleared": "Cleared {count} files",
     "cache_info": "Card art cache: {size}",
-
     "section_logs": "Logs",
     "export_logs_btn": "Export Logs",
     "logs_exported": "Exported!",
-
     "toggle_compact_tooltip": "Toggle compact / full view",
     "close_tooltip": "Close overlay",
     "minimize_tooltip": "Minimize overlay (hide to tray)",
     "tray_show": "Show NemeDraft",
     "tray_quit": "Quit",
-
     "archetype_label": "Archetype:",
     "copy_deck_btn": "Copy",
     "deck_stats": "Score: {score}  |  Creatures: {creatures}  Spells: {spells}  Lands: {lands}  |  Avg CMC: {cmc}",
@@ -116,9 +103,18 @@
     "update_download_progress": "Downloading update… {pct}%",
     "update_applying": "Applying update — restarting…",
     "update_failed": "Update failed: {error}",
-    "startup_error": "Startup error: {error}"
+    "startup_error": "Startup error: {error}",
+    "tab_summary": "Summary",
+    "summary_header": "Draft complete — {set_code} {arena_format}",
+    "summary_follow_rate": "Followed top pick: {followed}/{rated} rated picks",
+    "summary_picks_made": "{count} picks recorded",
+    "summary_copy_deck_btn": "Copy deck for Arena",
+    "summary_copy_pool_btn": "Copy pool",
+    "summary_no_suggestion": "Deck suggestion is loading…",
+    "summary_suggested_build": "Suggested build: {archetype} — {spells} spells / {lands} lands",
+    "summary_recap_title": "Pick recap",
+    "summary_ai_pick": "AI: {card}"
   },
-
   "fr": {
     "app_title": "NemeDraft Overlay",
     "header_default": "NemeDraft",
@@ -129,12 +125,10 @@
     "no_predictions": "Aucune prédiction disponible",
     "pool_count": "Réserve : {count} cartes",
     "pack_pick": "{set_code} — Booster {pack}, Choix {pick}",
-
     "tab_home": "Accueil",
     "tab_pack": "Booster",
     "tab_deck": "Deck",
     "tab_settings": "Paramètres",
-
     "home_title": "Bienvenue sur NemeDraft",
     "home_subtitle": "Lancez MTG Arena et démarrez un draft — l'overlay s'activera automatiquement.",
     "home_arena_status": "Client MTG Arena",
@@ -163,52 +157,41 @@
     "home_login_microsoft": "Se connecter avec Microsoft",
     "home_login_discord": "Se connecter avec Discord",
     "home_logout_btn": "Se déconnecter",
-
     "col_rank": "#",
     "col_card": "Carte",
     "col_type": "Type",
     "col_score": "Score",
     "col_gihwr": "GIH%",
     "col_ata": "ATA",
-
     "taken_separator": "— Pris ({count}) —",
     "wheel_title": "Cartes vues (Roue)",
-
     "mana_curve_label": "Courbe de mana",
     "deck_balance_label": "Équilibre du deck",
     "commitment_label": "Engagement",
     "open_lanes_label": "Voies ouvertes",
     "spells_count": "{total}/23 sorts",
-
     "pie_creatures": "Cré",
     "pie_spells": "Srt",
     "pie_lands": "Ter",
-
     "section_data": "Données 17Lands",
     "player_group_label": "Groupe de joueurs :",
     "player_group_tooltip": "Filtrer les statistiques 17Lands par niveau de compétence.\nLes groupes supérieurs donnent des données de drafteurs plus forts.",
-
     "section_overlay": "Overlay",
     "opacity_label": "Opacité :",
     "opacity_tooltip": "Niveau de transparence de la fenêtre.\nDes valeurs plus basses rendent l'overlay plus transparent.",
-
     "section_language": "Langue",
     "language_label": "Langue :",
     "language_tooltip": "Langue d'affichage de l'overlay et des noms de cartes.\nLes noms de cartes sont traduits via les données Scryfall.",
-
     "section_cache": "Cache",
     "clear_cache_btn": "Vider le cache d'images",
     "cache_cleared": "{count} fichiers supprimés",
     "cache_info": "Cache des illustrations : {size}",
-
     "section_logs": "Journaux",
     "export_logs_btn": "Exporter les journaux",
     "logs_exported": "Exporté !",
-
     "toggle_compact_tooltip": "Basculer vue compacte / complète",
     "close_tooltip": "Fermer l'overlay",
     "minimize_tooltip": "Réduire l'overlay",
-
     "archetype_label": "Archétype :",
     "copy_deck_btn": "Copier",
     "deck_stats": "Score : {score}  |  Créatures : {creatures}  Sorts : {spells}  Terrains : {lands}  |  CMC moy : {cmc}",
@@ -234,9 +217,18 @@
     "update_download_progress": "Téléchargement de la mise à jour… {pct}%",
     "update_applying": "Application de la mise à jour — redémarrage…",
     "update_failed": "Échec de la mise à jour : {error}",
-    "startup_error": "Erreur de démarrage : {error}"
+    "startup_error": "Erreur de démarrage : {error}",
+    "tab_summary": "Résumé",
+    "summary_header": "Draft terminé — {set_code} {arena_format}",
+    "summary_follow_rate": "Meilleur choix suivi : {followed}/{rated} picks notés",
+    "summary_picks_made": "{count} picks enregistrés",
+    "summary_copy_deck_btn": "Copier le deck pour Arena",
+    "summary_copy_pool_btn": "Copier le pool",
+    "summary_no_suggestion": "Suggestion de deck en cours…",
+    "summary_suggested_build": "Construction suggérée : {archetype} — {spells} sorts / {lands} terrains",
+    "summary_recap_title": "Récapitulatif des picks",
+    "summary_ai_pick": "IA : {card}"
   },
-
   "es": {
     "app_title": "NemeDraft Overlay",
     "header_default": "NemeDraft",
@@ -247,12 +239,10 @@
     "no_predictions": "Sin predicciones disponibles",
     "pool_count": "Reserva: {count} cartas",
     "pack_pick": "{set_code} — Sobre {pack}, Elección {pick}",
-
     "tab_home": "Inicio",
     "tab_pack": "Sobre",
     "tab_deck": "Mazo",
     "tab_settings": "Ajustes",
-
     "home_title": "Bienvenido a NemeDraft",
     "home_subtitle": "Inicia MTG Arena y comienza un draft — el overlay se activará automáticamente.",
     "home_arena_status": "Cliente MTG Arena",
@@ -281,52 +271,41 @@
     "home_login_microsoft": "Iniciar sesión con Microsoft",
     "home_login_discord": "Iniciar sesión con Discord",
     "home_logout_btn": "Cerrar sesión",
-
     "col_rank": "#",
     "col_card": "Carta",
     "col_type": "Tipo",
     "col_score": "Puntuación",
     "col_gihwr": "GIH%",
     "col_ata": "ATA",
-
     "taken_separator": "— Tomadas ({count}) —",
     "wheel_title": "Cartas vistas (Rueda)",
-
     "mana_curve_label": "Curva de maná",
     "deck_balance_label": "Equilibrio del mazo",
     "commitment_label": "Compromiso",
     "open_lanes_label": "Carriles abiertos",
     "spells_count": "{total}/23 hechizos",
-
     "pie_creatures": "Cri",
     "pie_spells": "Hch",
     "pie_lands": "Tie",
-
     "section_data": "Datos de 17Lands",
     "player_group_label": "Grupo de jugadores:",
     "player_group_tooltip": "Filtrar estadísticas de 17Lands por nivel de habilidad.\nLos grupos superiores dan datos de drafteadores más fuertes.",
-
     "section_overlay": "Overlay",
     "opacity_label": "Opacidad:",
     "opacity_tooltip": "Nivel de transparencia de la ventana.\nValores más bajos hacen el overlay más transparente.",
-
     "section_language": "Idioma",
     "language_label": "Idioma:",
     "language_tooltip": "Idioma de la interfaz del overlay y nombres de cartas.\nLos nombres de cartas se traducen con datos de Scryfall.",
-
     "section_cache": "Caché",
     "clear_cache_btn": "Limpiar caché de imágenes",
     "cache_cleared": "{count} archivos eliminados",
     "cache_info": "Caché de ilustraciones: {size}",
-
     "section_logs": "Registros",
     "export_logs_btn": "Exportar registros",
     "logs_exported": "¡Exportado!",
-
     "toggle_compact_tooltip": "Alternar vista compacta / completa",
     "close_tooltip": "Cerrar overlay",
     "minimize_tooltip": "Minimizar overlay",
-
     "archetype_label": "Arquetipo:",
     "copy_deck_btn": "Copiar",
     "deck_stats": "Puntuación: {score}  |  Criaturas: {creatures}  Hechizos: {spells}  Tierras: {lands}  |  CMC prom: {cmc}",
@@ -354,7 +333,6 @@
     "update_failed": "Error de actualización: {error}",
     "startup_error": "Error de inicio: {error}"
   },
-
   "de": {
     "app_title": "NemeDraft Overlay",
     "header_default": "NemeDraft",
@@ -365,12 +343,10 @@
     "no_predictions": "Keine Vorhersagen verfügbar",
     "pool_count": "Pool: {count} Karten",
     "pack_pick": "{set_code} — Booster {pack}, Pick {pick}",
-
     "tab_home": "Start",
     "tab_pack": "Booster",
     "tab_deck": "Deck",
     "tab_settings": "Einstellungen",
-
     "home_title": "Willkommen bei NemeDraft",
     "home_subtitle": "Starte MTG Arena und beginne einen Draft — das Overlay aktiviert sich automatisch.",
     "home_arena_status": "MTG Arena Client",
@@ -399,52 +375,41 @@
     "home_login_microsoft": "Mit Microsoft anmelden",
     "home_login_discord": "Mit Discord anmelden",
     "home_logout_btn": "Abmelden",
-
     "col_rank": "#",
     "col_card": "Karte",
     "col_type": "Typ",
     "col_score": "Wertung",
     "col_gihwr": "GIH%",
     "col_ata": "ATA",
-
     "taken_separator": "— Genommen ({count}) —",
     "wheel_title": "Gesehene Karten (Wheel)",
-
     "mana_curve_label": "Manakurve",
     "deck_balance_label": "Deck-Balance",
     "commitment_label": "Farbengagement",
     "open_lanes_label": "Offene Farben",
     "spells_count": "{total}/23 Zauber",
-
     "pie_creatures": "Kre",
     "pie_spells": "Zau",
     "pie_lands": "Lnd",
-
     "section_data": "17Lands-Daten",
     "player_group_label": "Spielergruppe:",
     "player_group_tooltip": "17Lands-Statistiken nach Spielerstärke filtern.\nHöhere Gruppen liefern Daten von stärkeren Draftern.",
-
     "section_overlay": "Overlay",
     "opacity_label": "Deckkraft:",
     "opacity_tooltip": "Transparenzstufe des Fensters.\nNiedrigere Werte machen das Overlay durchsichtiger.",
-
     "section_language": "Sprache",
     "language_label": "Sprache:",
     "language_tooltip": "Anzeigesprache für das Overlay und Kartennamen.\nKartennamen werden über Scryfall-Daten übersetzt.",
-
     "section_cache": "Cache",
     "clear_cache_btn": "Bild-Cache leeren",
     "cache_cleared": "{count} Dateien gelöscht",
     "cache_info": "Kartenbilder-Cache: {size}",
-
     "section_logs": "Protokolle",
     "export_logs_btn": "Protokolle exportieren",
     "logs_exported": "Exportiert!",
-
     "toggle_compact_tooltip": "Kompakt- / Vollansicht umschalten",
     "close_tooltip": "Overlay schließen",
     "minimize_tooltip": "Overlay minimieren",
-
     "archetype_label": "Archetyp:",
     "copy_deck_btn": "Kopieren",
     "deck_stats": "Wertung: {score}  |  Kreaturen: {creatures}  Zauber: {spells}  Länder: {lands}  |  Ø CMC: {cmc}",
@@ -472,7 +437,6 @@
     "update_failed": "Update fehlgeschlagen: {error}",
     "startup_error": "Startfehler: {error}"
   },
-
   "pt": {
     "app_title": "NemeDraft Overlay",
     "header_default": "NemeDraft",
@@ -483,12 +447,10 @@
     "no_predictions": "Sem previsões disponíveis",
     "pool_count": "Pool: {count} cartas",
     "pack_pick": "{set_code} — Booster {pack}, Escolha {pick}",
-
     "tab_home": "Início",
     "tab_pack": "Booster",
     "tab_deck": "Deck",
     "tab_settings": "Configurações",
-
     "home_title": "Bem-vindo ao NemeDraft",
     "home_subtitle": "Inicie o MTG Arena e comece um draft — o overlay será ativado automaticamente.",
     "home_arena_status": "Cliente MTG Arena",
@@ -517,52 +479,41 @@
     "home_login_microsoft": "Entrar com Microsoft",
     "home_login_discord": "Entrar com Discord",
     "home_logout_btn": "Sair",
-
     "col_rank": "#",
     "col_card": "Carta",
     "col_type": "Tipo",
     "col_score": "Pontuação",
     "col_gihwr": "GIH%",
     "col_ata": "ATA",
-
     "taken_separator": "— Pegadas ({count}) —",
     "wheel_title": "Cartas vistas (Wheel)",
-
     "mana_curve_label": "Curva de mana",
     "deck_balance_label": "Equilíbrio do deck",
     "commitment_label": "Comprometimento",
     "open_lanes_label": "Cores abertas",
     "spells_count": "{total}/23 feitiços",
-
     "pie_creatures": "Cri",
     "pie_spells": "Fei",
     "pie_lands": "Ter",
-
     "section_data": "Dados do 17Lands",
     "player_group_label": "Grupo de jogadores:",
     "player_group_tooltip": "Filtrar estatísticas do 17Lands por nível de habilidade.\nGrupos superiores fornecem dados de drafters mais fortes.",
-
     "section_overlay": "Overlay",
     "opacity_label": "Opacidade:",
     "opacity_tooltip": "Nível de transparência da janela.\nValores mais baixos tornam o overlay mais transparente.",
-
     "section_language": "Idioma",
     "language_label": "Idioma:",
     "language_tooltip": "Idioma da interface do overlay e nomes de cartas.\nNomes de cartas são traduzidos usando dados do Scryfall.",
-
     "section_cache": "Cache",
     "clear_cache_btn": "Limpar cache de imagens",
     "cache_cleared": "{count} arquivos removidos",
     "cache_info": "Cache de ilustrações: {size}",
-
     "section_logs": "Registros",
     "export_logs_btn": "Exportar registros",
     "logs_exported": "Exportado!",
-
     "toggle_compact_tooltip": "Alternar vista compacta / completa",
     "close_tooltip": "Fechar overlay",
     "minimize_tooltip": "Minimizar overlay",
-
     "archetype_label": "Arquétipo:",
     "copy_deck_btn": "Copiar",
     "deck_stats": "Pontuação: {score}  |  Criaturas: {creatures}  Feitiços: {spells}  Terrenos: {lands}  |  CMC méd: {cmc}",
@@ -590,7 +541,6 @@
     "update_failed": "Falha na atualização: {error}",
     "startup_error": "Erro de inicialização: {error}"
   },
-
   "it": {
     "app_title": "NemeDraft Overlay",
     "header_default": "NemeDraft",
@@ -601,12 +551,10 @@
     "no_predictions": "Nessuna previsione disponibile",
     "pool_count": "Pool: {count} carte",
     "pack_pick": "{set_code} — Busta {pack}, Scelta {pick}",
-
     "tab_home": "Home",
     "tab_pack": "Busta",
     "tab_deck": "Mazzo",
     "tab_settings": "Impostazioni",
-
     "home_title": "Benvenuto su NemeDraft",
     "home_subtitle": "Avvia MTG Arena e inizia un draft — l'overlay si attiverà automaticamente.",
     "home_arena_status": "Client MTG Arena",
@@ -635,52 +583,41 @@
     "home_login_microsoft": "Accedi con Microsoft",
     "home_login_discord": "Accedi con Discord",
     "home_logout_btn": "Esci",
-
     "col_rank": "#",
     "col_card": "Carta",
     "col_type": "Tipo",
     "col_score": "Punteggio",
     "col_gihwr": "GIH%",
     "col_ata": "ATA",
-
     "taken_separator": "— Prese ({count}) —",
     "wheel_title": "Carte viste (Wheel)",
-
     "mana_curve_label": "Curva di mana",
     "deck_balance_label": "Equilibrio del mazzo",
     "commitment_label": "Impegno",
     "open_lanes_label": "Colori aperti",
     "spells_count": "{total}/23 magie",
-
     "pie_creatures": "Cre",
     "pie_spells": "Mag",
     "pie_lands": "Ter",
-
     "section_data": "Dati 17Lands",
     "player_group_label": "Gruppo giocatori:",
     "player_group_tooltip": "Filtra le statistiche di 17Lands per livello di abilità.\nI gruppi superiori forniscono dati da drafter più forti.",
-
     "section_overlay": "Overlay",
     "opacity_label": "Opacità:",
     "opacity_tooltip": "Livello di trasparenza della finestra.\nValori più bassi rendono l'overlay più trasparente.",
-
     "section_language": "Lingua",
     "language_label": "Lingua:",
     "language_tooltip": "Lingua dell'interfaccia dell'overlay e dei nomi delle carte.\nI nomi delle carte sono tradotti tramite i dati di Scryfall.",
-
     "section_cache": "Cache",
     "clear_cache_btn": "Svuota cache immagini",
     "cache_cleared": "{count} file eliminati",
     "cache_info": "Cache illustrazioni: {size}",
-
     "section_logs": "Registri",
     "export_logs_btn": "Esporta registri",
     "logs_exported": "Esportato!",
-
     "toggle_compact_tooltip": "Alterna vista compatta / completa",
     "close_tooltip": "Chiudi overlay",
     "minimize_tooltip": "Riduci overlay",
-
     "archetype_label": "Archetipo:",
     "copy_deck_btn": "Copia",
     "deck_stats": "Punteggio: {score}  |  Creature: {creatures}  Magie: {spells}  Terre: {lands}  |  CMC med: {cmc}",
@@ -708,7 +645,6 @@
     "update_failed": "Aggiornamento fallito: {error}",
     "startup_error": "Errore di avvio: {error}"
   },
-
   "ja": {
     "app_title": "NemeDraft Overlay",
     "header_default": "NemeDraft",
@@ -719,12 +655,10 @@
     "no_predictions": "予測なし",
     "pool_count": "プール: {count}枚",
     "pack_pick": "{set_code} — パック{pack}, ピック{pick}",
-
     "tab_home": "ホーム",
     "tab_pack": "パック",
     "tab_deck": "デッキ",
     "tab_settings": "設定",
-
     "home_title": "NemeDraftへようこそ",
     "home_subtitle": "MTG Arenaを起動してドラフトを開始すると、オーバーレイが自動的にアクティブになります。",
     "home_arena_status": "MTG Arenaクライアント",
@@ -753,52 +687,41 @@
     "home_login_microsoft": "Microsoft でサインイン",
     "home_login_discord": "Discord でサインイン",
     "home_logout_btn": "ログアウト",
-
     "col_rank": "#",
     "col_card": "カード",
     "col_type": "タイプ",
     "col_score": "スコア",
     "col_gihwr": "GIH%",
     "col_ata": "ATA",
-
     "taken_separator": "— 取得済み ({count}) —",
     "wheel_title": "確認済みカード (ホイール)",
-
     "mana_curve_label": "マナカーブ",
     "deck_balance_label": "デッキバランス",
     "commitment_label": "色拘束",
     "open_lanes_label": "空き色",
     "spells_count": "{total}/23 呪文",
-
     "pie_creatures": "ク",
     "pie_spells": "呪",
     "pie_lands": "土",
-
     "section_data": "17Landsデータ",
     "player_group_label": "プレイヤーグループ:",
     "player_group_tooltip": "プレイヤーのスキル帯で17Lands統計をフィルタリング。",
-
     "section_overlay": "オーバーレイ",
     "opacity_label": "不透明度:",
     "opacity_tooltip": "ウィンドウの透明度レベル。",
-
     "section_language": "言語",
     "language_label": "言語:",
     "language_tooltip": "オーバーレイUIとカード名の表示言語。\nカード名はScryfallデータで翻訳されます。",
-
     "section_cache": "キャッシュ",
     "clear_cache_btn": "画像キャッシュを削除",
     "cache_cleared": "{count}ファイル削除",
     "cache_info": "カードアートキャッシュ: {size}",
-
     "section_logs": "ログ",
     "export_logs_btn": "ログをエクスポート",
     "logs_exported": "エクスポート完了！",
-
     "toggle_compact_tooltip": "コンパクト/フル表示切替",
     "close_tooltip": "オーバーレイを閉じる",
     "minimize_tooltip": "オーバーレイを最小化",
-
     "archetype_label": "アーキタイプ:",
     "copy_deck_btn": "コピー",
     "deck_stats": "スコア: {score}  |  クリーチャー: {creatures}  呪文: {spells}  土地: {lands}  |  平均CMC: {cmc}",
@@ -826,7 +749,6 @@
     "update_failed": "アップデート失敗: {error}",
     "startup_error": "起動エラー: {error}"
   },
-
   "ko": {
     "app_title": "NemeDraft Overlay",
     "header_default": "NemeDraft",
@@ -837,12 +759,10 @@
     "no_predictions": "예측 없음",
     "pool_count": "풀: {count}장",
     "pack_pick": "{set_code} — 팩 {pack}, 픽 {pick}",
-
     "tab_home": "홈",
     "tab_pack": "팩",
     "tab_deck": "덱",
     "tab_settings": "설정",
-
     "home_title": "NemeDraft에 오신 것을 환영합니다",
     "home_subtitle": "MTG Arena를 실행하고 드래프트를 시작하면 오버레이가 자동으로 활성화됩니다.",
     "home_arena_status": "MTG Arena 클라이언트",
@@ -870,52 +790,41 @@
     "home_login_microsoft": "Microsoft로 로그인",
     "home_login_discord": "Discord로 로그인",
     "home_logout_btn": "로그아웃",
-
     "col_rank": "#",
     "col_card": "카드",
     "col_type": "유형",
     "col_score": "점수",
     "col_gihwr": "GIH%",
     "col_ata": "ATA",
-
     "taken_separator": "— 선택됨 ({count}) —",
     "wheel_title": "확인된 카드 (휠)",
-
     "mana_curve_label": "마나 커브",
     "deck_balance_label": "덱 밸런스",
     "commitment_label": "색 약속",
     "open_lanes_label": "열린 색",
     "spells_count": "{total}/23 주문",
-
     "pie_creatures": "생",
     "pie_spells": "주",
     "pie_lands": "대",
-
     "section_data": "17Lands 데이터",
     "player_group_label": "플레이어 그룹:",
     "player_group_tooltip": "플레이어 실력 등급으로 17Lands 통계를 필터링합니다.",
-
     "section_overlay": "오버레이",
     "opacity_label": "불투명도:",
     "opacity_tooltip": "창의 투명도 수준.",
-
     "section_language": "언어",
     "language_label": "언어:",
     "language_tooltip": "오버레이 UI 및 카드 이름 표시 언어.\n카드 이름은 Scryfall 데이터로 번역됩니다.",
-
     "section_cache": "캐시",
     "clear_cache_btn": "이미지 캐시 삭제",
     "cache_cleared": "{count}개 파일 삭제",
     "cache_info": "카드 아트 캐시: {size}",
-
     "section_logs": "로그",
     "export_logs_btn": "로그 내보내기",
     "logs_exported": "내보내기 완료!",
-
     "toggle_compact_tooltip": "컴팩트 / 전체 보기 전환",
     "close_tooltip": "오버레이 닫기",
     "minimize_tooltip": "오버레이 최소화",
-
     "archetype_label": "아키타입:",
     "copy_deck_btn": "복사",
     "deck_stats": "점수: {score}  |  생물: {creatures}  주문: {spells}  대지: {lands}  |  평균 CMC: {cmc}",
@@ -943,7 +852,6 @@
     "update_failed": "업데이트 실패: {error}",
     "startup_error": "시작 오류: {error}"
   },
-
   "zh-Hans": {
     "app_title": "NemeDraft Overlay",
     "header_default": "NemeDraft",
@@ -954,12 +862,10 @@
     "no_predictions": "无预测可用",
     "pool_count": "牌池: {count}张",
     "pack_pick": "{set_code} — 包{pack}, 选{pick}",
-
     "tab_home": "首页",
     "tab_pack": "补充包",
     "tab_deck": "套牌",
     "tab_settings": "设置",
-
     "home_title": "欢迎使用 NemeDraft",
     "home_subtitle": "启动 MTG Arena 并开始轮抽 — 覆盖层将自动激活。",
     "home_arena_status": "MTG Arena 客户端",
@@ -987,52 +893,41 @@
     "home_login_microsoft": "使用 Microsoft 登录",
     "home_login_discord": "使用 Discord 登录",
     "home_logout_btn": "退出登录",
-
     "col_rank": "#",
     "col_card": "卡牌",
     "col_type": "类型",
     "col_score": "评分",
     "col_gihwr": "GIH%",
     "col_ata": "ATA",
-
     "taken_separator": "— 已选 ({count}) —",
     "wheel_title": "已见卡牌 (绕桌)",
-
     "mana_curve_label": "法力曲线",
     "deck_balance_label": "套牌平衡",
     "commitment_label": "颜色投入",
     "open_lanes_label": "开放颜色",
     "spells_count": "{total}/23 咒语",
-
     "pie_creatures": "生",
     "pie_spells": "咒",
     "pie_lands": "地",
-
     "section_data": "17Lands数据",
     "player_group_label": "玩家组:",
     "player_group_tooltip": "按玩家技能等级筛选17Lands统计数据。",
-
     "section_overlay": "覆盖层",
     "opacity_label": "不透明度:",
     "opacity_tooltip": "窗口透明度级别。",
-
     "section_language": "语言",
     "language_label": "语言:",
     "language_tooltip": "覆盖层UI和卡牌名称的显示语言。\n卡牌名称通过Scryfall数据翻译。",
-
     "section_cache": "缓存",
     "clear_cache_btn": "清除图片缓存",
     "cache_cleared": "已删除{count}个文件",
     "cache_info": "卡牌图片缓存: {size}",
-
     "section_logs": "日志",
     "export_logs_btn": "导出日志",
     "logs_exported": "已导出！",
-
     "toggle_compact_tooltip": "切换紧凑/完整视图",
     "close_tooltip": "关闭覆盖层",
     "minimize_tooltip": "最小化覆盖层",
-
     "archetype_label": "原型:",
     "copy_deck_btn": "复制",
     "deck_stats": "评分: {score}  |  生物: {creatures}  咒语: {spells}  地: {lands}  |  平均CMC: {cmc}",

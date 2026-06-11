@@ -32,6 +32,7 @@ from client.overlay.ui.deck_tab import DeckTab
 from client.overlay.ui.pack_tab import PackTab
 from client.overlay.ui.settings_tab import SettingsTab
 from client.overlay.ui.styles import OVERLAY_STYLESHEET, TRANSPARENT_STYLESHEET
+from client.overlay.ui.summary_tab import SummaryTab
 from client.overlay.ui.toast import ToastHost
 
 
@@ -75,6 +76,7 @@ class OverlayWindow(QWidget):
     deck_suggestions_ready = Signal(dict, list, dict)  # dict[str, DeckSuggestion], list[str], scryfall_cards
     pick_history_ready = Signal(object)    # dict[(int,int), PickHistoryEntry]
     draft_complete_signal = Signal()       # switch to deck tab on UI thread
+    draft_summary_ready = Signal(object)   # DraftSummary — reveal summary tab
     card_art_ready = Signal(str, object)   # card_name, Path | None — per-card art arrival
 
     def __init__(
@@ -119,6 +121,7 @@ class OverlayWindow(QWidget):
         self.deck_suggestions_ready.connect(self._on_deck_suggestions)
         self.pick_history_ready.connect(self._on_pick_history)
         self.draft_complete_signal.connect(self._on_draft_complete)
+        self.draft_summary_ready.connect(self._on_draft_summary)
         self.card_art_ready.connect(self._on_card_art_ready)
         self._show_status(tr("waiting_for_draft"))
 
@@ -237,18 +240,23 @@ class OverlayWindow(QWidget):
         self.tabs = QTabWidget()
         self.pack_tab = PackTab(show_art=self._show_art)
         self.deck_tab = DeckTab()
+        self.summary_tab = SummaryTab()
         self.settings_tab = SettingsTab(self._config)
 
         self.tabs.addTab(self.pack_tab, tr("tab_pack"))
         self.tabs.addTab(self.deck_tab, tr("tab_deck"))
+        self.tabs.addTab(self.summary_tab, tr("tab_summary"))
         self.tabs.addTab(self.settings_tab, tr("tab_settings"))
         # Store tab indices for retranslation.
         self._tab_pack_idx = 0
         self._tab_deck_idx = 1
-        self._tab_settings_idx = 2
+        self._tab_summary_idx = 2
+        self._tab_settings_idx = 3
 
-        # Hide deck/settings tabs until boot completes.
+        # Hide deck/settings tabs until boot completes; the summary tab
+        # only appears once a draft completes.
         self.tabs.setTabVisible(self._tab_deck_idx, False)
+        self.tabs.setTabVisible(self._tab_summary_idx, False)
         self.tabs.setTabVisible(self._tab_settings_idx, False)
 
         # Hide entire tabbed area during boot — shown after boot completes.
@@ -377,6 +385,24 @@ class OverlayWindow(QWidget):
     def show_draft_complete(self) -> None:
         """Thread-safe: emit signal to switch to the deck tab."""
         self.draft_complete_signal.emit()
+
+    def show_draft_summary(self, summary: object) -> None:
+        """Thread-safe: populate and reveal the summary tab."""
+        self.draft_summary_ready.emit(summary)
+
+    def hide_draft_summary(self) -> None:
+        """Clear and hide the summary tab (next draft started)."""
+        self.summary_tab.clear()
+        self.tabs.setTabVisible(self._tab_summary_idx, False)
+
+    @Slot(object)
+    def _on_draft_summary(self, summary: object) -> None:
+        """Reveal the summary tab and focus it (runs on UI thread)."""
+        if self._compact:
+            self._toggle_compact()
+        self.summary_tab.set_summary(summary)
+        self.tabs.setTabVisible(self._tab_summary_idx, True)
+        self.tabs.setCurrentIndex(self._tab_summary_idx)
 
     # -- live-applied settings -------------------------------------------------
 
@@ -568,11 +594,13 @@ class OverlayWindow(QWidget):
         self._close_btn.setToolTip(tr("close_tooltip"))
         self.tabs.setTabText(self._tab_pack_idx, tr("tab_pack"))
         self.tabs.setTabText(self._tab_deck_idx, tr("tab_deck"))
+        self.tabs.setTabText(self._tab_summary_idx, tr("tab_summary"))
         self.tabs.setTabText(self._tab_settings_idx, tr("tab_settings"))
         # Delegate static labels to child tabs.
         self.settings_tab.retranslate()
         self.pack_tab.retranslate()
         self.deck_tab.retranslate()
+        self.summary_tab.retranslate()
         # Re-render cached pack results so card names update.
         if self._last_results:
             self.pack_tab.update_predictions(
@@ -756,6 +784,11 @@ class OverlayWindow(QWidget):
         if suggestions:
             best_key = max(suggestions, key=lambda k: suggestions[k].score)
             self.pack_tab.update_deck_stats(suggestions[best_key])
+            # The summary tab's deck section fills in when suggestions land
+            # (they arrive async after draft completion).
+            self.summary_tab.set_best_suggestion(
+                suggestions[best_key], pool_names,
+            )
 
     def _on_archetype_changed(self, key: str) -> None:
         """When user selects a different archetype in the Deck tab, update Pack stats."""

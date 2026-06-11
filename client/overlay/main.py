@@ -510,6 +510,15 @@ class OverlayApp:
         if self.config.features.deck_builder_enabled:
             self._update_deck_suggestions()
         self.window.show_draft_complete()
+        self._show_draft_summary()
+
+    def _show_draft_summary(self) -> None:
+        """Build and reveal the draft-end summary from the current state."""
+        from client.overlay.draft_summary import build_draft_summary
+
+        summary = build_draft_summary(self.state)
+        if summary.pool or summary.rows:
+            self.window.show_draft_summary(summary)
 
     def _on_login_google(self) -> None:
         """Handle Google login button click (runs OAuth in background thread)."""
@@ -586,6 +595,7 @@ class OverlayApp:
             self._set_untrained = False
             self._in_lobby_context = ""
             self._pending_events.clear()
+            self.window.hide_draft_summary()
             self.window.show_draft_ended()
             return
 
@@ -620,6 +630,7 @@ class OverlayApp:
             if self.config.features.deck_builder_enabled:
                 self._update_deck_suggestions()
             self.window.show_draft_complete()
+            self._show_draft_summary()
             return
 
         if isinstance(event, DeckPoolDetectedEvent):
@@ -766,6 +777,7 @@ class OverlayApp:
 
             self.state.on_draft_start(event.event_name)
             self._draft_completed = False
+            self.window.hide_draft_summary()
 
             # Clear stale cache from a previous draft session so
             # restore_pool_if_needed won't load an outdated pool.

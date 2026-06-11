@@ -537,45 +537,14 @@ class DeckTab(QWidget):
     def _copy_to_clipboard(self) -> None:
         from PySide6.QtWidgets import QApplication
 
+        from client.overlay.deck_export import build_arena_deck_string
+
         sug = self._suggestions.get(self._current_key)
         if not sug:
             return
 
-        # MTG Arena format.
-        lines: list[str] = ["Deck"]
-
-        # Main deck spells.
-        name_counts = Counter(sug.main_deck)
-        for name in sorted(name_counts.keys()):
-            lines.append(f"{name_counts[name]} {name}")
-
-        # Lands (nonbasic + basic).
-        land_counts = Counter(sug.nonbasic_lands + sug.lands)
-        for name in sorted(land_counts.keys()):
-            lines.append(f"{land_counts[name]} {name}")
-
-        # Sideboard.
-        main_set = Counter(sug.main_deck)
-        nb_set = Counter(sug.nonbasic_lands)
-        sb_counts: Counter[str] = Counter()
-        for name in self._pool_names:
-            in_main = main_set.get(name, 0)
-            in_nb = nb_set.get(name, 0)
-            if in_main > 0:
-                main_set[name] -= 1
-            elif in_nb > 0:
-                nb_set[name] -= 1
-            else:
-                sb_counts[name] += 1
-
-        if sb_counts:
-            lines.append("")
-            lines.append("Sideboard")
-            for name in sorted(sb_counts.keys()):
-                lines.append(f"{sb_counts[name]} {name}")
-
         clipboard = QApplication.clipboard()
         if clipboard:
-            clipboard.setText("\n".join(lines))
+            clipboard.setText(build_arena_deck_string(sug, self._pool_names))
         self._copy_btn.setText(tr("copied_confirmation"))
         QTimer.singleShot(1500, lambda: self._copy_btn.setText(tr("copy_deck_btn")))

@@ -42,6 +42,7 @@ from client.overlay.log_watcher import (
     ReplayDoneEvent,
     is_arena_running,
 )
+from client.overlay.managers.auth_polling import AuthPollingManager, ServerStatus
 from client.overlay.managers.prediction import PredictionManager, PredictionRequest
 from client.overlay.managers.set_data import SetDataManager
 from client.overlay.managers.workers import (
@@ -165,12 +166,19 @@ class OverlayApp:
         home.logout_requested.connect(self._on_logout)
         home.simulator_detected.connect(self._on_simulator_detected)
 
-        # Start periodic server health / auth polling
-        self._health_timer = QTimer()
-        self._health_timer.setInterval(30_000)
-        self._health_timer.timeout.connect(self._poll_server_status)
-        self._health_timer.start()
-        self._login_worker: QThread | None = None
+        # Server health / auth polling + OAuth login lifecycle (30s tick,
+        # HTTP on worker threads).
+        self._auth_polling = AuthPollingManager(
+            api_client, auth_client,
+            has_player_id=lambda: self._has_arena_player_id,
+        )
+        self._auth_polling.status_changed.connect(self._on_server_status)
+        self._auth_polling.supported_sets_changed.connect(self._on_supported_sets)
+        self._auth_polling.login_started.connect(
+            lambda: home.show_login_error(""),
+        )
+        self._auth_polling.login_succeeded.connect(self._on_login_succeeded)
+        self._auth_polling.login_failed.connect(home.show_login_error)
 
         # Ref-keeper for arena memory-poll workers. Same rationale as
         # _inflight_set_workers above: the per-poll single-slot pointer can
@@ -195,8 +203,8 @@ class OverlayApp:
         self._arena_current_event_timer.timeout.connect(self._poll_arena_current_event)
         self._arena_current_event_timer.start()
 
-        # Set initial server status
-        self._poll_server_status()
+        # Start polling + set initial server status.
+        self._auth_polling.start()
 
     def start(self) -> None:
         self.watcher.start()
@@ -209,6 +217,7 @@ class OverlayApp:
 
     def stop(self) -> None:
         self._prediction.cancel()
+        self._auth_polling.stop()
         self._arena_identity_timer.stop()
         self._arena_current_event_timer.stop()
         self.watcher.stop()
@@ -221,10 +230,7 @@ class OverlayApp:
 
     def _is_vip(self) -> bool:
         """Return True if the user is authenticated with VIP status."""
-        if not self.auth_client.is_authenticated:
-            return False
-        session = self.auth_client.session
-        return bool(session and session.is_vip)
+        return self._auth_polling.is_vip()
 
     # Number of consecutive failed identity reads on an attached session
     # before forcing a re-attach. The cached image may be missing
@@ -281,7 +287,7 @@ class OverlayApp:
         self.auth_client.set_arena_player_id(identity.player_id)
         if self.auth_client.try_auto_login():
             logger.info("Auto-login succeeded after Arena identity retry")
-        self._poll_server_status()
+        self._auth_polling.poll_now()
 
     def _on_identity_read_failed(self) -> None:
         """Handle a failed identity read — force a session re-attach after N tries.
@@ -406,65 +412,18 @@ class OverlayApp:
 
     # -- server / auth polling -----------------------------------------------
 
-    def _poll_server_status(self) -> None:
-        """Check server health and update home tab status."""
-        health = self.api_client.health()
-        reachable = health is not None
-        maintenance = bool(health.get("maintenance")) if health else False
-        # Auto-refresh expired tokens so the sign-in button doesn't
-        # reappear when the user returns from a long draft.
-        if (
-            self._has_arena_player_id
-            and self.auth_client.session
-            and self.auth_client.session.is_expired
-        ):
-            self.auth_client.refresh()
-        authed = self.auth_client.is_authenticated
-
-        # Ask the server for the current VIP status so upgrades made
-        # since the JWT was issued (and stale claims from a restored
-        # session) are picked up.  On failure we keep the cached value.
-        if authed and reachable and self.auth_client.session is not None:
-            info = self.api_client.fetch_user_info()
-            if info is not None and info.is_vip != self.auth_client.session.is_vip:
-                old_is_vip = self.auth_client.session.is_vip
-                # /api/me reflects the live DB value, but the JWT in
-                # session.token has is_vip baked in at login time —
-                # /api/predict trusts the JWT claim, so a mid-session
-                # VIP promotion (or revocation) leaves the gate stale
-                # until the JWT is re-issued. Refresh now so the next
-                # predict call sees the new claim.
-                refreshed = self.auth_client.refresh()
-                if refreshed is None:
-                    # No refresh token, or Supabase/server unreachable:
-                    # mirror the value locally so the home tab UI is
-                    # accurate, but the JWT stays stale and predict will
-                    # keep being rejected until the user signs in again.
-                    self.auth_client.session.is_vip = info.is_vip
-                logger.info(
-                    "VIP status changed: %s -> %s (jwt refresh: %s)",
-                    old_is_vip, self.auth_client.session.is_vip,
-                    "ok" if refreshed else "failed",
-                )
-
-        email = self.auth_client.user_email
-        is_vip = (
-            self.auth_client.session.is_vip
-            if authed and self.auth_client.session
-            else False
-        )
-
+    def _on_server_status(self, status: ServerStatus) -> None:
+        """Push a status-poll result to the home tab."""
         self.window.pack_tab.home_widget.set_server_status(
-            reachable, authed, email, is_vip=is_vip,
-            has_arena_player_id=self._has_arena_player_id,
-            maintenance=maintenance,
+            status.reachable, status.authenticated, status.email,
+            is_vip=status.is_vip,
+            has_arena_player_id=status.has_arena_player_id,
+            maintenance=status.maintenance,
         )
 
-        # Refresh supported sets list from server health endpoint.
-        if health:
-            supported = health.get("supported_sets", [])
-            if supported:
-                self._server_supported_sets = supported
+    def _on_supported_sets(self, supported: list) -> None:
+        """Refresh the supported-sets list from the server health endpoint."""
+        self._server_supported_sets = supported
 
     # -- lazy set data loading -----------------------------------------------
 
@@ -670,74 +629,27 @@ class OverlayApp:
 
     def _on_login_google(self) -> None:
         """Handle Google login button click (runs OAuth in background thread)."""
-        self._do_login("google")
+        self._auth_polling.login("google")
 
     def _on_login_microsoft(self) -> None:
         """Handle Microsoft login button click."""
-        self._do_login("microsoft")
+        self._auth_polling.login("microsoft")
 
     def _on_login_discord(self) -> None:
         """Handle Discord login button click."""
-        self._do_login("discord")
+        self._auth_polling.login("discord")
 
-    def _do_login(self, provider: str) -> None:
-        """Run OAuth in a background thread to avoid blocking the UI."""
-        # Cancel any in-flight login first
-        if self._login_worker is not None and self._login_worker.isRunning():
-            self.auth_client.cancel_login()
-            self._login_worker.wait(2000)
-
-        home = self.window.pack_tab.home_widget
-        home.show_login_error("")
-
-        class _LoginWorker(QThread):
-            finished = Signal(object)  # ServerSession | None
-            error = Signal(str)
-
-            def __init__(self, auth: AuthClient, provider: str) -> None:
-                super().__init__()
-                self._auth = auth
-                self._provider = provider
-
-            def run(self) -> None:
-                try:
-                    if self._provider == "google":
-                        session = self._auth.login_google()
-                    elif self._provider == "discord":
-                        session = self._auth.login_discord()
-                    else:
-                        session = self._auth.login_microsoft()
-                    self.finished.emit(session)
-                except Exception as exc:
-                    self.error.emit(str(exc))
-
-        worker = _LoginWorker(self.auth_client, provider)
-
-        def _on_done(session: object) -> None:
-            if session is None:
-                home.show_login_error("Login failed — please try again")
-            else:
-                self._poll_server_status()
-                # If a draft is already active and the user is now VIP,
-                # switch to the pick view and run a prediction.
-                if self.state.draft_active and self._is_vip():
-                    self.window.show_draft_started()
-                    if self.state.current_pack:
-                        self._run_prediction()
-
-        def _on_err(msg: str) -> None:
-            home.show_login_error(f"Login error: {msg}")
-
-        worker.finished.connect(_on_done)
-        worker.error.connect(_on_err)
-        # Keep reference to prevent GC
-        self._login_worker = worker
-        worker.start()
+    def _on_login_succeeded(self) -> None:
+        """If a draft is already active and the user is now VIP, switch to
+        the pick view and run a prediction."""
+        if self.state.draft_active and self._is_vip():
+            self.window.show_draft_started()
+            if self.state.current_pack:
+                self._run_prediction()
 
     def _on_logout(self) -> None:
         """Handle logout button click."""
-        self.auth_client.logout()
-        self._poll_server_status()
+        self._auth_polling.logout()
 
     # -- event handling (from LogWatcher) ------------------------------------
 

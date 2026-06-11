@@ -330,6 +330,14 @@ class _ColumnHeader(QFrame):
             self._ata_lbl = _lbl(tr("col_ata"), _W_ATA)
             layout.addWidget(self._ata_lbl)
 
+    def set_right_gutter(self, px: int) -> None:
+        """Pad the right edge so columns stay aligned with the card rows
+        when the list below shows a vertical scrollbar."""
+        m = self.layout().contentsMargins()
+        self.layout().setContentsMargins(
+            m.left(), m.top(), _MARGIN + max(0, px), m.bottom()
+        )
+
     def retranslate(self) -> None:
         """Refresh header labels with the current language."""
         self._rank_lbl.setText(tr("col_rank"))

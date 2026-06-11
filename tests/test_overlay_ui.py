@@ -362,3 +362,33 @@ def test_compact_hides_deck_strip_and_nav(qapp):
     tab.set_compact(False)
     assert not tab.deck_rail.isHidden()
     assert not tab._nav_container.isHidden()
+
+
+def test_pack_scroll_horizontal_scrollbar_is_off(qapp):
+    from PySide6.QtCore import Qt
+    from client.overlay.ui.pack_tab import PackTab
+    tab = PackTab(show_art=False)
+    assert (
+        tab._scroll.horizontalScrollBarPolicy()
+        == Qt.ScrollBarPolicy.ScrollBarAlwaysOff
+    )
+
+
+def test_column_header_gutter_tracks_vertical_scrollbar(qapp):
+    from client.overlay.ui.pack_tab import PackTab
+    from client.overlay.ui.pack_widgets import _MARGIN
+    tab = PackTab(show_art=False)
+    assert tab._column_header.layout().contentsMargins().right() == _MARGIN
+
+    # Scrollable range appears -> header pads right by the scrollbar width.
+    tab._on_scroll_range_changed(0, 120)
+    gutter = tab._scroll.verticalScrollBar().sizeHint().width()
+    assert gutter > 0
+    assert (
+        tab._column_header.layout().contentsMargins().right()
+        == _MARGIN + gutter
+    )
+
+    # Range collapses -> padding is removed again.
+    tab._on_scroll_range_changed(0, 0)
+    assert tab._column_header.layout().contentsMargins().right() == _MARGIN

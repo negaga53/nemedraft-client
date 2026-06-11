@@ -108,6 +108,10 @@ class PackTab(QWidget):
         self._card_layout.addStretch()
         scroll.setWidget(self._card_container)
         self._scroll = scroll
+        # The header lives outside the viewport and cannot follow a
+        # horizontal scroll — forbid it; the name column absorbs squeeze.
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll.verticalScrollBar().rangeChanged.connect(self._on_scroll_range_changed)
 
         # Pick history navigation bar — spans the full window width.
         nav_bar = QHBoxLayout()
@@ -200,6 +204,13 @@ class PackTab(QWidget):
     def hide_loading(self) -> None:
         """Hide the prediction loading bar (called when results arrive)."""
         self.loading_bar.setVisible(False)
+
+    def _on_scroll_range_changed(self, _min: int, _max: int) -> None:
+        """Keep the column header pixel-aligned with the rows by padding
+        its right edge whenever the card list can scroll vertically."""
+        sb = self._scroll.verticalScrollBar()
+        gutter = sb.sizeHint().width() if _max > _min else 0
+        self._column_header.set_right_gutter(gutter)
 
     def update_predictions(
         self,

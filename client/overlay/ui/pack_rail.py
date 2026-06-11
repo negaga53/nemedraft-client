@@ -1,7 +1,7 @@
-"""Right-hand deck rail for the Pack tab's full view.
+"""Bottom deck strip for the Pack tab's full view.
 
-Stacks small glass cards: archetype, curve, lanes. Visual states are
-objectNames + dynamic properties resolved by the theme stylesheet.
+Lays out small glass cards side by side: archetype, curve, lanes. Visual
+states are objectNames + dynamic properties resolved by the theme stylesheet.
 """
 
 from __future__ import annotations
@@ -167,11 +167,11 @@ class _LanesCard(QFrame):
 
 
 class DeckRail(QWidget):
-    """Vertical stack of rail cards. Used by the Pack tab full view."""
+    """Horizontal strip of rail cards. Used by the Pack tab full view."""
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
-        layout = QVBoxLayout(self)
+        layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(6)
 
@@ -179,10 +179,9 @@ class DeckRail(QWidget):
         self.curve_card = _CurveCard()
         self.lanes_card = _LanesCard()
 
-        layout.addWidget(self.archetype_card)
-        layout.addWidget(self.curve_card)
-        layout.addWidget(self.lanes_card)
-        layout.addStretch()
+        layout.addWidget(self.archetype_card, 1)
+        layout.addWidget(self.curve_card, 1)
+        layout.addWidget(self.lanes_card, 1)
 
     def set_archetype(self, name: str, score: float, colors: list[str], count: int) -> None:
         self.archetype_card.set_values(name, score, colors, count)

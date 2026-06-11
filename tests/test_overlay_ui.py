@@ -317,3 +317,23 @@ def test_compact_toggle_is_discoverable(qapp):
     # The generated stylesheet must carry a rule for it.
     from client.overlay.ui.theme.qss import build_stylesheet
     assert "QPushButton#compactToggle" in build_stylesheet(False)
+
+
+def test_deck_rail_is_horizontal_strip(qapp):
+    from PySide6.QtWidgets import QHBoxLayout
+    from client.overlay.ui.pack_rail import DeckRail
+    rail = DeckRail()
+    assert isinstance(rail.layout(), QHBoxLayout)
+
+
+def test_deck_rail_api_smoke_after_flip(qapp):
+    from types import SimpleNamespace
+    from client.overlay.ui.pack_rail import DeckRail
+    rail = DeckRail()
+    rail.set_archetype("UR", 47.3, ["U", "R"], 14)
+    rail.set_pips({"W": 2, "U": 9, "B": 0, "R": 8, "G": 1})
+    rail.set_curve(SimpleNamespace(curve=[0, 2, 4, 3, 1, 0, 0, 0]))
+    rail.set_lanes([("U", "open"), ("R", "closing")])
+    rail.retranslate()
+    assert rail.archetype_card._pip_counts["U"].text() == "9"
+    assert "14/40" in rail.archetype_card.count_label.text()

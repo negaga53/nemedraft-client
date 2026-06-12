@@ -1,4 +1,4 @@
-"""Mana-curve plot used in the pack rail."""
+"""Mana-curve plot used in the Stats tab and the Pack tab's deck strip."""
 
 from __future__ import annotations
 

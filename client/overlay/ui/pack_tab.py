@@ -527,7 +527,7 @@ class PackTab(QWidget):
             self._preview.hide()
 
     def set_compact(self, compact: bool) -> None:
-        """Compact mode = hide deck rail + nav bar; keep pill + card list."""
+        """Compact mode = hide deck strip + nav bar; keep pill + card list."""
         self.deck_rail.setVisible(not compact)
         self._nav_container.setVisible(not compact)
 

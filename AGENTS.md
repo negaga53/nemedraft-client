@@ -58,8 +58,9 @@ reaches into these paths when a new MTG set is added.
 - **The look is token-driven.** Font sizes, spacing, radii, and colours live in
   `ui/theme/tokens.py`; the stylesheet is generated in `ui/theme/qss.py`. Bump the `FONT_SIZE_*`
   scale there rather than hardcoding px. Row/column pixel dimensions live in `ui/pack_widgets.py`
-  (and must stay in sync: `_W_BAR` == `ScoreBar._W`); the right-hand deck rail width is set in
-  `pack_tab.py` (`deck_rail.setFixedWidth`). Headless layout/size checks render via
+  (and must stay in sync: `_W_BAR` == `ScoreBar._W`); the deck strip (archetype + colour
+  commitment, mana curve, open lanes) sits full-width below the card table in `pack_tab.py`;
+  its height is driven by `_CurveCard`'s fixed-90px `ManaCurvePlot` (`stats_tab.py`). Headless layout/size checks render via
   `OverlayWindow(...).grab()` under `QT_QPA_PLATFORM=offscreen`.
 
 ## Releasing

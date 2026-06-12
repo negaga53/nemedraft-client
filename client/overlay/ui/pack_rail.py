@@ -53,11 +53,11 @@ class _ArchetypeCard(QFrame):
             cell_layout.setSpacing(1)
 
             icon = QLabel()
-            pm = cache.get_pixmap(c, 22)
+            pm = cache.get_pixmap(c, 19)
             if pm:
                 icon.setPixmap(pm)
             # Bounding box gets a small margin so the SVG's AA halo isn't clipped.
-            icon.setFixedSize(28, 28)
+            icon.setFixedSize(24, 24)
             icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
             count = QLabel("0")
             count.setObjectName("pipCount")

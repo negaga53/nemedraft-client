@@ -65,6 +65,55 @@ def archetype_display_name(colors: list[str]) -> str:
     return f"{len(combo)}-Color"
 
 
+class FactionLine(QWidget):
+    """Mana pips for a colour combination followed by its faction name.
+
+    "UR" renders as the U and R mana icons then "Izzet". Shared by the Pack
+    tab's deck strip and the Deck tab's header so both read identically.
+    """
+
+    def __init__(
+        self,
+        *,
+        icon_size: int = 18,
+        name_object_name: str = "archetypeName",
+        parent: QWidget | None = None,
+    ) -> None:
+        super().__init__(parent)
+        self._layout = QHBoxLayout(self)
+        self._layout.setContentsMargins(0, 0, 0, 0)
+        self._layout.setSpacing(5)
+
+        cache = get_mana_icon_cache()
+        box = icon_size + 2
+        self._icons: dict[str, QLabel] = {}
+        for c in _MANA_LETTERS:
+            icon = QLabel()
+            pm = cache.get_pixmap(c, icon_size)
+            if pm:
+                icon.setPixmap(pm)
+            icon.setFixedSize(box, box)
+            icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            icon.setVisible(False)
+            self._icons[c] = icon
+            self._layout.addWidget(icon)
+
+        self.name_label = QLabel("—")
+        self.name_label.setObjectName(name_object_name)
+        self.name_label.setWordWrap(False)
+        self._layout.addWidget(self.name_label)
+
+    def add_trailing_stretch(self) -> None:
+        """Push the pips + name to the left when the line owns its full row."""
+        self._layout.addStretch()
+
+    def set_colors(self, colors: list[str]) -> None:
+        active = {c for c in colors if c in _MANA_LETTERS}
+        for c in _MANA_LETTERS:
+            self._icons[c].setVisible(c in active)
+        self.name_label.setText(archetype_display_name(colors))
+
+
 class _ArchetypeCard(QFrame):
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -76,24 +125,14 @@ class _ArchetypeCard(QFrame):
 
         cache = get_mana_icon_cache()
 
-        # Row 1 — identity: archetype colour icons + name, score chip right.
+        # Row 1 — identity: the shared faction line + score chip right.
         top = QHBoxLayout()
         top.setSpacing(5)
-        self._color_icons: dict[str, QLabel] = {}
-        for c in _MANA_LETTERS:
-            icon = QLabel()
-            pm = cache.get_pixmap(c, 18)
-            if pm:
-                icon.setPixmap(pm)
-            icon.setFixedSize(20, 20)
-            icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            icon.setVisible(False)
-            self._color_icons[c] = icon
-            top.addWidget(icon)
-        self.name_label = QLabel("—")
-        self.name_label.setObjectName("archetypeName")
-        self.name_label.setWordWrap(False)
-        top.addWidget(self.name_label, 1)
+        self._faction_line = FactionLine(icon_size=18, name_object_name="archetypeName")
+        # Aliases preserve the previous public surface (tests + callers).
+        self._color_icons = self._faction_line._icons
+        self.name_label = self._faction_line.name_label
+        top.addWidget(self._faction_line, 1)
         self.score_chip = QLabel("")
         self.score_chip.setObjectName("scoreChip")
         self.score_chip.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -149,10 +188,7 @@ class _ArchetypeCard(QFrame):
 
     def set_values(self, name: str, score: float, colors: list[str], count: int) -> None:
         del name  # the colour combination drives the displayed name
-        active = {c for c in colors if c in _MANA_LETTERS}
-        for c in _MANA_LETTERS:
-            self._color_icons[c].setVisible(c in active)
-        self.name_label.setText(archetype_display_name(colors))
+        self._faction_line.set_colors(colors)
 
         if score >= 0:
             self.score_chip.setText(f"{score:.1f}")

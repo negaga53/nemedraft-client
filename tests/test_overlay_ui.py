@@ -145,6 +145,19 @@ def test_deck_rail_archetype_text(qapp):
     assert rail.archetype_card.count_bar.value() == 14
 
 
+def test_deck_banner_shows_faction_line(qapp):
+    """The deck-tab header reuses the faction line (mana pips + name) instead
+    of printing the raw colour letters: key "UR" → icons U,R + "Izzet"."""
+    from client.overlay.ui.deck_tab import DeckTab
+    from common.inference.deck_builder import DeckSuggestion
+
+    tab = DeckTab()
+    tab.update_suggestions({"UR": DeckSuggestion(archetype="UR", score=4.3)}, [])
+    assert tab._faction_line.name_label.text() == "Izzet"
+    shown = [c for c in "WUBRG" if tab._faction_line._icons[c].isVisibleTo(tab)]
+    assert shown == ["U", "R"]
+
+
 def test_window_has_two_row_header(qapp):
     from client.overlay.ui.window import OverlayWindow
     from client.overlay.config import OverlayConfig

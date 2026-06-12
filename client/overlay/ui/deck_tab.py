@@ -22,6 +22,7 @@ from common.inference.deck_builder import DeckSuggestion
 from common.inference.pool_analyzer import ScryfallCard
 from client.overlay.i18n import card_name, tr
 from client.overlay.mana_icons import get_mana_icon_cache, parse_mana_pips
+from client.overlay.ui.pack_rail import FactionLine
 from client.overlay.ui.pack_widgets import _CardPreview
 from client.overlay.ui.theme import set_prop
 from client.overlay.ui.theme.tokens import card_tint, short_type
@@ -199,12 +200,14 @@ class DeckTab(QWidget):
 
         arch_col = QVBoxLayout()
         arch_col.setSpacing(2)
-        self._arch_name_label = QLabel("—")
-        self._arch_name_label.setObjectName("deckArchetypeName")
+        # Reuse the Pack tab's faction line (mana pips + name) so the header
+        # reads "UR Izzet" rather than the bare colour letters.
+        self._faction_line = FactionLine(icon_size=20, name_object_name="deckArchetypeName")
+        self._faction_line.add_trailing_stretch()
         self._stats_label = QLabel("")
         self._stats_label.setObjectName("deckStatsLine")
         self._stats_label.setWordWrap(True)
-        arch_col.addWidget(self._arch_name_label)
+        arch_col.addWidget(self._faction_line)
         arch_col.addWidget(self._stats_label)
         strip_layout.addLayout(arch_col, stretch=1)
 
@@ -333,7 +336,7 @@ class DeckTab(QWidget):
         if self._preview:
             self._preview.hide()
 
-        self._arch_name_label.setText(key)
+        self._faction_line.set_colors(list(key))
         self._stats_label.setText(
             tr(
                 "deck_stats",

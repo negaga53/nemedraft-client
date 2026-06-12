@@ -85,6 +85,7 @@ class SettingsTab(QWidget):
         layout.addWidget(self._show_art_checkbox)
 
         self._transparent_checkbox = QCheckBox(tr("transparent_mode_label"))
+        self._transparent_checkbox.setToolTip(tr("transparent_mode_tooltip"))
         self._transparent_checkbox.setChecked(config.overlay.transparent)
         self._transparent_checkbox.toggled.connect(self._sync)
         layout.addWidget(self._transparent_checkbox)
@@ -257,6 +258,7 @@ class SettingsTab(QWidget):
         self._opacity_lbl.setToolTip(tr("opacity_tooltip"))
         self._show_art_checkbox.setText(tr("show_art_label"))
         self._transparent_checkbox.setText(tr("transparent_mode_label"))
+        self._transparent_checkbox.setToolTip(tr("transparent_mode_tooltip"))
         self._sec_language.setText(tr("section_language"))
         self._lang_lbl.setText(tr("language_label"))
         self._lang_lbl.setToolTip(tr("language_tooltip"))

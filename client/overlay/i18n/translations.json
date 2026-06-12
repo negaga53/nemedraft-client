@@ -113,7 +113,11 @@
     "summary_no_suggestion": "Deck suggestion is loading…",
     "summary_suggested_build": "Suggested build: {archetype} — {spells} spells / {lands} lands",
     "summary_recap_title": "Pick recap",
-    "summary_ai_pick": "AI: {card}"
+    "summary_ai_pick": "AI: {card}",
+    "compact_btn": "Compact",
+    "full_btn": "Full",
+    "compact_disabled_tooltip": "Compact view becomes available during a draft",
+    "transparent_mode_tooltip": "Translucent HUD-style window with rounded corners. Turn off for a solid opaque window — useful if the overlay shows rendering artifacts (remote desktop, no desktop compositor) or if the see-through look is distracting."
   },
   "fr": {
     "app_title": "NemeDraft Overlay",
@@ -227,7 +231,11 @@
     "summary_no_suggestion": "Suggestion de deck en cours…",
     "summary_suggested_build": "Construction suggérée : {archetype} — {spells} sorts / {lands} terrains",
     "summary_recap_title": "Récapitulatif des picks",
-    "summary_ai_pick": "IA : {card}"
+    "summary_ai_pick": "IA : {card}",
+    "compact_btn": "Compacte",
+    "full_btn": "Complète",
+    "compact_disabled_tooltip": "La vue compacte devient disponible pendant un draft",
+    "transparent_mode_tooltip": "Fenêtre translucide style HUD aux coins arrondis. Désactivez pour une fenêtre opaque — utile si l'overlay présente des artefacts d'affichage (bureau à distance, pas de compositeur) ou si la transparence vous distrait."
   },
   "es": {
     "app_title": "NemeDraft Overlay",
@@ -331,7 +339,11 @@
     "update_download_progress": "Descargando actualización… {pct}%",
     "update_applying": "Aplicando actualización — reiniciando…",
     "update_failed": "Error de actualización: {error}",
-    "startup_error": "Error de inicio: {error}"
+    "startup_error": "Error de inicio: {error}",
+    "compact_btn": "Compacta",
+    "full_btn": "Completa",
+    "compact_disabled_tooltip": "La vista compacta está disponible durante un draft",
+    "transparent_mode_tooltip": "Ventana translúcida estilo HUD con esquinas redondeadas. Desactívalo para una ventana opaca — útil si el overlay muestra artefactos de renderizado (escritorio remoto, sin compositor) o si la transparencia te distrae."
   },
   "de": {
     "app_title": "NemeDraft Overlay",
@@ -435,7 +447,11 @@
     "update_download_progress": "Update wird heruntergeladen… {pct}%",
     "update_applying": "Update wird angewendet — Neustart…",
     "update_failed": "Update fehlgeschlagen: {error}",
-    "startup_error": "Startfehler: {error}"
+    "startup_error": "Startfehler: {error}",
+    "compact_btn": "Kompakt",
+    "full_btn": "Voll",
+    "compact_disabled_tooltip": "Die Kompaktansicht ist während eines Drafts verfügbar",
+    "transparent_mode_tooltip": "Durchscheinendes HUD-Fenster mit abgerundeten Ecken. Deaktivieren für ein deckendes Fenster — nützlich bei Darstellungsfehlern (Remote-Desktop, kein Compositor) oder wenn der Durchblick stört."
   },
   "pt": {
     "app_title": "NemeDraft Overlay",
@@ -539,7 +555,11 @@
     "update_download_progress": "Baixando atualização… {pct}%",
     "update_applying": "Aplicando atualização — reiniciando…",
     "update_failed": "Falha na atualização: {error}",
-    "startup_error": "Erro de inicialização: {error}"
+    "startup_error": "Erro de inicialização: {error}",
+    "compact_btn": "Compacta",
+    "full_btn": "Completa",
+    "compact_disabled_tooltip": "A vista compacta fica disponível durante um draft",
+    "transparent_mode_tooltip": "Janela translúcida estilo HUD com cantos arredondados. Desative para uma janela opaca — útil se o overlay mostrar artefactos de renderização (área de trabalho remota, sem compositor) ou se a transparência distrair."
   },
   "it": {
     "app_title": "NemeDraft Overlay",
@@ -643,7 +663,11 @@
     "update_download_progress": "Download aggiornamento… {pct}%",
     "update_applying": "Applicazione aggiornamento — riavvio…",
     "update_failed": "Aggiornamento fallito: {error}",
-    "startup_error": "Errore di avvio: {error}"
+    "startup_error": "Errore di avvio: {error}",
+    "compact_btn": "Compatta",
+    "full_btn": "Completa",
+    "compact_disabled_tooltip": "La vista compatta è disponibile durante un draft",
+    "transparent_mode_tooltip": "Finestra traslucida in stile HUD con angoli arrotondati. Disattiva per una finestra opaca — utile se l'overlay mostra artefatti di rendering (desktop remoto, nessun compositore) o se la trasparenza distrae."
   },
   "ja": {
     "app_title": "NemeDraft Overlay",
@@ -747,7 +771,11 @@
     "update_download_progress": "アップデートをダウンロード中… {pct}%",
     "update_applying": "アップデートを適用中 — 再起動します…",
     "update_failed": "アップデート失敗: {error}",
-    "startup_error": "起動エラー: {error}"
+    "startup_error": "起動エラー: {error}",
+    "compact_btn": "コンパクト",
+    "full_btn": "フル",
+    "compact_disabled_tooltip": "コンパクト表示はドラフト中に利用できます",
+    "transparent_mode_tooltip": "角丸の半透明HUDスタイルのウィンドウ。描画の乱れ（リモートデスクトップ、コンポジタなし）がある場合や透過表示が気になる場合は、オフにして不透明ウィンドウにしてください。"
   },
   "ko": {
     "app_title": "NemeDraft Overlay",
@@ -850,7 +878,11 @@
     "update_download_progress": "업데이트 다운로드 중… {pct}%",
     "update_applying": "업데이트 적용 중 — 재시작합니다…",
     "update_failed": "업데이트 실패: {error}",
-    "startup_error": "시작 오류: {error}"
+    "startup_error": "시작 오류: {error}",
+    "compact_btn": "컴팩트",
+    "full_btn": "전체",
+    "compact_disabled_tooltip": "컴팩트 보기는 드래프트 중에 사용할 수 있습니다",
+    "transparent_mode_tooltip": "둥근 모서리의 반투명 HUD 스타일 창입니다. 렌더링 문제(원격 데스크톱, 컴포지터 없음)가 있거나 투명 효과가 거슬리면 꺼서 불투명 창으로 사용하세요."
   },
   "zh-Hans": {
     "app_title": "NemeDraft Overlay",
@@ -953,6 +985,10 @@
     "update_download_progress": "正在下载更新… {pct}%",
     "update_applying": "正在应用更新 — 重启中…",
     "update_failed": "更新失败: {error}",
-    "startup_error": "启动错误: {error}"
+    "startup_error": "启动错误: {error}",
+    "compact_btn": "紧凑",
+    "full_btn": "完整",
+    "compact_disabled_tooltip": "紧凑视图在轮抽期间可用",
+    "transparent_mode_tooltip": "圆角半透明 HUD 风格窗口。如出现渲染异常（远程桌面、无合成器）或觉得透明效果干扰，可关闭以使用不透明窗口。"
   }
 }

@@ -164,12 +164,14 @@ class OverlayWindow(QWidget):
         drag_row.setContentsMargins(8, 4, 8, 4)
         drag_row.setSpacing(6)
 
-        self._toggle_btn = QPushButton("▾")
+        # Always visible so users discover the control; enabled only while
+        # a draft is live (compact view has nothing to show otherwise).
+        self._toggle_btn = QPushButton()
         self._toggle_btn.setObjectName("compactToggle")
-        self._toggle_btn.setFixedSize(26, 22)
-        self._toggle_btn.setToolTip(tr("toggle_compact_tooltip") + "  (Ctrl+M)")
+        self._toggle_btn.setFixedHeight(22)
         self._toggle_btn.clicked.connect(self._toggle_compact)
-        self._toggle_btn.setVisible(False)
+        self._toggle_btn.setEnabled(False)
+        self._refresh_toggle_btn()
         drag_row.addWidget(self._toggle_btn)
 
         self._brand_tick = QLabel("◢")
@@ -357,8 +359,8 @@ class OverlayWindow(QWidget):
         self.pack_tab.home_widget.set_draft_active(True)
         self.pack_tab.show_pack_view()
         self.tabs.setCurrentIndex(self._tab_pack_idx)
-        self._toggle_btn.setVisible(True)
         self._toggle_btn.setEnabled(True)
+        self._refresh_toggle_btn()
         # Restore the user's preferred view mode now that a draft is live
         # (the overlay always boots FULL so the home tab is reachable).
         if self._view_mode.persisted_mode() is ViewMode.COMPACT:
@@ -369,7 +371,7 @@ class OverlayWindow(QWidget):
         self.pack_tab.home_widget.set_draft_active(False)
         self.pack_tab.show_home()
         self._toggle_btn.setEnabled(False)
-        self._toggle_btn.setVisible(False)
+        self._refresh_toggle_btn()
         # System-driven exit — keep the user's preferred mode for next draft.
         self._view_mode.set_mode(ViewMode.FULL, persist=False)
 
@@ -576,7 +578,7 @@ class OverlayWindow(QWidget):
     def retranslate(self) -> None:
         """Refresh all UI labels and re-render cached data with the current language."""
         self.setWindowTitle(f"{tr('app_title')} — v{__version__}")
-        self._toggle_btn.setToolTip(tr("toggle_compact_tooltip"))
+        self._refresh_toggle_btn()
         self._min_btn.setToolTip(tr("minimize_tooltip"))
         self._close_btn.setToolTip(tr("close_tooltip"))
         self.tabs.setTabText(self._tab_pack_idx, tr("tab_pack"))
@@ -856,6 +858,19 @@ class OverlayWindow(QWidget):
         """User-initiated toggle between full view and the compact strip."""
         self._view_mode.toggle()
 
+    def _refresh_toggle_btn(self) -> None:
+        """Sync the compact-toggle's label and tooltip with mode + state."""
+        if self._view_mode.is_compact:
+            self._toggle_btn.setText("▴ " + tr("full_btn"))
+        else:
+            self._toggle_btn.setText("▾ " + tr("compact_btn"))
+        if self._toggle_btn.isEnabled():
+            self._toggle_btn.setToolTip(
+                tr("toggle_compact_tooltip") + "  (Ctrl+M)"
+            )
+        else:
+            self._toggle_btn.setToolTip(tr("compact_disabled_tooltip"))
+
     def _apply_view_mode(self, old: ViewMode, new: ViewMode) -> None:
         """Visually switch modes; per-mode geometry is saved and restored."""
         self._view_mode.save_geometry(
@@ -866,7 +881,7 @@ class OverlayWindow(QWidget):
             self.status.setVisible(False)
             self._mini_container.setVisible(True)
             self.pack_tab.set_compact(True)
-            self._toggle_btn.setText("▴")
+            self._refresh_toggle_btn()
             self._refresh_mini()
             self.setMinimumWidth(460)
             self.setMaximumWidth(720)
@@ -882,7 +897,7 @@ class OverlayWindow(QWidget):
             self._mini_container.setVisible(False)
             self.pack_tab.set_compact(False)
             self.tabs.setVisible(True)
-            self._toggle_btn.setText("▾")
+            self._refresh_toggle_btn()
             self.setMinimumWidth(600)
             self.setMaximumWidth(1100)
             stored = self._view_mode.geometry_for(new)
@@ -931,13 +946,9 @@ class OverlayWindow(QWidget):
         add("Esc", self._shortcut_exit_compact)
 
     def _shortcut_toggle_compact(self) -> None:
-        # Compact mode is gated on an active draft (same as the button).
-        # isVisibleTo: the button's own flag, independent of whether the
-        # window itself is currently shown.
-        if (
-            not self._toggle_btn.isVisibleTo(self)
-            or not self._toggle_btn.isEnabled()
-        ):
+        # Compact mode is gated on an active draft (same as the button,
+        # which is always visible but only enabled mid-draft).
+        if not self._toggle_btn.isEnabled():
             return
         self._view_mode.toggle()
 

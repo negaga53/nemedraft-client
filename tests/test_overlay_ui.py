@@ -137,8 +137,12 @@ def test_deck_rail_archetype_text(qapp):
     from client.overlay.ui.pack_rail import DeckRail
     rail = DeckRail()
     rail.set_archetype("UR Tempo", score=47.3, colors=["U", "U", "R", "R", "R"], count=14)
-    assert "UR Tempo" in rail.archetype_card.name_label.text()
+    # The colour combination drives a friendly identity name; the score
+    # lives in its own chip and the count drives the fill bar.
+    assert rail.archetype_card.name_label.text() == "Izzet"
+    assert rail.archetype_card.score_chip.text() == "47.3"
     assert "14/40" in rail.archetype_card.count_label.text()
+    assert rail.archetype_card.count_bar.value() == 14
 
 
 def test_window_has_two_row_header(qapp):
@@ -317,6 +321,53 @@ def test_compact_toggle_is_discoverable(qapp):
     # The generated stylesheet must carry a rule for it.
     from client.overlay.ui.theme.qss import build_stylesheet
     assert "QPushButton#compactToggle" in build_stylesheet(False)
+
+
+def test_compact_toggle_always_visible_gated_by_enabled(qapp):
+    """The toggle stays visible outside drafts (discoverability) and is
+    gated by enabled-state only; it carries a label, not a bare glyph."""
+    from client.overlay.ui.window import OverlayWindow
+    from client.overlay.config import OverlayConfig
+
+    w = OverlayWindow(OverlayConfig(), transparent=False, show_art=False)
+    # Never hidden — only disabled while no draft is live.
+    assert w._toggle_btn.isVisibleTo(w)
+    assert not w._toggle_btn.isEnabled()
+    assert len(w._toggle_btn.text()) > 2  # "▾ Compact", not "▾"
+    assert w._toggle_btn.toolTip()
+
+    w.show_draft_started()
+    assert w._toggle_btn.isVisibleTo(w)
+    assert w._toggle_btn.isEnabled()
+    assert "Ctrl+M" in w._toggle_btn.toolTip()
+
+    w.show_draft_ended()
+    assert w._toggle_btn.isVisibleTo(w)
+    assert not w._toggle_btn.isEnabled()
+
+
+def test_archetype_combo_fits_five_colour_entries(qapp):
+    """Deck-tab archetype selector must not crop 4-5 colour entries
+    (it was pinned at 90 px regardless of content)."""
+    from client.overlay.ui.deck_tab import DeckTab
+    from common.inference.deck_builder import DeckSuggestion
+
+    def sug(score: float) -> DeckSuggestion:
+        s = DeckSuggestion(archetype="x", main_deck=[], lands=[],
+                           nonbasic_lands=[])
+        s.score = score
+        return s
+
+    tab = DeckTab()
+    tab.update_suggestions(
+        {"WUBRG": sug(4.3), "UR": sug(3.1), "WUBG": sug(2.2)}, [], {},
+    )
+    combo = tab._arch_combo
+    longest = max(
+        (combo.itemText(i) for i in range(combo.count())), key=len,
+    )
+    needed = combo.fontMetrics().horizontalAdvance(longest)
+    assert combo.sizeHint().width() >= needed + 16
 
 
 def test_deck_rail_is_horizontal_strip(qapp):

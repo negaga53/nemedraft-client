@@ -214,7 +214,12 @@ class DeckTab(QWidget):
         strip_layout.addWidget(self._copy_btn)
 
         self._arch_combo = QComboBox()
-        self._arch_combo.setMinimumWidth(90)
+        # Track the widest entry ("WUBRG  (4.3)") instead of a fixed width —
+        # 4-5 colour archetypes were cropped at the old 90 px minimum.
+        self._arch_combo.setSizeAdjustPolicy(
+            QComboBox.SizeAdjustPolicy.AdjustToContents
+        )
+        self._arch_combo.setMinimumContentsLength(12)
         self._arch_combo.setToolTip(tr("archetype_label"))
         strip_layout.addWidget(self._arch_combo)
 

@@ -134,19 +134,26 @@ QPushButton#windowBtnClose:hover {{
     color: #ffffff;
 }}
 
-/* Compact-view toggle — accent-tinted so it's discoverable during a draft. */
+/* Compact-view toggle — always visible in the title row; accent-tinted
+   while a draft is live, faded to a ghost chip otherwise. */
 QPushButton#compactToggle {{
     background: {t.ACCENT_WASH};
     border: 1px solid {t.ACCENT_DIM};
     border-radius: {t.RADIUS_CHIP}px;
     color: {t.ACCENT};
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
-    padding: 0;
+    letter-spacing: 0.04em;
+    padding: 0 10px;
 }}
 QPushButton#compactToggle:hover {{
     background: {t.ACCENT};
     color: {t.ACCENT_TEXT_ON};
+}}
+QPushButton#compactToggle:disabled {{
+    background: transparent;
+    border-color: {t.L1_STROKE};
+    color: {t.TEXT_FAINT};
 }}
 
 QLabel#status {{
@@ -551,6 +558,28 @@ QLabel#archetypeName {{
     font-size: {t.FONT_SIZE_TITLE}px;
     background: transparent;
     border: none;
+}}
+
+/* Deck-suggestion score — accent chip so it reads as a rating, not prose. */
+QLabel#scoreChip {{
+    background: {t.ACCENT_WASH};
+    border: 1px solid {t.ACCENT_DIM};
+    border-radius: {t.RADIUS_CHIP}px;
+    color: {t.ACCENT};
+    font-size: {t.FONT_SIZE_DENSE}px;
+    font-weight: 700;
+    padding: 1px 8px;
+}}
+
+/* Deck fill towards 40 cards — thin track under the archetype header. */
+QProgressBar#deckCountBar {{
+    background: {t.L1_PANEL};
+    border: 1px solid {t.L1_STROKE};
+    border-radius: 3px;
+}}
+QProgressBar#deckCountBar::chunk {{
+    background: {t.ACCENT_DIM};
+    border-radius: 2px;
 }}
 
 QLabel#railTitle {{

@@ -53,11 +53,11 @@ class _ArchetypeCard(QFrame):
             cell_layout.setSpacing(1)
 
             icon = QLabel()
-            pm = cache.get_pixmap(c, 11)
+            pm = cache.get_pixmap(c, 22)
             if pm:
                 icon.setPixmap(pm)
             # Bounding box gets a small margin so the SVG's AA halo isn't clipped.
-            icon.setFixedSize(14, 14)
+            icon.setFixedSize(28, 28)
             icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
             count = QLabel("0")
             count.setObjectName("pipCount")
@@ -179,9 +179,11 @@ class DeckRail(QWidget):
         self.curve_card = _CurveCard()
         self.lanes_card = _LanesCard()
 
-        layout.addWidget(self.archetype_card, 1)
-        layout.addWidget(self.curve_card, 1)
-        layout.addWidget(self.lanes_card, 1)
+        # Width split ~47/33/20: the colour-commitment card needs room for
+        # five double-size pips; the lanes list reads fine narrow.
+        layout.addWidget(self.archetype_card, 7)
+        layout.addWidget(self.curve_card, 5)
+        layout.addWidget(self.lanes_card, 3)
 
     def set_archetype(self, name: str, score: float, colors: list[str], count: int) -> None:
         self.archetype_card.set_values(name, score, colors, count)

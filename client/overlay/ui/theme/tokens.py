@@ -136,6 +136,7 @@ FONT_SIZE_DENSE = 13
 FONT_SIZE_BODY = 14
 FONT_SIZE_TITLE = 15
 FONT_SIZE_HEADLINE = 17
+FONT_SIZE_PIP = 22      # colour-commitment pip counts — sized to the 22px mana icons
 FONT_SIZE_WORDMARK = 23
 
 _PIP_RE = re.compile(r"\{(.*?)\}")

@@ -571,7 +571,7 @@ QLabel#railDetail {{
 
 QLabel#pipCount {{
     color: {t.TEXT_FAINT};
-    font-size: {t.FONT_SIZE_DENSE}px;
+    font-size: {t.FONT_SIZE_PIP}px;
     background: transparent;
     border: none;
 }}

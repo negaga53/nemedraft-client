@@ -771,6 +771,13 @@ class OverlayWindow(QWidget):
             self._show_status(tr("no_predictions"))
             return
 
+        # A live prediction is on screen, so the compact view has something
+        # to show — enable its toggle even when show_draft_started() was
+        # skipped (e.g. a mid-draft attach that never replayed pick 1).
+        if not self._toggle_btn.isEnabled():
+            self._toggle_btn.setEnabled(True)
+            self._refresh_toggle_btn()
+
         # Store current pack in history for taken-card computation.
         current_names = [r.card for r in results]
         self._pack_history[(pack_number, pick_number)] = current_names

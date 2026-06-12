@@ -455,3 +455,27 @@ def test_scroll_range_signal_is_wired_to_header_gutter(qapp):
     assert tab._column_header.layout().contentsMargins().right() > _MARGIN
     tab._scroll.verticalScrollBar().rangeChanged.emit(0, 0)
     assert tab._column_header.layout().contentsMargins().right() == _MARGIN
+
+
+def test_prediction_render_enables_compact_toggle(qapp):
+    """The compact toggle is enabled as soon as a live prediction renders —
+    not only inside show_draft_started(). On a mid-draft attach the pack
+    view appears (via _render_picks) while show_draft_started may have been
+    skipped, which previously left the toggle greyed even though P1P8 was
+    on screen."""
+    from client.overlay.ui.window import OverlayWindow
+    from client.overlay.config import OverlayConfig
+    from client.overlay.api_client import Pick
+
+    w = OverlayWindow(OverlayConfig(), transparent=False, show_art=False)
+    w.show_model_ready()
+    assert not w._toggle_btn.isEnabled()  # disabled until a pack is live
+
+    pick = Pick(
+        card="Counterspell", score=0.8, rank=1, is_elite=False,
+        colors=["U"], mana_cost="{U}{U}", type_line="Instant",
+        gihwr=0.58, ata=3.4, iwd=0.0, stats_loaded=True,
+    )
+    # Simulate a prediction landing WITHOUT a prior show_draft_started().
+    w._on_prediction([pick], "FIN", 0, 7, 5, {})
+    assert w._toggle_btn.isEnabled()

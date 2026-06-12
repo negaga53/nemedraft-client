@@ -387,6 +387,44 @@ class DraftState:
                     candidates[0],
                 )
 
+    def reconstruct_pick_history_from_pool(self) -> None:
+        """Synthesise provisional history entries for picks made before the
+        overlay observed the draft.
+
+        On a mid-draft attach only the current pack is seen (the MemoryWatcher's
+        first poll, or a ``Player.log`` whose early packs rotated out), so the
+        navigator would have a single entry and stay dead. The cumulative pool
+        still records *which* card was taken at each past pick, so map the pool
+        back onto ``(pack, pick)`` coordinates. The full pack ranking is left
+        empty — it was never observed. Existing entries (including live-scored
+        ones) are never overwritten.
+        """
+        cpp = max(1, self.cards_per_pick)
+        picks_made = len(self.pool) // cpp
+        if picks_made == 0:
+            return
+        if self.pack_number > 0:
+            # Packs are uniform; derive their size from the known position.
+            pack_size = (picks_made - self.pick_number) // self.pack_number
+            if pack_size <= 0:
+                pack_size = picks_made
+        else:
+            # Everything taken so far belongs to the opening pack.
+            pack_size = max(picks_made, self.pick_number + 1)
+        for g in range(picks_made):
+            pack, pick = divmod(g, pack_size)
+            key = (pack, pick)
+            if key in self.pick_history:
+                continue
+            taken = self.pool[g * cpp:(g + 1) * cpp]
+            self.pick_history[key] = PickHistoryEntry(
+                pack_number=pack,
+                pick_number=pick,
+                picked_card=taken[0] if taken else "",
+                picked_cards=list(taken),
+                picks=[],
+            )
+
     # -- state persistence ------------------------------------------------------
 
     _STATE_FILE = "draft_state.json"

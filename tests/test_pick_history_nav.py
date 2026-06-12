@@ -10,6 +10,8 @@ left the history empty and the arrows permanently disabled.
 from __future__ import annotations
 
 import os
+import tempfile
+from pathlib import Path
 from unittest.mock import MagicMock
 
 # Must be set before any PySide6 import.
@@ -40,6 +42,7 @@ def _make_app(mapper_names: list[str]):
     app._pending_events = []
     app._draft_completed = False
     app._in_lobby_context = ""
+    app._cache_dir = Path(tempfile.mkdtemp())
 
     app.mapper = MagicMock()
     app.mapper.grpids_to_names.return_value = mapper_names
@@ -62,7 +65,7 @@ def _make_app(mapper_names: list[str]):
     return app
 
 
-def _pack_event(grpids: list[int], pack: int, pick: int):
+def _pack_event(grpids: list[int], pack: int, pick: int, picked: list[int] | None = None):
     from client.overlay.log_watcher import PackEvent
 
     return PackEvent(
@@ -70,6 +73,7 @@ def _pack_event(grpids: list[int], pack: int, pick: int):
         pack_number=pack,
         pick_number=pick,
         event_name="PremierDraft_FIN_20260601",
+        picked_grpids=picked or [],
     )
 
 
@@ -153,3 +157,61 @@ def _exercise_nav(tab) -> None:
     tab._nav_go_prev()
     assert tab._nav_next.isEnabled()
     assert tab._nav_last.isEnabled()
+
+
+# -- mid-draft attach --------------------------------------------------------
+#
+# Launching the overlay while a draft is already in progress (e.g. at P1P8)
+# observes only the current pack. Past picks must be reconstructed from the
+# restored pool so the navigator is not permanently dead.
+
+
+def test_mid_draft_attach_reconstructs_past_picks(qapp):
+    from client.overlay.log_watcher import DraftStartEvent
+
+    app = _make_app([])
+    # grpId N → name "C<N>" for both the live pack and the picked pool.
+    app.mapper.grpids_to_names.side_effect = lambda gids: [f"C{g}" for g in gids]
+
+    app._on_event(DraftStartEvent(event_name="PremierDraft_FIN_20260601"), replaying=False)
+    # First (and only) observed pack is P1P8; pool carries the 7 prior picks.
+    app._on_event(
+        _pack_event(list(range(200, 208)), 0, 7, picked=list(range(100, 107))),
+        replaying=False,
+    )
+
+    # The current pick plus the seven reconstructed past picks.
+    assert set(app.state.pick_history) == {(0, i) for i in range(8)}
+    assert app.state.pick_history[(0, 3)].picked_card == "C103"
+    # Past entries carry no full pack ranking (it was never observed).
+    assert app.state.pick_history[(0, 3)].picks == []
+
+
+def test_nav_arrows_enable_after_mid_draft_attach(qapp):
+    """A navigator fed a mid-draft-attach history (current pick + restored
+    past picks) must enable the back arrows."""
+    from client.overlay.ui.pack_tab import PackTab
+    from client.overlay.api_client import Pick
+    from client.overlay.draft_state import PickHistoryEntry
+
+    tab = PackTab()
+    try:
+        hist = {
+            (0, i): PickHistoryEntry(pack_number=0, pick_number=i,
+                                     picked_card=f"C{i}", picks=[])
+            for i in range(7)
+        }
+        tab.update_predictions(
+            [Pick(card="Live", card_id=1, rank=1, score=1.0, gihwr=0.5,
+                  ata=2.0, colors=["U"], mana_cost="{U}",
+                  type_line="Creature", is_elite=False)],
+            pack_number=0, pick_number=7,
+        )
+        hist[(0, 7)] = PickHistoryEntry(pack_number=0, pick_number=7,
+                                        picked_card="", picks=[])
+        tab.set_pick_history(hist)
+        assert tab._nav_prev.isEnabled()
+        assert tab._nav_first.isEnabled()
+    finally:
+        tab.deleteLater()
+        qapp.processEvents()

@@ -650,6 +650,9 @@ class OverlayApp:
                     logger.info("Pool restored from disk after replay")
                 self.state.load_pick_history(self._cache_dir)
                 self.state.infer_picked_cards()
+                # Past picks the replay never produced (rotated log / memory-
+                # only attach) are rebuilt from the restored pool.
+                self.state.reconstruct_pick_history_from_pool()
                 if self.state.pick_history:
                     self.window.sync_pick_history(self.state.pick_history)
                     self.state.save_pick_history(self._cache_dir)
@@ -884,6 +887,9 @@ class OverlayApp:
             # in _on_prediction_results must not leave the pick missing
             # from the history navigator.
             self._record_history_entry(card_names, event.pack_number, event.pick_number)
+            # On a mid-draft attach only this pack is observed; rebuild the
+            # past picks from the restored pool so the navigator is usable.
+            self.state.reconstruct_pick_history_from_pool()
             if not replaying:
                 self.window.sync_pick_history(self.state.pick_history)
                 self._run_prediction()

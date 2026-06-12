@@ -88,8 +88,6 @@
     "sideboard_expand_hint_open": "▾",
     "sideboard_expand_hint_closed": "▸",
     "show_art_label": "Show card art",
-    "transparent_mode_label": "Transparent window",
-    "transparent_mode_note": "Restart NemeDraft to apply.",
     "export_logs_label": "Overlay logs",
     "section_maintenance": "Maintenance",
     "basic_land_type": "Basic Land",
@@ -116,8 +114,7 @@
     "summary_ai_pick": "AI: {card}",
     "compact_btn": "Compact",
     "full_btn": "Full",
-    "compact_disabled_tooltip": "Compact view becomes available during a draft",
-    "transparent_mode_tooltip": "Translucent HUD-style window with rounded corners. Turn off for a solid opaque window — useful if the overlay shows rendering artifacts (remote desktop, no desktop compositor) or if the see-through look is distracting."
+    "compact_disabled_tooltip": "Compact view becomes available during a draft"
   },
   "fr": {
     "app_title": "NemeDraft Overlay",
@@ -206,8 +203,6 @@
     "sideboard_expand_hint_open": "▾",
     "sideboard_expand_hint_closed": "▸",
     "show_art_label": "Afficher l'art",
-    "transparent_mode_label": "Fenêtre transparente",
-    "transparent_mode_note": "Redémarrer NemeDraft pour appliquer.",
     "export_logs_label": "Journaux de l'overlay",
     "section_maintenance": "Maintenance",
     "basic_land_type": "Terrain de base",
@@ -234,8 +229,7 @@
     "summary_ai_pick": "IA : {card}",
     "compact_btn": "Compacte",
     "full_btn": "Complète",
-    "compact_disabled_tooltip": "La vue compacte devient disponible pendant un draft",
-    "transparent_mode_tooltip": "Fenêtre translucide style HUD aux coins arrondis. Désactivez pour une fenêtre opaque — utile si l'overlay présente des artefacts d'affichage (bureau à distance, pas de compositeur) ou si la transparence vous distrait."
+    "compact_disabled_tooltip": "La vue compacte devient disponible pendant un draft"
   },
   "es": {
     "app_title": "NemeDraft Overlay",
@@ -324,8 +318,6 @@
     "sideboard_expand_hint_open": "▾",
     "sideboard_expand_hint_closed": "▸",
     "show_art_label": "Mostrar arte",
-    "transparent_mode_label": "Ventana transparente",
-    "transparent_mode_note": "Reinicia NemeDraft para aplicar.",
     "export_logs_label": "Registros del overlay",
     "section_maintenance": "Mantenimiento",
     "basic_land_type": "Tierra básica",
@@ -342,8 +334,7 @@
     "startup_error": "Error de inicio: {error}",
     "compact_btn": "Compacta",
     "full_btn": "Completa",
-    "compact_disabled_tooltip": "La vista compacta está disponible durante un draft",
-    "transparent_mode_tooltip": "Ventana translúcida estilo HUD con esquinas redondeadas. Desactívalo para una ventana opaca — útil si el overlay muestra artefactos de renderizado (escritorio remoto, sin compositor) o si la transparencia te distrae."
+    "compact_disabled_tooltip": "La vista compacta está disponible durante un draft"
   },
   "de": {
     "app_title": "NemeDraft Overlay",
@@ -432,8 +423,6 @@
     "sideboard_expand_hint_open": "▾",
     "sideboard_expand_hint_closed": "▸",
     "show_art_label": "Kartenbilder anzeigen",
-    "transparent_mode_label": "Transparentes Fenster",
-    "transparent_mode_note": "Zum Übernehmen NemeDraft neu starten.",
     "export_logs_label": "Overlay-Logs",
     "section_maintenance": "Wartung",
     "basic_land_type": "Standardland",
@@ -450,8 +439,7 @@
     "startup_error": "Startfehler: {error}",
     "compact_btn": "Kompakt",
     "full_btn": "Voll",
-    "compact_disabled_tooltip": "Die Kompaktansicht ist während eines Drafts verfügbar",
-    "transparent_mode_tooltip": "Durchscheinendes HUD-Fenster mit abgerundeten Ecken. Deaktivieren für ein deckendes Fenster — nützlich bei Darstellungsfehlern (Remote-Desktop, kein Compositor) oder wenn der Durchblick stört."
+    "compact_disabled_tooltip": "Die Kompaktansicht ist während eines Drafts verfügbar"
   },
   "pt": {
     "app_title": "NemeDraft Overlay",
@@ -540,8 +528,6 @@
     "sideboard_expand_hint_open": "▾",
     "sideboard_expand_hint_closed": "▸",
     "show_art_label": "Mostrar arte das cartas",
-    "transparent_mode_label": "Janela transparente",
-    "transparent_mode_note": "Reinicie o NemeDraft para aplicar.",
     "export_logs_label": "Registros do overlay",
     "section_maintenance": "Maintenance",
     "basic_land_type": "Terreno básico",
@@ -558,8 +544,7 @@
     "startup_error": "Erro de inicialização: {error}",
     "compact_btn": "Compacta",
     "full_btn": "Completa",
-    "compact_disabled_tooltip": "A vista compacta fica disponível durante um draft",
-    "transparent_mode_tooltip": "Janela translúcida estilo HUD com cantos arredondados. Desative para uma janela opaca — útil se o overlay mostrar artefactos de renderização (área de trabalho remota, sem compositor) ou se a transparência distrair."
+    "compact_disabled_tooltip": "A vista compacta fica disponível durante um draft"
   },
   "it": {
     "app_title": "NemeDraft Overlay",
@@ -648,8 +633,6 @@
     "sideboard_expand_hint_open": "▾",
     "sideboard_expand_hint_closed": "▸",
     "show_art_label": "Mostra arte delle carte",
-    "transparent_mode_label": "Finestra trasparente",
-    "transparent_mode_note": "Riavvia NemeDraft per applicare.",
     "export_logs_label": "Registri overlay",
     "section_maintenance": "Maintenance",
     "basic_land_type": "Terra base",
@@ -666,8 +649,7 @@
     "startup_error": "Errore di avvio: {error}",
     "compact_btn": "Compatta",
     "full_btn": "Completa",
-    "compact_disabled_tooltip": "La vista compatta è disponibile durante un draft",
-    "transparent_mode_tooltip": "Finestra traslucida in stile HUD con angoli arrotondati. Disattiva per una finestra opaca — utile se l'overlay mostra artefatti di rendering (desktop remoto, nessun compositore) o se la trasparenza distrae."
+    "compact_disabled_tooltip": "La vista compatta è disponibile durante un draft"
   },
   "ja": {
     "app_title": "NemeDraft Overlay",
@@ -756,8 +738,6 @@
     "sideboard_expand_hint_open": "▾",
     "sideboard_expand_hint_closed": "▸",
     "show_art_label": "カードアートを表示",
-    "transparent_mode_label": "透明ウィンドウ",
-    "transparent_mode_note": "適用するには NemeDraft を再起動してください。",
     "export_logs_label": "オーバーレイのログ",
     "section_maintenance": "メンテナンス",
     "basic_land_type": "基本土地",
@@ -774,8 +754,7 @@
     "startup_error": "起動エラー: {error}",
     "compact_btn": "コンパクト",
     "full_btn": "フル",
-    "compact_disabled_tooltip": "コンパクト表示はドラフト中に利用できます",
-    "transparent_mode_tooltip": "角丸の半透明HUDスタイルのウィンドウ。描画の乱れ（リモートデスクトップ、コンポジタなし）がある場合や透過表示が気になる場合は、オフにして不透明ウィンドウにしてください。"
+    "compact_disabled_tooltip": "コンパクト表示はドラフト中に利用できます"
   },
   "ko": {
     "app_title": "NemeDraft Overlay",
@@ -863,8 +842,6 @@
     "sideboard_expand_hint_open": "▾",
     "sideboard_expand_hint_closed": "▸",
     "show_art_label": "카드 아트 표시",
-    "transparent_mode_label": "투명 창",
-    "transparent_mode_note": "적용하려면 NemeDraft를 재시작하세요.",
     "export_logs_label": "오버레이 로그",
     "section_maintenance": "Maintenance",
     "basic_land_type": "기본 대지",
@@ -881,8 +858,7 @@
     "startup_error": "시작 오류: {error}",
     "compact_btn": "컴팩트",
     "full_btn": "전체",
-    "compact_disabled_tooltip": "컴팩트 보기는 드래프트 중에 사용할 수 있습니다",
-    "transparent_mode_tooltip": "둥근 모서리의 반투명 HUD 스타일 창입니다. 렌더링 문제(원격 데스크톱, 컴포지터 없음)가 있거나 투명 효과가 거슬리면 꺼서 불투명 창으로 사용하세요."
+    "compact_disabled_tooltip": "컴팩트 보기는 드래프트 중에 사용할 수 있습니다"
   },
   "zh-Hans": {
     "app_title": "NemeDraft Overlay",
@@ -970,8 +946,6 @@
     "sideboard_expand_hint_open": "▾",
     "sideboard_expand_hint_closed": "▸",
     "show_art_label": "显示卡牌图片",
-    "transparent_mode_label": "透明窗口",
-    "transparent_mode_note": "重启 NemeDraft 以应用。",
     "export_logs_label": "覆盖层日志",
     "section_maintenance": "Maintenance",
     "basic_land_type": "基本地",
@@ -988,7 +962,6 @@
     "startup_error": "启动错误: {error}",
     "compact_btn": "紧凑",
     "full_btn": "完整",
-    "compact_disabled_tooltip": "紧凑视图在轮抽期间可用",
-    "transparent_mode_tooltip": "圆角半透明 HUD 风格窗口。如出现渲染异常（远程桌面、无合成器）或觉得透明效果干扰，可关闭以使用不透明窗口。"
+    "compact_disabled_tooltip": "紧凑视图在轮抽期间可用"
   }
 }

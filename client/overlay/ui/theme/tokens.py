@@ -16,7 +16,6 @@ from PySide6.QtGui import QColor
 # Glass elevation layers (fill, hairline stroke)
 # ---------------------------------------------------------------------------
 
-L0_WINDOW_GLASS = "rgba(10, 13, 20, 0.93)"
 L0_WINDOW_OPAQUE = "#0a0d14"
 L0_WELL = "#0b1018"                      # input/score-bar track wells
 
@@ -127,7 +126,6 @@ RADIUS_ROW = 3
 RADIUS_CHIP = 4
 RADIUS_CARD = 6
 RADIUS_PANEL = 10
-RADIUS_WINDOW = 12   # glass mode only
 
 FONT_STACK = '"Inter", "Segoe UI", sans-serif'
 FONT_SIZE_MICRO = 11

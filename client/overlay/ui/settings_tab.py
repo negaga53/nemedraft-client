@@ -84,12 +84,6 @@ class SettingsTab(QWidget):
         self._show_art_checkbox.toggled.connect(self._sync)
         layout.addWidget(self._show_art_checkbox)
 
-        self._transparent_checkbox = QCheckBox(tr("transparent_mode_label"))
-        self._transparent_checkbox.setToolTip(tr("transparent_mode_tooltip"))
-        self._transparent_checkbox.setChecked(config.overlay.transparent)
-        self._transparent_checkbox.toggled.connect(self._sync)
-        layout.addWidget(self._transparent_checkbox)
-
         # -- Language section ------------------------------------------------
         self._sec_language = self._section(tr("section_language"))
         layout.addWidget(self._sec_language)
@@ -186,19 +180,16 @@ class SettingsTab(QWidget):
             "data.user_group": self._ug_combo.currentText(),
             "overlay.opacity": self._opacity_slider.value() / 100.0,
             "overlay.show_art": self._show_art_checkbox.isChecked(),
-            "overlay.transparent": self._transparent_checkbox.isChecked(),
         }
         old_values = {
             "data.user_group": c.data.user_group,
             "overlay.opacity": c.overlay.opacity,
             "overlay.show_art": c.overlay.show_art,
-            "overlay.transparent": c.overlay.transparent,
         }
 
         c.data.user_group = new_values["data.user_group"]
         c.overlay.opacity = new_values["overlay.opacity"]
         c.overlay.show_art = new_values["overlay.show_art"]
-        c.overlay.transparent = new_values["overlay.transparent"]
 
         for key, value in new_values.items():
             if old_values[key] != value:
@@ -257,8 +248,6 @@ class SettingsTab(QWidget):
         self._opacity_lbl.setText(tr("opacity_label"))
         self._opacity_lbl.setToolTip(tr("opacity_tooltip"))
         self._show_art_checkbox.setText(tr("show_art_label"))
-        self._transparent_checkbox.setText(tr("transparent_mode_label"))
-        self._transparent_checkbox.setToolTip(tr("transparent_mode_tooltip"))
         self._sec_language.setText(tr("section_language"))
         self._lang_lbl.setText(tr("language_label"))
         self._lang_lbl.setToolTip(tr("language_tooltip"))

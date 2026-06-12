@@ -53,7 +53,6 @@ class DataSettings:
 class OverlaySettings:
     """Window appearance preferences."""
 
-    transparent: bool = False
     opacity: float = 0.85
     show_art: bool = True
     geometry: str = ""  # legacy single-geometry slot (pre-0.6 fallback)

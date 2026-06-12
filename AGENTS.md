@@ -62,6 +62,18 @@ reaches into these paths when a new MTG set is added.
   commitment, mana curve, open lanes) sits full-width below the card table in `pack_tab.py`;
   its height is driven by `_CurveCard`'s fixed-90px `ManaCurvePlot` (`stats_tab.py`). Headless layout/size checks render via
   `OverlayWindow(...).grab()` under `QT_QPA_PLATFORM=offscreen`.
+- **The window is opaque-only.** The old glass/transparent mode
+  (`WA_TranslucentBackground` + translucent root + rounded corners + the
+  Settings "Transparent window" toggle) was removed — it rendered poorly
+  (see-through tab bar, remote-desktop/no-compositor artifacts). The whole
+  window is `L0_WINDOW_OPAQUE`; only the Settings opacity slider (30–100%, via
+  `setWindowOpacity`) controls translucency now. `build_stylesheet()` takes no
+  mode argument.
+- **A styled `QTabWidget` does not paint behind its tab-bar row.** A
+  `QTabBar { background: transparent }` leaves the row unpainted; the bar must
+  paint the window background **and** the `QTabWidget` must be in `documentMode`
+  so the bar spans the full width (otherwise the gap beside the tabs stays
+  unpainted). Guarded by `tests/test_tab_bar_opacity.py`.
 
 ## Releasing
 

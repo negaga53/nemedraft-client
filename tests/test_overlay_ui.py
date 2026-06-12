@@ -121,7 +121,7 @@ def test_pack_tab_has_pill_and_no_column_header(qapp):
 def test_overlay_window_has_no_bottom_pool_label(qapp):
     from client.overlay.ui.window import OverlayWindow
     from client.overlay.config import OverlayConfig
-    w = OverlayWindow(OverlayConfig(), transparent=False, show_art=False)
+    w = OverlayWindow(OverlayConfig(), show_art=False)
     assert not hasattr(w, "pool_label")
 
 
@@ -161,7 +161,7 @@ def test_deck_banner_shows_faction_line(qapp):
 def test_window_has_two_row_header(qapp):
     from client.overlay.ui.window import OverlayWindow
     from client.overlay.config import OverlayConfig
-    w = OverlayWindow(OverlayConfig(), transparent=False, show_art=False)
+    w = OverlayWindow(OverlayConfig(), show_art=False)
     assert hasattr(w, "_drag_row_widget")
     assert hasattr(w, "_brand_label")
     # brand shows app name, not pack/pick
@@ -171,7 +171,7 @@ def test_window_has_two_row_header(qapp):
 def test_compact_height_matches_spec(qapp):
     from client.overlay.ui.window import OverlayWindow
     from client.overlay.config import OverlayConfig
-    w = OverlayWindow(OverlayConfig(), transparent=False, show_art=False)
+    w = OverlayWindow(OverlayConfig(), show_art=False)
     # Per spec: drag row + pill + 3 rows + padding ≈ 160-200
     h = w._compact_height()
     assert 160 <= h <= 200
@@ -201,12 +201,11 @@ def test_sideboard_starts_collapsed(qapp):
     assert not t._sb_scroll.isVisible()
 
 
-def test_settings_has_show_art_and_transparent_toggles(qapp):
+def test_settings_has_show_art_toggle(qapp):
     from client.overlay.ui.settings_tab import SettingsTab
     from client.overlay.config import OverlayConfig
     t = SettingsTab(OverlayConfig())
     assert hasattr(t, "_show_art_checkbox")
-    assert hasattr(t, "_transparent_checkbox")
 
 
 def test_settings_toggle_syncs_config(qapp):
@@ -214,23 +213,18 @@ def test_settings_toggle_syncs_config(qapp):
     from client.overlay.config import OverlayConfig
     cfg = OverlayConfig()
     cfg.overlay.show_art = True
-    cfg.overlay.transparent = False
     t = SettingsTab(cfg)
     t._show_art_checkbox.setChecked(False)
     assert cfg.overlay.show_art is False
-    t._transparent_checkbox.setChecked(True)
-    assert cfg.overlay.transparent is True
 
 
-def test_generated_stylesheets_use_layer_tokens(qapp):
+def test_generated_stylesheet_uses_layer_tokens(qapp):
     from client.overlay.ui.theme import tokens
     from client.overlay.ui.theme.qss import build_stylesheet
 
-    opaque = build_stylesheet(glass=False)
-    glass = build_stylesheet(glass=True)
+    opaque = build_stylesheet()
     assert tokens.L0_WINDOW_OPAQUE in opaque
-    assert tokens.L0_WINDOW_GLASS in glass
-    assert tokens.ACCENT in opaque and tokens.ACCENT in glass
+    assert tokens.ACCENT in opaque
     # Old selectors we removed shouldn't be present
     assert "QLabel#poolLabel" not in opaque
     assert "QLabel#cardName" not in opaque
@@ -243,16 +237,15 @@ def test_generated_stylesheet_parses_without_warnings(qapp):
 
     from client.overlay.ui.theme.qss import build_stylesheet
 
-    for glass in (False, True):
-        w = QWidget()
-        w.setStyleSheet(build_stylesheet(glass))
-        w.ensurePolished()
+    w = QWidget()
+    w.setStyleSheet(build_stylesheet())
+    w.ensurePolished()
 
 
 def test_compact_mode_shows_context_pill(qapp):
     from client.overlay.ui.window import OverlayWindow
     from client.overlay.config import OverlayConfig
-    w = OverlayWindow(OverlayConfig(), transparent=False, show_art=False)
+    w = OverlayWindow(OverlayConfig(), show_art=False)
     assert hasattr(w, "_mini_pill")
 
 
@@ -274,7 +267,7 @@ def test_overlay_window_has_minimize_button(qapp):
     from client.overlay.ui.window import OverlayWindow
     from client.overlay.config import OverlayConfig
 
-    w = OverlayWindow(OverlayConfig(), transparent=False, show_art=False)
+    w = OverlayWindow(OverlayConfig(), show_art=False)
     assert hasattr(w, "_min_btn")
     # Tooltip mentions the hide-to-tray behaviour added so Windows
     # users (where Qt.Tool windows have no taskbar entry) can find
@@ -310,7 +303,7 @@ def test_window_edge_resize_hit_testing(qapp):
     from client.overlay.config import OverlayConfig
     from PySide6.QtCore import QPoint, Qt
 
-    w = OverlayWindow(OverlayConfig(), transparent=False, show_art=False)
+    w = OverlayWindow(OverlayConfig(), show_art=False)
     w.resize(720, 900)
     rect = w.rect()
     # Centre is draggable territory, not a resize edge.
@@ -329,11 +322,11 @@ def test_compact_toggle_is_discoverable(qapp):
     from client.overlay.ui.window import OverlayWindow
     from client.overlay.config import OverlayConfig
 
-    w = OverlayWindow(OverlayConfig(), transparent=False, show_art=False)
+    w = OverlayWindow(OverlayConfig(), show_art=False)
     assert w._toggle_btn.objectName() == "compactToggle"
     # The generated stylesheet must carry a rule for it.
     from client.overlay.ui.theme.qss import build_stylesheet
-    assert "QPushButton#compactToggle" in build_stylesheet(False)
+    assert "QPushButton#compactToggle" in build_stylesheet()
 
 
 def test_compact_toggle_always_visible_gated_by_enabled(qapp):
@@ -342,7 +335,7 @@ def test_compact_toggle_always_visible_gated_by_enabled(qapp):
     from client.overlay.ui.window import OverlayWindow
     from client.overlay.config import OverlayConfig
 
-    w = OverlayWindow(OverlayConfig(), transparent=False, show_art=False)
+    w = OverlayWindow(OverlayConfig(), show_art=False)
     # Never hidden — only disabled while no draft is live.
     assert w._toggle_btn.isVisibleTo(w)
     assert not w._toggle_btn.isEnabled()
@@ -480,7 +473,7 @@ def test_prediction_render_enables_compact_toggle(qapp):
     from client.overlay.config import OverlayConfig
     from client.overlay.api_client import Pick
 
-    w = OverlayWindow(OverlayConfig(), transparent=False, show_art=False)
+    w = OverlayWindow(OverlayConfig(), show_art=False)
     w.show_model_ready()
     assert not w._toggle_btn.isEnabled()  # disabled until a pack is live
 

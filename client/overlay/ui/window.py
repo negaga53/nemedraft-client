@@ -74,9 +74,8 @@ class OverlayWindow(QWidget):
 
     Args:
         config: Overlay configuration (persisted between sessions).
-        transparent: Use frameless click-through transparent mode.
         show_art: Display Scryfall card art thumbnails.
-        opacity: Window opacity in transparent mode (0.0–1.0).
+        opacity: Whole-window opacity (0.0–1.0), applied via setWindowOpacity.
     """
 
     # Thread-safe signals emitted from background threads, handled on UI thread.
@@ -93,13 +92,11 @@ class OverlayWindow(QWidget):
         self,
         config: OverlayConfig,
         *,
-        transparent: bool = False,
         show_art: bool = False,
         opacity: float = 0.85,
         scryfall_dir: Path | None = None,
     ) -> None:
         super().__init__()
-        self._transparent = transparent
         self._show_art = show_art
         self._config = config
         self._recommend_count = 1
@@ -116,9 +113,6 @@ class OverlayWindow(QWidget):
             | Qt.WindowType.Tool
             | Qt.WindowType.FramelessWindowHint
         )
-        if transparent:
-            self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
-
         self.setWindowFlags(flags)
         self.setMinimumWidth(600)
         self.setMaximumWidth(1100)
@@ -128,7 +122,7 @@ class OverlayWindow(QWidget):
         # the edge hot-zones in mousePressEvent can show resize cursors and
         # hand off to the window manager via startSystemResize.
         self.setMouseTracking(True)
-        apply_theme(self, glass=transparent)
+        apply_theme(self)
 
         self._build_ui()
         self.prediction_ready.connect(self._on_prediction)
@@ -237,6 +231,11 @@ class OverlayWindow(QWidget):
 
         # Tabbed area.
         self.tabs = QTabWidget()
+        # Document mode stretches the tab bar to the full widget width so its
+        # QSS background fills the whole tab-bar row; without it the bar is
+        # only as wide as the tabs and the gap beside them stays transparent
+        # (the translucent window then shows the desktop through that gap).
+        self.tabs.setDocumentMode(True)
         self.pack_tab = PackTab(show_art=self._show_art)
         self.deck_tab = DeckTab()
         self.summary_tab = SummaryTab()
@@ -411,28 +410,6 @@ class OverlayWindow(QWidget):
             )
             if self._compact:
                 self._refresh_mini()
-
-    def set_transparent(self, enabled: bool) -> None:
-        """Apply transparent mode live by re-creating the native window.
-
-        ``WA_TranslucentBackground`` only takes effect at native window
-        creation, and ``setWindowFlags`` early-returns when the flags are
-        unchanged (ours never change). ``setParent(None, flags)`` is the
-        reliable way to force a re-create; ``show()`` re-runs the macOS
-        floating elevation via ``showEvent``.
-        """
-        if enabled == self._transparent:
-            return
-        self._transparent = enabled
-        geometry = self.geometry()
-        was_visible = self.isVisible()
-        self.hide()
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, enabled)
-        self.setParent(None, self.windowFlags())
-        apply_theme(self, glass=enabled)
-        self.setGeometry(geometry)
-        if was_visible:
-            self.show()
 
     def show_prediction_loading(self, pack_number: int, pick_number: int) -> None:
         """Surface a loading indicator while a prediction is in flight.

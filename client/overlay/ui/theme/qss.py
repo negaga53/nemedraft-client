@@ -1,11 +1,7 @@
-"""Stylesheet generation — one builder for both window modes.
+"""Stylesheet generation for the opaque overlay window.
 
-``build_stylesheet(glass)`` renders the entire application stylesheet
-from tokens. The only ``glass`` delta is the root background (translucent
-rgba + rounded corners vs opaque hex) — everything else is shared, which
-is what collapsed the old OVERLAY/TRANSPARENT stylesheet pair.
-
-Widget variants are addressed by objectName and enumerable dynamic
+``build_stylesheet()`` renders the entire application stylesheet from
+tokens. Widget variants are addressed by objectName and enumerable dynamic
 properties (``tint``, ``medal``, ``status``, ``severity``, ``picked``,
 ``recommended``, …) instead of per-widget setStyleSheet calls.
 """
@@ -41,27 +37,12 @@ _DeckCardRow[tint="{key}"] {{
     return "\n".join(rules)
 
 
-def build_stylesheet(glass: bool) -> str:
-    """Render the full application stylesheet for the given window mode."""
-    if glass:
-        root = f"""
+def build_stylesheet() -> str:
+    """Render the full application stylesheet (opaque window)."""
+    window_bg = t.L0_WINDOW_OPAQUE
+    root = f"""
 QWidget {{
-    background-color: {t.L0_WINDOW_GLASS};
-    color: {t.TEXT_PRIMARY};
-    font-family: {t.FONT_STACK};
-    font-size: {t.FONT_SIZE_BODY}px;
-    border-radius: {t.RADIUS_WINDOW}px;
-}}
-QScrollArea {{
-    background: transparent;
-    border: none;
-    border-radius: 0;
-}}
-"""
-    else:
-        root = f"""
-QWidget {{
-    background-color: {t.L0_WINDOW_OPAQUE};
+    background-color: {window_bg};
     color: {t.TEXT_PRIMARY};
     font-family: {t.FONT_STACK};
     font-size: {t.FONT_SIZE_BODY}px;
@@ -171,8 +152,11 @@ QTabWidget::pane {{
     padding: 0;
 }}
 
+/* Paint the window background so the bar reads as a flush chrome strip:
+   a styled QTabWidget doesn't fill behind its tab-bar row, and the bar
+   spans full width via documentMode (see OverlayWindow._build_ui). */
 QTabBar {{
-    background: transparent;
+    background: {window_bg};
 }}
 
 QTabBar::tab {{

@@ -1,4 +1,4 @@
-"""HUD-glass theme: tokens, generated QSS, fonts, and the property helper."""
+"""HUD theme: tokens, generated QSS, fonts, and the property helper."""
 
 from __future__ import annotations
 
@@ -7,9 +7,9 @@ from PySide6.QtWidgets import QWidget
 from client.overlay.ui.theme.qss import build_stylesheet
 
 
-def apply_theme(window: QWidget, *, glass: bool) -> None:
+def apply_theme(window: QWidget) -> None:
     """Apply the generated application stylesheet to *window*."""
-    window.setStyleSheet(build_stylesheet(glass))
+    window.setStyleSheet(build_stylesheet())
 
 
 def set_prop(widget: QWidget, name: str, value: object) -> None:

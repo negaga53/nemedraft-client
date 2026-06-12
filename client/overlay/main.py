@@ -1148,8 +1148,6 @@ class OverlayApp:
         if key == "overlay.show_art":
             self.art_cache.enabled = bool(value)
             self.window.set_show_art(bool(value))
-        elif key == "overlay.transparent":
-            self.window.set_transparent(bool(value))
 
     def _on_settings_changed(self) -> None:
         """Persist settings and apply changes."""
@@ -1205,11 +1203,6 @@ def parse_args() -> argparse.Namespace:
         help="Re-download Scryfall bulk data before starting",
     )
     parser.add_argument(
-        "--transparent",
-        action="store_true",
-        help="Use frameless transparent overlay window",
-    )
-    parser.add_argument(
         "--show-art",
         action="store_true",
         help="Show card art thumbnails in the overlay",
@@ -1218,7 +1211,7 @@ def parse_args() -> argparse.Namespace:
         "--opacity",
         type=float,
         default=0.85,
-        help="Window opacity for transparent mode (0.0-1.0)",
+        help="Whole-window opacity (0.0-1.0)",
     )
     return parser.parse_args()
 
@@ -1264,8 +1257,6 @@ def main() -> None:
     env = load_client_env()
 
     # CLI flags override config.
-    if args.transparent:
-        config.overlay.transparent = True
     if args.show_art:
         config.overlay.show_art = True
     if args.opacity != 0.85:
@@ -1282,7 +1273,6 @@ def main() -> None:
     # --- Show window immediately (Home tab is visible) ---
     window = OverlayWindow(
         config,
-        transparent=config.overlay.transparent,
         show_art=config.overlay.show_art,
         opacity=config.overlay.opacity,
         scryfall_dir=Path(args.scryfall_dir),

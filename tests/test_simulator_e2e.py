@@ -94,7 +94,7 @@ def _build_app(qapp, sim_log: Path, grpid_to_name: dict[int, str]):
     app.memory_watcher = None
     app.config = OverlayConfig()
 
-    app.window = OverlayWindow(OverlayConfig(), transparent=False, show_art=False)
+    app.window = OverlayWindow(OverlayConfig(), show_art=False)
     app.window.show_model_ready()
 
     app._marshaler = UiMarshaler()

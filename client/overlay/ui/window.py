@@ -164,16 +164,6 @@ class OverlayWindow(QWidget):
         drag_row.setContentsMargins(8, 4, 8, 4)
         drag_row.setSpacing(6)
 
-        # Always visible so users discover the control; enabled only while
-        # a draft is live (compact view has nothing to show otherwise).
-        self._toggle_btn = QPushButton()
-        self._toggle_btn.setObjectName("compactToggle")
-        self._toggle_btn.setFixedHeight(22)
-        self._toggle_btn.clicked.connect(self._toggle_compact)
-        self._toggle_btn.setEnabled(False)
-        self._refresh_toggle_btn()
-        drag_row.addWidget(self._toggle_btn)
-
         self._brand_tick = QLabel("◢")
         self._brand_tick.setObjectName("brandTick")
         self._brand_label = QLabel("NEMEDRAFT")
@@ -184,6 +174,17 @@ class OverlayWindow(QWidget):
         drag_row.addWidget(self._brand_label)
         drag_row.addWidget(self._version_label)
         drag_row.addStretch()
+
+        # Sits at the right edge next to the window buttons; always visible so
+        # users discover the control, enabled only while a draft is live
+        # (compact view has nothing to show otherwise).
+        self._toggle_btn = QPushButton()
+        self._toggle_btn.setObjectName("compactToggle")
+        self._toggle_btn.setFixedHeight(22)
+        self._toggle_btn.clicked.connect(self._toggle_compact)
+        self._toggle_btn.setEnabled(False)
+        self._refresh_toggle_btn()
+        drag_row.addWidget(self._toggle_btn)
 
         self._min_btn = QPushButton("‒")
         self._min_btn.setObjectName("windowBtn")

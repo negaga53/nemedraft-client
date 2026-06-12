@@ -878,9 +878,14 @@ class OverlayApp:
                         len(picked_names),
                     )
 
-            if replaying:
-                self._record_replay_history(card_names, event.pack_number, event.pick_number)
-            else:
+            # Always record a provisional history entry at pack arrival.
+            # Predictions overwrite it with scored picks when they land —
+            # but a fast pick, a server hiccup, or the stale-result guard
+            # in _on_prediction_results must not leave the pick missing
+            # from the history navigator.
+            self._record_history_entry(card_names, event.pack_number, event.pick_number)
+            if not replaying:
+                self.window.sync_pick_history(self.state.pick_history)
                 self._run_prediction()
 
         elif isinstance(event, PickEvent):
@@ -907,13 +912,16 @@ class OverlayApp:
                         self.state.save_pick_history(self._cache_dir)
                         self._update_deck_suggestions()
 
-    def _record_replay_history(
+    def _record_history_entry(
         self,
         card_names: list[str],
         pack_number: int,
         pick_number: int,
     ) -> None:
-        """Create a minimal history entry from replayed log data (no ML scores)."""
+        """Create a minimal history entry from pack data (no ML scores).
+
+        Used for both replayed packs and live packs; an existing entry
+        (e.g. one already enriched with prediction scores) is kept."""
         key = (pack_number, pick_number)
         if key in self.state.pick_history:
             return

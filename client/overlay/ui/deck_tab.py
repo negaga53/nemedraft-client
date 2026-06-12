@@ -243,7 +243,7 @@ class DeckTab(QWidget):
         self._sb_scroll = QScrollArea()
         self._sb_scroll.setWidgetResizable(True)
         self._sb_scroll.setFrameShape(QFrame.Shape.NoFrame)
-        self._sb_scroll.setMaximumHeight(160)
+        self._sb_scroll.setFixedHeight(6 * _ROW_H + 5)  # 6 rows × 24 px + 5 × 1 px spacing
         self._sb_container = QWidget()
         self._sb_container.setMouseTracking(True)
         self._sb_layout = QVBoxLayout(self._sb_container)

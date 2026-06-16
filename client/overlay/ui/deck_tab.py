@@ -311,8 +311,10 @@ class DeckTab(QWidget):
         self._arch_combo.blockSignals(True)
         self._arch_combo.clear()
         for key, sug in ordered:
-            score_text = f"{sug.score:.1f}" if sug.score >= 0 else "N/A"
-            self._arch_combo.addItem(f"{key}  ({score_text})", key)
+            if sug.score >= 0:
+                self._arch_combo.addItem(f"{key}  ({sug.score:.1f})", key)
+            else:
+                self._arch_combo.addItem(key, key)
         self._arch_combo.blockSignals(False)
 
         if ordered:
@@ -337,16 +339,17 @@ class DeckTab(QWidget):
             self._preview.hide()
 
         self._faction_line.set_colors(list(key))
-        self._stats_label.setText(
-            tr(
-                "deck_stats",
-                score=f"{sug.score:.1f}" if sug.score >= 0 else "N/A",
-                creatures=sug.creature_count,
-                spells=sug.spell_count,
-                lands=sug.land_count,
-                cmc=f"{sug.avg_cmc:.1f}",
-            )
+        stat_fields = dict(
+            creatures=sug.creature_count,
+            spells=sug.spell_count,
+            lands=sug.land_count,
+            cmc=f"{sug.avg_cmc:.1f}",
         )
+        if sug.score >= 0:
+            stats_text = tr("deck_stats", score=f"{sug.score:.1f}", **stat_fields)
+        else:
+            stats_text = tr("deck_stats_no_score", **stat_fields)
+        self._stats_label.setText(stats_text)
 
         # --- Build categorised main deck ---
         self._clear_layout(self._main_layout)

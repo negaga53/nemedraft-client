@@ -487,6 +487,40 @@ def test_prediction_render_enables_compact_toggle(qapp):
     assert w._toggle_btn.isEnabled()
 
 
+def test_deck_tab_omits_na_when_unscored(qapp):
+    from client.overlay.ui.deck_tab import DeckTab
+    from common.inference.deck_builder import DeckSuggestion
+
+    tab = DeckTab()
+    sug = DeckSuggestion(
+        archetype="UG", main_deck=[], score=-1.0,
+        creature_count=10, spell_count=13, land_count=17, avg_cmc=2.5,
+    )
+    tab.update_suggestions({"UG": sug}, pool_names=[], scryfall_cards={})
+
+    assert tab._arch_combo.itemText(0) == "UG"          # no "(N/A)" suffix
+    label = tab._stats_label.text()
+    assert "N/A" not in label
+    # Locale-robust: if the scored template (deck_stats, which has {score}) were
+    # used by mistake, tr() can't fill {score} and leaves the literal placeholder.
+    assert "{score}" not in label
+    assert "Score" not in label  # English-locale guard (active in tests)
+
+
+def test_deck_tab_shows_score_when_available(qapp):
+    from client.overlay.ui.deck_tab import DeckTab
+    from common.inference.deck_builder import DeckSuggestion
+
+    tab = DeckTab()
+    sug = DeckSuggestion(
+        archetype="UG", main_deck=[], score=78.5,
+        creature_count=10, spell_count=13, land_count=17, avg_cmc=2.5,
+    )
+    tab.update_suggestions({"UG": sug}, pool_names=[], scryfall_cards={})
+    assert tab._arch_combo.itemText(0) == "UG  (78.5)"
+    assert "78.5" in tab._stats_label.text()
+
+
 def test_deck_stats_no_score_key_present_all_locales():
     import json
     from pathlib import Path

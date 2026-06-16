@@ -19,7 +19,7 @@ SCRYFALL_DIR = Path(__file__).resolve().parents[2] / "data" / "scryfall"
 
 # Sets currently shipped with per-set JSONs in SCRYFALL_DIR. Used as the
 # default filter target when callers don't pass --sets.
-DEFAULT_SETS = ["ECL", "EOE", "FDN", "FIN", "SOS", "TLA", "TMT", "MKM", "BLB", "DSK"]
+DEFAULT_SETS = ["ECL", "EOE", "FDN", "FIN", "SOS", "TLA", "TMT", "MKM", "BLB", "DSK", "MSH"]
 
 _FILTERED_FIELDS = [
     "name", "oracle_id", "mana_cost", "cmc", "type_line", "oracle_text",

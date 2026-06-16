@@ -948,6 +948,30 @@ def _holistic_score(
     return base * completeness
 
 
+def _color_match_key(
+    archetype: str,
+    pip_totals: dict[str, int],
+    ranked_colors: list[str],
+) -> tuple[int, int, float]:
+    """Ordering key for an unscored archetype, by fit to the pool's colours.
+
+    Returns ``(overlap, -num_colours, coverage)`` for a descending sort:
+    1. overlap     — how many of the archetype's colours are among the pool's two
+                     most-drafted colours (prefers decks in your main colours);
+    2. -num_colours — prefers the tight pair over a 3-colour splash that also
+                     uses your main colours (e.g. ``UG`` over ``UGW``);
+    3. coverage    — total pool pips in the archetype's colours (final tiebreak).
+
+    overlap is colour-membership, not magnitude, so it does not flip to a mono
+    deck when one of the two main colours slightly leads.
+    """
+    top2 = set(ranked_colors[:2])
+    arch_colors = set(archetype)
+    overlap = len(arch_colors & top2)
+    coverage = sum(pip_totals.get(c, 0) for c in arch_colors)
+    return (overlap, -len(archetype), coverage)
+
+
 def suggest_decks(
     pool_names: list[str],
     scryfall_cards: dict[str, ScryfallCard],
@@ -1035,7 +1059,16 @@ def suggest_decks(
         pairs_to_try = _make_pairs(list(CARD_COLORS))
         min_spells_threshold = 0
         fallback_attempted = True
-    ordered = dict(sorted(results.items(), key=lambda kv: kv[1].score, reverse=True))
+    def _order_key(item):
+        arch, sug = item
+        has_score = sug.score >= 0.0
+        return (
+            1 if has_score else 0,            # scored decks first
+            sug.score if has_score else 0.0,  # then by score
+            *_color_match_key(arch, pip_totals, ranked_colors),  # else / tiebreak by colours
+        )
+
+    ordered = dict(sorted(results.items(), key=_order_key, reverse=True))
     # Filter out archetypes scoring far below the top option — the UI lists
     # every suggestion in a dropdown, and a deck 20+ points behind the
     # leader is noise (typically a weird 4-splash build into a colour pair

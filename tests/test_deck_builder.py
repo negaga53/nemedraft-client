@@ -1637,3 +1637,56 @@ class TestDemotionSkippedAboveFloor:
             f"Expected ≥7 Mountains (floor), got {mountains}. "
             f"Lands: {top.lands}, archetype: {top.archetype}"
         )
+
+
+class TestColorFallbackOrdering:
+    def test_color_match_key_prefers_main_pair(self):
+        from common.inference.deck_builder import _color_match_key
+        pip = {"W": 3, "U": 14, "B": 0, "R": 0, "G": 10}
+        top = ["U", "G", "W"]  # ranked_colors; top-2 = U, G
+        ug = _color_match_key("UG", pip, top)
+        ugw = _color_match_key("UGW", pip, top)
+        mono_u = _color_match_key("U", pip, top)
+        # pair first, then 3-colour splash using the pair, then mono — holds
+        # even though U (14) > G (10): overlap is membership, not magnitude.
+        assert ug > ugw > mono_u
+
+    def test_color_match_key_empty_pool(self):
+        from common.inference.deck_builder import _color_match_key
+        pip = {c: 0 for c in "WUBRG"}
+        assert _color_match_key("UG", pip, []) == (0, -2, 0)
+
+    def _spell(self, name, cost, colors):
+        from common.inference.pool_analyzer import ScryfallCard
+        return ScryfallCard(
+            name=name, mana_cost=cost, cmc=2, type_line="Creature",
+            oracle_text="", colors=colors, color_identity=colors,
+            keywords=[], rarity="common",
+        )
+
+    def test_suggest_decks_orders_by_colors_when_unscored(self):
+        scry, pool = {}, []
+        for i in range(14):
+            scry[f"u{i}"] = self._spell(f"u{i}", "{1}{U}", ["U"]); pool.append(f"u{i}")
+        for i in range(10):
+            scry[f"g{i}"] = self._spell(f"g{i}", "{1}{G}", ["G"]); pool.append(f"g{i}")
+        for i in range(3):
+            scry[f"w{i}"] = self._spell(f"w{i}", "{1}{W}", ["W"]); pool.append(f"w{i}")
+        result = suggest_decks(pool, scry, card_map=None, set_metrics=None,
+                               trophy_prior=None)
+        assert result, "expected at least one suggestion"
+        assert all(s.score < 0 for s in result.values())  # no 17Lands data
+        assert next(iter(result)) == "UG"  # dominant pair first
+
+    def test_suggest_decks_orders_by_score_when_available(self):
+        scry, pool = {}, []
+        for i in range(14):
+            scry[f"u{i}"] = self._spell(f"u{i}", "{1}{U}", ["U"]); pool.append(f"u{i}")
+        for i in range(14):
+            scry[f"g{i}"] = self._spell(f"g{i}", "{1}{G}", ["G"]); pool.append(f"g{i}")
+        card_map = _card_map({n: 0.60 for n in pool})
+        sm = _set_metrics(mean=0.55, std=0.03)
+        result = suggest_decks(pool, scry, card_map=card_map, set_metrics=sm,
+                               trophy_prior=None)
+        scores = [s.score for s in result.values()]
+        assert scores == sorted(scores, reverse=True)  # ordered by score, not colors

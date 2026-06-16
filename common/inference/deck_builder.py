@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 # Deck constraints.
 TARGET_SPELLS = 23
 TARGET_LANDS = 17
+DECK_SIZE = TARGET_SPELLS + TARGET_LANDS  # 40 — a legal limited deck
 MIN_CREATURES = 9
 MIN_NONCREATURES = 6
 
@@ -39,10 +40,6 @@ TROPHY_DECK_SCORE_BONUS = 8.0
 _TROPHY_FALLBACK_BASE_PENALTY = 0.10
 _TROPHY_FALLBACK_SPAN = 0.05
 
-# Alternative archetypes with fewer playables than this are dropped from
-# the dropdown — they fill out as 35+ lands and are noise next to a real
-# build. The top suggestion is kept regardless so the UI is never empty.
-_PLAYABLE_FLOOR = 14
 
 
 @dataclass
@@ -1086,19 +1083,18 @@ def suggest_decks(
         return ordered
     top_score = next(iter(ordered.values())).score
     score_filtered = {k: v for k, v in ordered.items() if v.score >= top_score - 20.0}
-    # Secondary filter: a deck with fewer than _PLAYABLE_FLOOR spells in
-    # main_deck is mostly lands (target_lands = 40 - len(main_deck)) and
-    # qualitatively unplayable, even when its avg-spell-quality scores
-    # decently. Drop such alternatives so the dropdown only shows
-    # buildable options. We keep the top suggestion regardless so the
-    # dropdown is never empty — better to surface a thin best-effort
-    # recommendation than nothing.
+    # Secondary filter: only offer archetypes that field a legal 40-card deck.
+    # An archetype whose colors lack enough playables (e.g. mono-black from a
+    # 19-card pool → ~20 spells + 17 lands = 37) can't reach DECK_SIZE without
+    # flooding, so drop it from the dropdown rather than show an undersized
+    # deck. The top suggestion is always kept so the dropdown is never empty —
+    # if every option is short, surface the best one rather than nothing.
     top_key = next(iter(score_filtered))
-    playable = {
+    buildable = {
         k: v for k, v in score_filtered.items()
-        if k == top_key or len(v.main_deck) >= _PLAYABLE_FLOOR
+        if k == top_key or (len(v.main_deck) + v.land_count) >= DECK_SIZE
     }
-    return playable
+    return buildable
 
 
 def _build_for_pairs(

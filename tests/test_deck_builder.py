@@ -1720,3 +1720,22 @@ class TestColorFallbackOrdering:
                                trophy_prior=None)
         scores = [s.score for s in result.values()]
         assert scores == sorted(scores, reverse=True)  # ordered by score, not colors
+
+    def test_thin_archetypes_hidden_from_suggestions(self):
+        """Option C: only offer archetypes that field a legal 40-card deck;
+        drop thin builds (too few playables in that color combo) from the
+        dropdown. The top suggestion is always kept so it's never empty."""
+        scry, pool = {}, []
+        for i in range(16):
+            scry[f"w{i}"] = self._spell(f"w{i}", "{1}{W}", ["W"]); pool.append(f"w{i}")
+        for i in range(19):
+            scry[f"b{i}"] = self._spell(f"b{i}", "{1}{B}", ["B"]); pool.append(f"b{i}")
+        result = suggest_decks(pool, scry, card_map=None, set_metrics=None,
+                               trophy_prior=None)
+        # WB has 35 castables → a full 40-card deck → offered.
+        assert "WB" in result
+        # No offered deck is undersized: the thin mono alternatives (mono-B ~36,
+        # mono-W ~33) must be dropped from the dropdown.
+        for key, sug in result.items():
+            total = len(sug.main_deck) + sug.land_count
+            assert total >= 40, f"{key} offered with only {total} cards"

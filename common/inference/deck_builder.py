@@ -580,10 +580,18 @@ def _demote_infeasible_minority(
         # when the floor itself can't be met (e.g., budget too tight
         # or a color has zero basics after redistribution).
         committed_colors_in_base = [c for c in deck_colors if c in mana_base_colors]
+        # Count fixing lands toward each color's floor, not basics alone:
+        # nonbasic fixers (duals, fetches, universal fixers) eat the basics
+        # budget (basics_budget = 17 - nonbasics), so with 4+ fixers two colors
+        # can never both reach MIN_BASICS_PER_COMMIT_COLOR *basics* — which used
+        # to disable this "keep all cards" escape and over-cut a perfectly
+        # castable 2-colour deck down to mono. A color is at floor if its
+        # basics + floored fixing sources meet the threshold.
         all_committed_at_floor = (
             committed_colors_in_base
             and all(
-                trial_basics.get(c, 0) >= MIN_BASICS_PER_COMMIT_COLOR
+                trial_basics.get(c, 0) + int(fixing_sources.get(c, 0.0))
+                >= MIN_BASICS_PER_COMMIT_COLOR
                 for c in committed_colors_in_base
             )
         )

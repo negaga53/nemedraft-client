@@ -1460,6 +1460,36 @@ class TestSuggestDecksAdaptiveLandCount:
         assert len(top.nonbasic_lands) == 4
         assert len(top.lands) == 13
 
+    def test_feasible_two_color_deck_not_over_cut(self):
+        """Regression: a single-pip UB pool with universal fixers (4 Evolving
+        Wilds) is trivially castable, so _demote_infeasible_minority must NOT
+        collapse it to a thin mono deck. The per-color floor escape must credit
+        fixing lands, not basics alone — otherwise 4+ fixers eat the basics
+        budget below 2*MIN_BASICS_PER_COMMIT_COLOR and disable the escape.
+        """
+        from common.inference.deck_builder import suggest_decks
+
+        wilds = _sc(
+            "Evolving Wilds", "", 0, type_line="Land",
+            oracle="search your library for a basic land card", ci=[],
+        )
+        spells = (
+            [_sc(f"U2_{i}", "{1}{U}", 2, ci=["U"]) for i in range(6)]
+            + [_sc(f"U3_{i}", "{2}{U}", 3, ci=["U"]) for i in range(6)]
+            + [_sc(f"B2_{i}", "{1}{B}", 2, ci=["B"]) for i in range(6)]
+            + [_sc(f"B3_{i}", "{2}{B}", 3, ci=["B"]) for i in range(7)]
+        )
+        pool_names = [c.name for c in spells] + ["Evolving Wilds"] * 4
+        scryfall = {c.name: c for c in spells} | {"Evolving Wilds": wilds}
+
+        suggestions = suggest_decks(pool_names=pool_names, scryfall_cards=scryfall)
+        top = next(iter(suggestions.values()))
+        # 25 castable spells in pool; a feasible UB build keeps ~23, not ~13.
+        assert len(top.main_deck) >= 22, (
+            f"feasible UB deck over-cut to {len(top.main_deck)} spells "
+            f"(archetype={top.archetype})"
+        )
+
 
 class TestHolisticScoreTrophyFallback:
     def test_falls_back_to_trophy_when_card_map_has_no_gihwr(self):

@@ -114,7 +114,8 @@
     "summary_ai_pick": "AI: {card}",
     "compact_btn": "Compact",
     "full_btn": "Full",
-    "compact_disabled_tooltip": "Compact view becomes available during a draft"
+    "compact_disabled_tooltip": "Compact view becomes available during a draft",
+    "deck_stats_no_score": "Creatures: {creatures}  Spells: {spells}  Lands: {lands}  |  Avg CMC: {cmc}"
   },
   "fr": {
     "app_title": "NemeDraft Overlay",
@@ -229,7 +230,8 @@
     "summary_ai_pick": "IA : {card}",
     "compact_btn": "Compacte",
     "full_btn": "Complète",
-    "compact_disabled_tooltip": "La vue compacte devient disponible pendant un draft"
+    "compact_disabled_tooltip": "La vue compacte devient disponible pendant un draft",
+    "deck_stats_no_score": "Créatures : {creatures}  Sorts : {spells}  Terrains : {lands}  |  CMC moy : {cmc}"
   },
   "es": {
     "app_title": "NemeDraft Overlay",
@@ -334,7 +336,8 @@
     "startup_error": "Error de inicio: {error}",
     "compact_btn": "Compacta",
     "full_btn": "Completa",
-    "compact_disabled_tooltip": "La vista compacta está disponible durante un draft"
+    "compact_disabled_tooltip": "La vista compacta está disponible durante un draft",
+    "deck_stats_no_score": "Criaturas: {creatures}  Hechizos: {spells}  Tierras: {lands}  |  CMC prom: {cmc}"
   },
   "de": {
     "app_title": "NemeDraft Overlay",
@@ -439,7 +442,8 @@
     "startup_error": "Startfehler: {error}",
     "compact_btn": "Kompakt",
     "full_btn": "Voll",
-    "compact_disabled_tooltip": "Die Kompaktansicht ist während eines Drafts verfügbar"
+    "compact_disabled_tooltip": "Die Kompaktansicht ist während eines Drafts verfügbar",
+    "deck_stats_no_score": "Kreaturen: {creatures}  Zauber: {spells}  Länder: {lands}  |  Ø CMC: {cmc}"
   },
   "pt": {
     "app_title": "NemeDraft Overlay",
@@ -544,7 +548,8 @@
     "startup_error": "Erro de inicialização: {error}",
     "compact_btn": "Compacta",
     "full_btn": "Completa",
-    "compact_disabled_tooltip": "A vista compacta fica disponível durante um draft"
+    "compact_disabled_tooltip": "A vista compacta fica disponível durante um draft",
+    "deck_stats_no_score": "Criaturas: {creatures}  Feitiços: {spells}  Terrenos: {lands}  |  CMC méd: {cmc}"
   },
   "it": {
     "app_title": "NemeDraft Overlay",
@@ -649,7 +654,8 @@
     "startup_error": "Errore di avvio: {error}",
     "compact_btn": "Compatta",
     "full_btn": "Completa",
-    "compact_disabled_tooltip": "La vista compatta è disponibile durante un draft"
+    "compact_disabled_tooltip": "La vista compatta è disponibile durante un draft",
+    "deck_stats_no_score": "Creature: {creatures}  Magie: {spells}  Terre: {lands}  |  CMC med: {cmc}"
   },
   "ja": {
     "app_title": "NemeDraft Overlay",
@@ -754,7 +760,8 @@
     "startup_error": "起動エラー: {error}",
     "compact_btn": "コンパクト",
     "full_btn": "フル",
-    "compact_disabled_tooltip": "コンパクト表示はドラフト中に利用できます"
+    "compact_disabled_tooltip": "コンパクト表示はドラフト中に利用できます",
+    "deck_stats_no_score": "クリーチャー: {creatures}  呪文: {spells}  土地: {lands}  |  平均CMC: {cmc}"
   },
   "ko": {
     "app_title": "NemeDraft Overlay",
@@ -858,7 +865,8 @@
     "startup_error": "시작 오류: {error}",
     "compact_btn": "컴팩트",
     "full_btn": "전체",
-    "compact_disabled_tooltip": "컴팩트 보기는 드래프트 중에 사용할 수 있습니다"
+    "compact_disabled_tooltip": "컴팩트 보기는 드래프트 중에 사용할 수 있습니다",
+    "deck_stats_no_score": "생물: {creatures}  주문: {spells}  대지: {lands}  |  평균 CMC: {cmc}"
   },
   "zh-Hans": {
     "app_title": "NemeDraft Overlay",
@@ -962,6 +970,7 @@
     "startup_error": "启动错误: {error}",
     "compact_btn": "紧凑",
     "full_btn": "完整",
-    "compact_disabled_tooltip": "紧凑视图在轮抽期间可用"
+    "compact_disabled_tooltip": "紧凑视图在轮抽期间可用",
+    "deck_stats_no_score": "生物: {creatures}  咒语: {spells}  地: {lands}  |  平均CMC: {cmc}"
   }
 }

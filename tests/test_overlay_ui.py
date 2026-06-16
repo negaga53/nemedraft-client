@@ -485,3 +485,17 @@ def test_prediction_render_enables_compact_toggle(qapp):
     # Simulate a prediction landing WITHOUT a prior show_draft_started().
     w._on_prediction([pick], "FIN", 0, 7, 5, {})
     assert w._toggle_btn.isEnabled()
+
+
+def test_deck_stats_no_score_key_present_all_locales():
+    import json
+    from pathlib import Path
+    p = (Path(__file__).resolve().parents[1]
+         / "client" / "overlay" / "i18n" / "translations.json")
+    data = json.loads(p.read_text(encoding="utf-8"))
+    for loc, strings in data.items():
+        assert "deck_stats" in strings, f"{loc} missing deck_stats"
+        assert "deck_stats_no_score" in strings, f"{loc} missing deck_stats_no_score"
+        ns = strings["deck_stats_no_score"]
+        assert "{score}" not in ns, f"{loc} no-score variant still has {{score}}"
+        assert "{creatures}" in ns and "{cmc}" in ns, f"{loc} dropped real fields"

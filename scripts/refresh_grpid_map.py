@@ -25,6 +25,10 @@ MTGJSON_URL = "https://mtgjson.com/api/v5/AllIdentifiers.json.gz"
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 OUTPUT_PATH = REPO_ROOT / "client" / "overlay" / "data" / "grpid_to_name.json"
+# Hand-sourced grpId->name entries for sets mtgjson hasn't published Arena IDs
+# for yet (e.g. MSH, baked from the MTGA client DB). Merged on every refresh so
+# a regeneration never silently drops them. Delete once upstream covers them.
+MANUAL_PATH = REPO_ROOT / "client" / "overlay" / "data" / "grpid_to_name_manual.json"
 
 
 def fetch_mtgjson(url: str = MTGJSON_URL) -> dict:
@@ -59,7 +63,32 @@ def extract_mapping(payload: dict) -> tuple[dict[str, str], str]:
     return mapping, source_date
 
 
-def write_output(mapping: dict[str, str], source_date: str, out_path: Path) -> None:
+def merge_manual(mapping: dict[str, str], manual_path: Path = MANUAL_PATH) -> int:
+    """Merge hand-sourced entries (e.g. MSH from the MTGA client DB) into
+    ``mapping``. mtgjson stays authoritative: only grpIds it lacks are added.
+    Returns the number of manual entries added. No-op (returns 0) if the file
+    is absent — e.g. once upstream covers the set and it has been deleted.
+    """
+    if not manual_path.is_file():
+        return 0
+    manual = json.loads(manual_path.read_text(encoding="utf-8")).get("grpid_to_name", {})
+    added = 0
+    for key, name in manual.items():
+        if key not in mapping and name:
+            mapping[key] = name
+            added += 1
+    if added:
+        print(
+            f"  merged {added} hand-sourced grpId->name entries from "
+            f"{manual_path.name}",
+            file=sys.stderr,
+        )
+    return added
+
+
+def write_output(
+    mapping: dict[str, str], source_date: str, out_path: Path, manual_added: int = 0
+) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     sorted_mapping = {k: mapping[k] for k in sorted(mapping, key=int)}
     payload = {
@@ -68,6 +97,7 @@ def write_output(mapping: dict[str, str], source_date: str, out_path: Path) -> N
             "source_date": source_date,
             "generated_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "count": len(sorted_mapping),
+            "manual_merged": manual_added,
         },
         "grpid_to_name": sorted_mapping,
     }
@@ -91,7 +121,8 @@ def main() -> int:
             file=sys.stderr,
         )
         return 1
-    write_output(mapping, source_date, OUTPUT_PATH)
+    manual_added = merge_manual(mapping)
+    write_output(mapping, source_date, OUTPUT_PATH, manual_added=manual_added)
     return 0
 
 

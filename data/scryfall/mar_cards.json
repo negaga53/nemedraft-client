@@ -1,0 +1,1308 @@
+[
+  {
+    "name": "Sword of Fire and Ice",
+    "oracle_id": "2ccdc60a-49a9-44b9-a7af-0ebf18b26785",
+    "mana_cost": "{3}",
+    "cmc": 3.0,
+    "type_line": "Artifact \u2014 Equipment",
+    "oracle_text": "Equipped creature gets +2/+2 and has protection from red and from blue.\nWhenever equipped creature deals combat damage to a player, this Equipment deals 2 damage to any target and you draw a card.\nEquip {2}",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [
+      "Equip"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "100"
+  },
+  {
+    "name": "Archangel of Thune",
+    "oracle_id": "4f2d4538-dc1d-4c09-964b-b0d7c240fb7d",
+    "mana_cost": "{3}{W}{W}",
+    "cmc": 5.0,
+    "type_line": "Creature \u2014 Angel",
+    "oracle_text": "Flying\nLifelink (Damage dealt by this creature also causes you to gain that much life.)\nWhenever you gain life, put a +1/+1 counter on each creature you control.",
+    "power": "3",
+    "toughness": "4",
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [
+      "Flying",
+      "Lifelink"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "41"
+  },
+  {
+    "name": "Concerted Effort",
+    "oracle_id": "fd4236e5-6a2c-45ec-afb3-cd4fc516fbf1",
+    "mana_cost": "{2}{W}{W}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "At the beginning of each upkeep, creatures you control gain flying until end of turn if a creature you control has flying. The same is true for fear, first strike, double strike, landwalk, protection, trample, and vigilance.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "42"
+  },
+  {
+    "name": "Don't Move",
+    "oracle_id": "23cf095c-d43e-4a80-9bc5-f0f46ff885c4",
+    "mana_cost": "{3}{W}{W}",
+    "cmc": 5.0,
+    "type_line": "Sorcery",
+    "oracle_text": "Destroy all tapped creatures. Until your next turn, whenever a creature becomes tapped, destroy it.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "43"
+  },
+  {
+    "name": "Ephemerate",
+    "oracle_id": "0fd57894-b917-41c8-a394-360d1d31b236",
+    "mana_cost": "{W}",
+    "cmc": 1.0,
+    "type_line": "Instant",
+    "oracle_text": "Exile target creature you control, then return it to the battlefield under its owner's control.\nRebound (If you cast this spell from your hand, exile it as it resolves. At the beginning of your next upkeep, you may cast this card from exile without paying its mana cost.)",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [
+      "Rebound"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "44"
+  },
+  {
+    "name": "Final Showdown",
+    "oracle_id": "7e7ec3d6-a84f-4cc3-93f4-4d181d41e126",
+    "mana_cost": "{W}",
+    "cmc": 1.0,
+    "type_line": "Instant",
+    "oracle_text": "Spree (Choose one or more additional costs.)\n+ {1} \u2014 All creatures lose all abilities until end of turn.\n+ {1} \u2014 Choose a creature you control. It gains indestructible until end of turn.\n+ {3}{W}{W} \u2014 Destroy all creatures.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [
+      "Spree"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "45"
+  },
+  {
+    "name": "Light of Promise",
+    "oracle_id": "64c54c9f-0550-41e2-a44a-5892a199f670",
+    "mana_cost": "{2}{W}",
+    "cmc": 3.0,
+    "type_line": "Enchantment \u2014 Aura",
+    "oracle_text": "Enchant creature\nEnchanted creature has \"Whenever you gain life, put that many +1/+1 counters on this creature.\"",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [
+      "Enchant"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "46"
+  },
+  {
+    "name": "Path to Exile",
+    "oracle_id": "d683d985-9888-4d21-8b5f-69e69ce4a03b",
+    "mana_cost": "{W}",
+    "cmc": 1.0,
+    "type_line": "Instant",
+    "oracle_text": "Exile target creature. Its controller may search their library for a basic land card, put that card onto the battlefield tapped, then shuffle.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "47"
+  },
+  {
+    "name": "Return to the Ranks",
+    "oracle_id": "0d4ee553-f206-4e70-a7b2-a3670440aee7",
+    "mana_cost": "{X}{W}{W}",
+    "cmc": 2.0,
+    "type_line": "Sorcery",
+    "oracle_text": "Convoke (Your creatures can help cast this spell. Each creature you tap while casting this spell pays for {1} or one mana of that creature's color.)\nReturn X target creature cards with mana value 2 or less from your graveyard to the battlefield.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [
+      "Convoke"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "48"
+  },
+  {
+    "name": "Righteous Fury",
+    "oracle_id": "f0ff2c1c-702d-406b-a426-4282117afe8e",
+    "mana_cost": "{4}{W}{W}",
+    "cmc": 6.0,
+    "type_line": "Sorcery",
+    "oracle_text": "Destroy all tapped creatures. You gain 2 life for each creature destroyed this way.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "49"
+  },
+  {
+    "name": "Steelshaper's Gift",
+    "oracle_id": "d9abda7e-6ca2-42ea-ab24-c542e57014f1",
+    "mana_cost": "{W}",
+    "cmc": 1.0,
+    "type_line": "Sorcery",
+    "oracle_text": "Search your library for an Equipment card, reveal that card, put it into your hand, then shuffle.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "50"
+  },
+  {
+    "name": "Teferi's Protection",
+    "oracle_id": "0d4ecdb1-ec90-497f-a7a4-1c68092b8757",
+    "mana_cost": "{2}{W}",
+    "cmc": 3.0,
+    "type_line": "Instant",
+    "oracle_text": "Until your next turn, your life total can't change and you gain protection from everything. All permanents you control phase out. (While they're phased out, they're treated as though they don't exist. They phase in before you untap during your untap step.)\nExile Teferi's Protection.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "51"
+  },
+  {
+    "name": "Counterspell",
+    "oracle_id": "cc187110-1148-4090-bbb8-e205694a39f5",
+    "mana_cost": "{U}{U}",
+    "cmc": 2.0,
+    "type_line": "Instant",
+    "oracle_text": "Counter target spell.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "52"
+  },
+  {
+    "name": "Cyberdrive Awakener",
+    "oracle_id": "126a5d0b-e7d6-458e-87af-47d845678014",
+    "mana_cost": "{5}{U}",
+    "cmc": 6.0,
+    "type_line": "Artifact Creature \u2014 Construct",
+    "oracle_text": "Flying\nOther artifact creatures you control have flying.\nWhen this creature enters, each noncreature artifact you control becomes a 4/4 artifact creature until end of turn.",
+    "power": "4",
+    "toughness": "4",
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [
+      "Flying"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "53"
+  },
+  {
+    "name": "Dig Through Time",
+    "oracle_id": "f8b17b89-26ce-4208-874a-9e1d66514640",
+    "mana_cost": "{6}{U}{U}",
+    "cmc": 8.0,
+    "type_line": "Instant",
+    "oracle_text": "Delve (Each card you exile from your graveyard while casting this spell pays for {1}.)\nLook at the top seven cards of your library. Put two of them into your hand and the rest on the bottom of your library in any order.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [
+      "Delve"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "54"
+  },
+  {
+    "name": "Harbinger of the Seas",
+    "oracle_id": "84910453-e5dc-4bff-8554-86a5f4ab2746",
+    "mana_cost": "{1}{U}{U}",
+    "cmc": 3.0,
+    "type_line": "Creature \u2014 Merfolk Wizard",
+    "oracle_text": "Nonbasic lands are Islands.",
+    "power": "2",
+    "toughness": "2",
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "55"
+  },
+  {
+    "name": "Lord of Atlantis",
+    "oracle_id": "cc7f290f-ca00-4285-9bdb-4b4402444f30",
+    "mana_cost": "{U}{U}",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Merfolk",
+    "oracle_text": "Other Merfolk get +1/+1 and have islandwalk. (They can't be blocked as long as defending player controls an Island.)",
+    "power": "2",
+    "toughness": "2",
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "56"
+  },
+  {
+    "name": "Mechanized Production",
+    "oracle_id": "39d8406a-90c3-460c-b4e8-0f590573db51",
+    "mana_cost": "{2}{U}{U}",
+    "cmc": 4.0,
+    "type_line": "Enchantment \u2014 Aura",
+    "oracle_text": "Enchant artifact you control\nAt the beginning of your upkeep, create a token that's a copy of enchanted artifact. Then if you control eight or more artifacts with the same name as one another, you win the game.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [
+      "Enchant"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "57"
+  },
+  {
+    "name": "Narset's Reversal",
+    "oracle_id": "d55f6c70-321f-4fb4-bd33-0850ae1a7c36",
+    "mana_cost": "{U}{U}",
+    "cmc": 2.0,
+    "type_line": "Instant",
+    "oracle_text": "Copy target instant or sorcery spell, then return it to its owner's hand. You may choose new targets for the copy.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "58"
+  },
+  {
+    "name": "Reconnaissance Mission",
+    "oracle_id": "11bf211c-95a3-4e7f-bd08-13f979d54e73",
+    "mana_cost": "{2}{U}{U}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever a creature you control deals combat damage to a player, you may draw a card.\nCycling {2} ({2}, Discard this card: Draw a card.)",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [
+      "Cycling"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "59"
+  },
+  {
+    "name": "Show and Tell",
+    "oracle_id": "b83a3ba0-249e-4c39-bbf0-cb005413f7d2",
+    "mana_cost": "{2}{U}",
+    "cmc": 3.0,
+    "type_line": "Sorcery",
+    "oracle_text": "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "60"
+  },
+  {
+    "name": "Simulacrum Synthesizer",
+    "oracle_id": "eb7a1f21-a66d-415b-8520-710b44890bb6",
+    "mana_cost": "{2}{U}",
+    "cmc": 3.0,
+    "type_line": "Artifact",
+    "oracle_text": "When this artifact enters, scry 2.\nWhenever another artifact you control with mana value 3 or greater enters, create a 0/0 colorless Construct artifact creature token with \"This token gets +1/+1 for each artifact you control.\"",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [
+      "Scry"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "61"
+  },
+  {
+    "name": "Three Steps Ahead",
+    "oracle_id": "282dfeaa-6243-4f92-838a-5cb54fa85184",
+    "mana_cost": "{U}",
+    "cmc": 1.0,
+    "type_line": "Instant",
+    "oracle_text": "Spree (Choose one or more additional costs.)\n+ {1}{U} \u2014 Counter target spell.\n+ {3} \u2014 Create a token that's a copy of target artifact or creature you control.\n+ {2} \u2014 Draw two cards, then discard a card.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [
+      "Spree"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "62"
+  },
+  {
+    "name": "Dauthi Voidwalker",
+    "oracle_id": "f1c2dbe2-fbe0-4058-bdf1-91d1b1832786",
+    "mana_cost": "{B}{B}",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Dauthi Rogue",
+    "oracle_text": "Shadow (This creature can block or be blocked by only creatures with shadow.)\nIf a card would be put into an opponent's graveyard from anywhere, instead exile it with a void counter on it.\n{T}, Sacrifice this creature: Choose an exiled card an opponent owns with a void counter on it. You may play it this turn without paying its mana cost.",
+    "power": "3",
+    "toughness": "2",
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [
+      "Shadow"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "63"
+  },
+  {
+    "name": "Deadly Dispute",
+    "oracle_id": "457af74a-02b3-4659-846d-63e482667f34",
+    "mana_cost": "{1}{B}",
+    "cmc": 2.0,
+    "type_line": "Instant",
+    "oracle_text": "As an additional cost to cast this spell, sacrifice an artifact or creature.\nDraw two cards and create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [
+      "Treasure"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "64"
+  },
+  {
+    "name": "Extinction Event",
+    "oracle_id": "0a11a3a8-ee5f-4caf-bf84-c8248e07c825",
+    "mana_cost": "{3}{B}",
+    "cmc": 4.0,
+    "type_line": "Sorcery",
+    "oracle_text": "Choose odd or even. Exile each creature with mana value of the chosen quality. (Zero is even.)",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "65"
+  },
+  {
+    "name": "Final Act",
+    "oracle_id": "335a6c6a-030f-45d4-806c-467a22962eed",
+    "mana_cost": "{4}{B}{B}",
+    "cmc": 6.0,
+    "type_line": "Sorcery",
+    "oracle_text": "Choose one or more \u2014\n\u2022 Destroy all creatures.\n\u2022 Destroy all planeswalkers.\n\u2022 Destroy all battles.\n\u2022 Exile all graveyards.\n\u2022 Each opponent loses all counters.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "66"
+  },
+  {
+    "name": "Massacre Girl",
+    "oracle_id": "63e6cb7d-cc27-4200-85fc-ff6472318c1a",
+    "mana_cost": "{3}{B}{B}",
+    "cmc": 5.0,
+    "type_line": "Legendary Creature \u2014 Human Assassin",
+    "oracle_text": "Menace\nWhen Massacre Girl enters, each other creature gets -1/-1 until end of turn. Whenever a creature dies this turn, each creature other than Massacre Girl gets -1/-1 until end of turn.",
+    "power": "4",
+    "toughness": "4",
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [
+      "Menace"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "67"
+  },
+  {
+    "name": "No Mercy",
+    "oracle_id": "b9538d53-480b-481a-abbf-83ab17e1a45b",
+    "mana_cost": "{2}{B}{B}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever a creature deals damage to you, destroy it.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "68"
+  },
+  {
+    "name": "Chaos Warp",
+    "oracle_id": "07a0cba9-8768-4fd9-a3d5-b0f83b4bf8e8",
+    "mana_cost": "{2}{R}",
+    "cmc": 3.0,
+    "type_line": "Instant",
+    "oracle_text": "The owner of target permanent shuffles it into their library, then reveals the top card of their library. If it's a permanent card, they put it onto the battlefield.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "69"
+  },
+  {
+    "name": "Fiery Emancipation",
+    "oracle_id": "52159875-354c-47f9-bb1c-cd65395fcc68",
+    "mana_cost": "{3}{R}{R}{R}",
+    "cmc": 6.0,
+    "type_line": "Enchantment",
+    "oracle_text": "If a source you control would deal damage to a permanent or player, it deals triple that damage to that permanent or player instead.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [
+      "Triple"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "70"
+  },
+  {
+    "name": "Fury of the Horde",
+    "oracle_id": "c90e2db7-6973-4243-9645-265fd3bc8546",
+    "mana_cost": "{5}{R}{R}",
+    "cmc": 7.0,
+    "type_line": "Sorcery",
+    "oracle_text": "You may exile two red cards from your hand rather than pay this spell's mana cost.\nUntap all creatures that attacked this turn. After this main phase, there is an additional combat phase followed by an additional main phase.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "71"
+  },
+  {
+    "name": "Monstrous Rage",
+    "oracle_id": "646a2371-54c0-4492-ac2f-20f109d6108c",
+    "mana_cost": "{R}",
+    "cmc": 1.0,
+    "type_line": "Instant",
+    "oracle_text": "Target creature gets +2/+0 until end of turn. Create a Monster Role token attached to it. (If you control another Role on it, put that one into the graveyard. Enchanted creature gets +1/+1 and has trample.)",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [
+      "Role token"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "72"
+  },
+  {
+    "name": "Seize the Day",
+    "oracle_id": "2a6abd59-e448-46f1-9af8-bb9040645971",
+    "mana_cost": "{3}{R}",
+    "cmc": 4.0,
+    "type_line": "Sorcery",
+    "oracle_text": "Untap target creature. After this main phase, there is an additional combat phase followed by an additional main phase.\nFlashback {2}{R} (You may cast this card from your graveyard for its flashback cost. Then exile it.)",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [
+      "Flashback"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "73"
+  },
+  {
+    "name": "Bedlam",
+    "oracle_id": "c28d4caf-9b7c-40b1-9cbe-275ca9dae06a",
+    "mana_cost": "{2}{R}{R}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Creatures can't block.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "74"
+  },
+  {
+    "name": "Beast Within",
+    "oracle_id": "7735eeba-693b-47e2-bd51-414379cf1016",
+    "mana_cost": "{2}{G}",
+    "cmc": 3.0,
+    "type_line": "Instant",
+    "oracle_text": "Destroy target permanent. Its controller creates a 3/3 green Beast creature token.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "75"
+  },
+  {
+    "name": "Defense of the Heart",
+    "oracle_id": "e7e1b166-9267-426d-897d-24903327b48d",
+    "mana_cost": "{3}{G}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "At the beginning of your upkeep, if an opponent controls three or more creatures, sacrifice this enchantment, search your library for up to two creature cards, put those cards onto the battlefield, then shuffle.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "76"
+  },
+  {
+    "name": "Force of Vigor",
+    "oracle_id": "5f627e45-deee-4a4f-8128-57b0d8ebc553",
+    "mana_cost": "{2}{G}{G}",
+    "cmc": 4.0,
+    "type_line": "Instant",
+    "oracle_text": "If it's not your turn, you may exile a green card from your hand rather than pay this spell's mana cost.\nDestroy up to two target artifacts and/or enchantments.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "77"
+  },
+  {
+    "name": "Heroic Intervention",
+    "oracle_id": "24882fa2-3fe9-4c1b-aa3d-0e6488b9db27",
+    "mana_cost": "{1}{G}",
+    "cmc": 2.0,
+    "type_line": "Instant",
+    "oracle_text": "Permanents you control gain hexproof and indestructible until end of turn.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "78"
+  },
+  {
+    "name": "Primal Vigor",
+    "oracle_id": "c665544f-557b-4631-a1dc-39571470ca2e",
+    "mana_cost": "{4}{G}",
+    "cmc": 5.0,
+    "type_line": "Enchantment",
+    "oracle_text": "If one or more tokens would be created, twice that many of those tokens are created instead.\nIf one or more +1/+1 counters would be put on a creature, twice that many +1/+1 counters are put on that creature instead.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "81"
+  },
+  {
+    "name": "Rancor",
+    "oracle_id": "9d2d6479-531c-4ce1-b52b-00e36fa63b64",
+    "mana_cost": "{G}",
+    "cmc": 1.0,
+    "type_line": "Enchantment \u2014 Aura",
+    "oracle_text": "Enchant creature\nEnchanted creature gets +2/+0 and has trample.\nWhen this Aura is put into a graveyard from the battlefield, return it to its owner's hand.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [
+      "Enchant"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "82"
+  },
+  {
+    "name": "Steely Resolve",
+    "oracle_id": "48c127f0-2857-4c36-97bc-1291b6fe4a82",
+    "mana_cost": "{1}{G}",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "oracle_text": "As this enchantment enters, choose a creature type.\nCreatures of the chosen type have shroud. (They can't be the targets of spells or abilities.)",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "83"
+  },
+  {
+    "name": "Unnatural Growth",
+    "oracle_id": "7324abaa-48da-439d-9339-b0ea5eea612e",
+    "mana_cost": "{1}{G}{G}{G}{G}",
+    "cmc": 5.0,
+    "type_line": "Enchantment",
+    "oracle_text": "At the beginning of each combat, double the power and toughness of each creature you control until end of turn.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [
+      "Double"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "84"
+  },
+  {
+    "name": "Anthem of Champions",
+    "oracle_id": "f1d8e9a6-1903-4be5-8609-1009a463f393",
+    "mana_cost": "{G}{W}",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Creatures you control get +1/+1.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G",
+      "W"
+    ],
+    "color_identity": [
+      "G",
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "85"
+  },
+  {
+    "name": "Aurelia, the Warleader",
+    "oracle_id": "0f5a3a09-2f07-4774-9e0f-e99d9a444166",
+    "mana_cost": "{2}{R}{R}{W}{W}",
+    "cmc": 6.0,
+    "type_line": "Legendary Creature \u2014 Angel",
+    "oracle_text": "Flying, vigilance, haste\nWhenever Aurelia attacks for the first time each turn, untap all creatures you control. After this phase, there is an additional combat phase.",
+    "power": "3",
+    "toughness": "4",
+    "colors": [
+      "R",
+      "W"
+    ],
+    "color_identity": [
+      "R",
+      "W"
+    ],
+    "keywords": [
+      "Flying",
+      "Vigilance",
+      "Haste"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "86"
+  },
+  {
+    "name": "Black Panther, Wakandan King",
+    "oracle_id": "48deff27-b421-430b-a484-55b4a593010a",
+    "mana_cost": "{G}{W}",
+    "cmc": 2.0,
+    "type_line": "Legendary Creature \u2014 Human Noble Hero",
+    "oracle_text": "First strike\nSurvey the Realm \u2014 Whenever Black Panther or another creature you control enters, put a +1/+1 counter on target land you control.\nMine Vibranium \u2014 {3}: Move all +1/+1 counters from target land you control onto target creature. If one or more +1/+1 counters are moved this way, you gain that much life and draw a card.",
+    "power": "2",
+    "toughness": "2",
+    "colors": [
+      "G",
+      "W"
+    ],
+    "color_identity": [
+      "G",
+      "W"
+    ],
+    "keywords": [
+      "Mine Vibranium",
+      "First strike",
+      "Survey the Realm"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "87"
+  },
+  {
+    "name": "Captain America, First Avenger",
+    "oracle_id": "7d038055-035d-4698-b6b6-e2859bf2f1d1",
+    "mana_cost": "{R}{W}{U}",
+    "cmc": 3.0,
+    "type_line": "Legendary Creature \u2014 Human Soldier Hero",
+    "oracle_text": "Throw ... \u2014 {3}, Unattach an Equipment from Captain America: He deals damage equal to that Equipment's mana value divided as you choose among one, two, or three targets.\n... Catch \u2014 At the beginning of combat on your turn, attach up to one target Equipment you control to Captain America.",
+    "power": "4",
+    "toughness": "4",
+    "colors": [
+      "R",
+      "U",
+      "W"
+    ],
+    "color_identity": [
+      "R",
+      "U",
+      "W"
+    ],
+    "keywords": [
+      "Throw ...",
+      "... Catch"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "88"
+  },
+  {
+    "name": "Escape to the Wilds",
+    "oracle_id": "45a8c126-5396-4736-a37e-460a50706a98",
+    "mana_cost": "{3}{R}{G}",
+    "cmc": 5.0,
+    "type_line": "Sorcery",
+    "oracle_text": "Exile the top five cards of your library. You may play cards exiled this way until the end of your next turn.\nYou may play an additional land this turn.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G",
+      "R"
+    ],
+    "color_identity": [
+      "G",
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "89"
+  },
+  {
+    "name": "Fight to the Death",
+    "oracle_id": "7f885ffc-7245-4f00-a903-6e088007c635",
+    "mana_cost": "{R}{W}",
+    "cmc": 2.0,
+    "type_line": "Instant",
+    "oracle_text": "Destroy all blocking creatures and all blocked creatures.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R",
+      "W"
+    ],
+    "color_identity": [
+      "R",
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "90"
+  },
+  {
+    "name": "Iron Man, Titan of Innovation",
+    "oracle_id": "67ab82de-1167-42f5-90bd-21c63edcc712",
+    "mana_cost": "{3}{U}{R}",
+    "cmc": 5.0,
+    "type_line": "Legendary Artifact Creature \u2014 Human Hero",
+    "oracle_text": "Flying, haste\nGenius Industrialist \u2014 Whenever Iron Man attacks, create a Treasure token, then you may sacrifice a noncreature artifact. If you do, search your library for an artifact card with mana value equal to 1 plus the sacrificed artifact's mana value, put it onto the battlefield tapped, then shuffle.",
+    "power": "4",
+    "toughness": "4",
+    "colors": [
+      "R",
+      "U"
+    ],
+    "color_identity": [
+      "R",
+      "U"
+    ],
+    "keywords": [
+      "Flying",
+      "Genius Industrialist",
+      "Treasure",
+      "Haste"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "91"
+  },
+  {
+    "name": "Privileged Position",
+    "oracle_id": "abd62af0-c17d-4f62-af15-9ea83037b990",
+    "mana_cost": "{2}{G/W}{G/W}{G/W}",
+    "cmc": 5.0,
+    "type_line": "Enchantment",
+    "oracle_text": "({G/W} can be paid with either {G} or {W}.)\nOther permanents you control have hexproof. (They can't be the targets of spells or abilities your opponents control.)",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G",
+      "W"
+    ],
+    "color_identity": [
+      "G",
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "92"
+  },
+  {
+    "name": "Ravenous Tyrannosaurus",
+    "oracle_id": "9cfac390-4638-4654-8b50-65c0f0886b18",
+    "mana_cost": "{4}{R}{G}",
+    "cmc": 6.0,
+    "type_line": "Creature \u2014 Dinosaur",
+    "oracle_text": "Devour 3 (As this creature enters, you may sacrifice any number of creatures. It enters with three times that many +1/+1 counters on it.)\nWhenever this creature attacks, it deals damage equal to its power to up to one other target creature. Excess damage is dealt to that creature's controller instead.",
+    "power": "6",
+    "toughness": "6",
+    "colors": [
+      "G",
+      "R"
+    ],
+    "color_identity": [
+      "G",
+      "R"
+    ],
+    "keywords": [
+      "Devour"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "93"
+  },
+  {
+    "name": "Storm, Force of Nature",
+    "oracle_id": "7c47876d-143f-4e4c-b151-90c099e452a1",
+    "mana_cost": "{1}{G}{U}{R}",
+    "cmc": 4.0,
+    "type_line": "Legendary Creature \u2014 Mutant Hero",
+    "oracle_text": "Flying, vigilance\nCeaseless Tempest \u2014 Whenever Storm deals combat damage to a player, the next instant or sorcery spell you cast this turn has storm. (When you cast it, copy it for each spell cast before it this turn. You may choose new targets for the copies.)",
+    "power": "3",
+    "toughness": "4",
+    "colors": [
+      "G",
+      "R",
+      "U"
+    ],
+    "color_identity": [
+      "G",
+      "R",
+      "U"
+    ],
+    "keywords": [
+      "Flying",
+      "Vigilance",
+      "Ceaseless Tempest"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "94"
+  },
+  {
+    "name": "Sundering Growth",
+    "oracle_id": "a2a380d8-4df7-4357-862c-ed3fb795db6c",
+    "mana_cost": "{G/W}{G/W}",
+    "cmc": 2.0,
+    "type_line": "Instant",
+    "oracle_text": "Destroy target artifact or enchantment, then populate. (Create a token that's a copy of a creature token you control.)",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G",
+      "W"
+    ],
+    "color_identity": [
+      "G",
+      "W"
+    ],
+    "keywords": [
+      "Populate"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "95"
+  },
+  {
+    "name": "Warleader's Call",
+    "oracle_id": "a751c07b-fc21-4854-96e7-f71abf4e86c9",
+    "mana_cost": "{1}{R}{W}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Creatures you control get +1/+1.\nWhenever a creature you control enters, this enchantment deals 1 damage to each opponent.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R",
+      "W"
+    ],
+    "color_identity": [
+      "R",
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "96"
+  },
+  {
+    "name": "Wolverine, Best There Is",
+    "oracle_id": "6e53a43e-5a23-4057-9bb5-281508da57af",
+    "mana_cost": "{1}{R}{G}",
+    "cmc": 3.0,
+    "type_line": "Legendary Creature \u2014 Mutant Berserker Hero",
+    "oracle_text": "Unrivaled Lethality \u2014 Double all damage Wolverine would deal.\nAt the beginning of each end step, if Wolverine dealt damage to another creature this turn, put a +1/+1 counter on him.\n{1}{G}: Regenerate Wolverine. (The next time he would be destroyed this turn, instead tap him, remove him from combat, and heal all damage on him.)",
+    "power": "2",
+    "toughness": "2",
+    "colors": [
+      "G",
+      "R"
+    ],
+    "color_identity": [
+      "G",
+      "R"
+    ],
+    "keywords": [
+      "Unrivaled Lethality",
+      "Double"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "97"
+  },
+  {
+    "name": "Horn of Greed",
+    "oracle_id": "b8181d53-1954-4f46-8670-8696440208e8",
+    "mana_cost": "{3}",
+    "cmc": 3.0,
+    "type_line": "Artifact",
+    "oracle_text": "Whenever a player plays a land, that player draws a card.",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "98"
+  },
+  {
+    "name": "Roaming Throne",
+    "oracle_id": "3640c29b-1534-4952-b297-619ade948431",
+    "mana_cost": "{4}",
+    "cmc": 4.0,
+    "type_line": "Artifact Creature \u2014 Golem",
+    "oracle_text": "Ward {2}\nAs this creature enters, choose a creature type.\nThis creature is the chosen type in addition to its other types.\nIf a triggered ability of another creature you control of the chosen type triggers, it triggers an additional time.",
+    "power": "4",
+    "toughness": "4",
+    "colors": [],
+    "color_identity": [],
+    "keywords": [
+      "Ward"
+    ],
+    "rarity": "mythic",
+    "set": "mar",
+    "arena_id": null,
+    "collector_number": "99"
+  }
+]

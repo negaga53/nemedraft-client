@@ -1087,14 +1087,18 @@ def suggest_decks(
     # An archetype whose colors lack enough playables (e.g. mono-black from a
     # 19-card pool → ~20 spells + 17 lands = 37) can't reach DECK_SIZE without
     # flooding, so drop it from the dropdown rather than show an undersized
-    # deck. The top suggestion is always kept so the dropdown is never empty —
-    # if every option is short, surface the best one rather than nothing.
-    top_key = next(iter(score_filtered))
-    buildable = {
+    # deck. Crucially, the *top* slot must never be an undersized deck while a
+    # complete one exists — so we surface the complete builds (already score
+    # ordered) and only fall back to the single best partial when no archetype
+    # can field a full 40 (a genuinely thin pool — better than an empty list).
+    complete = {
         k: v for k, v in score_filtered.items()
-        if k == top_key or (len(v.main_deck) + v.land_count) >= DECK_SIZE
+        if (len(v.main_deck) + v.land_count) >= DECK_SIZE
     }
-    return buildable
+    if complete:
+        return complete
+    top_key = next(iter(score_filtered))
+    return {top_key: score_filtered[top_key]}
 
 
 def _build_for_pairs(
@@ -1247,7 +1251,14 @@ def _build_for_pairs(
             max_splash=deck_max_splash,
             trophy_prior=trophy_prior,
             main_deck_powers=main_deck_powers,
-        ) if len(main_deck) >= 10 else []
+        ) if 10 <= len(main_deck) < TARGET_SPELLS else []
+        # Note the upper bound: a 2-colour deck that already fields a full
+        # TARGET_SPELLS castable count must NOT reach for a 3rd colour. Doing
+        # so only displaces on-colour cards and adds a colour the 17-land mana
+        # base can't support — which then trips _demote_infeasible_minority,
+        # stranding the splash and shrinking the deck to an undersized
+        # "mono + splash" (the MSH 2026-06-26 "Mono Red with white cards"
+        # bug). Splash is for *thin* pools that can't otherwise reach 23.
 
         splash_colors: list[str] = []
         if splashes:
@@ -1367,8 +1378,20 @@ def _build_for_pairs(
         total_lands = len(lands) + len(nonbasic_lands)
         avg = sum(main_deck_cmc) / max(len(main_deck_cmc), 1)
 
-        results[key] = DeckSuggestion(
-            archetype=key,
+        # The displayed archetype must name *every* colour the deck plays —
+        # committed colours, splash colours, and the colour identity of any
+        # card that ended up in the main deck (e.g. a splash the demotion
+        # left behind). Keying only on the committed colours produced the
+        # MSH "Mono Red" label on a deck that ran white cards + Plains.
+        # ``key`` (committed colours) is kept for the 17Lands archetype
+        # scoring lookup above; ``display_key`` is what the UI/Discord show.
+        played = set(deck_colors) | set(splash_colors)
+        for sc in main_deck_cards:
+            played |= {c for c in (sc.color_identity or []) if c in CARD_COLORS}
+        display_key = "".join(c for c in "WUBRG" if c in played) or key
+
+        candidate = DeckSuggestion(
+            archetype=display_key,
             main_deck=main_deck,
             main_deck_cmc=main_deck_cmc,
             lands=lands,
@@ -1379,5 +1402,23 @@ def _build_for_pairs(
             land_count=total_lands,
             avg_cmc=round(avg, 2),
         )
+        # Two different colour pairs can now resolve to the same display key
+        # (e.g. a clean WR build and a mono-W deck that splashes red both map
+        # to "WR"). Keep the stronger one rather than letting the later pair
+        # blindly overwrite — a complete 40-card deck must never be clobbered
+        # by an undersized same-colour fragment.
+        existing = results.get(display_key)
+        if existing is None or _deck_rank(candidate) > _deck_rank(existing):
+            results[display_key] = candidate
 
     return results
+
+
+def _deck_rank(s: DeckSuggestion) -> tuple[int, float]:
+    """Ordering key for choosing between two decks of the same colours.
+
+    Completeness first (capped at ``DECK_SIZE`` so an over-padded pile can't
+    win on raw count), then holistic score. Ensures a legal 40-card build
+    always beats an undersized one when both share a display key.
+    """
+    return (min(len(s.main_deck) + s.land_count, DECK_SIZE), s.score)

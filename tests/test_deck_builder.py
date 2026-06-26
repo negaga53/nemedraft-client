@@ -1739,3 +1739,144 @@ class TestColorFallbackOrdering:
         for key, sug in result.items():
             total = len(sug.main_deck) + sug.land_count
             assert total >= 40, f"{key} offered with only {total} cards"
+
+
+class TestComplete40CardDeckNoFragmentation:
+    """Regression for the MSH 2026-06-26 draft bug.
+
+    A pool that supports a full 23-spell two-color deck must yield a
+    complete 40-card deck. The reported failure: a WR pool was
+    fragmented into a "Mono Red" deck that still ran white cards and
+    Plains (a stranded white splash) and only 37 cards total — the
+    3rd-colour splash was added to an already-full 2-colour deck, then
+    the minority colour was demoted to mono, leaving the splash behind.
+    """
+
+    _BASIC_COLOR = {
+        "Plains": "W", "Island": "U", "Swamp": "B", "Mountain": "R", "Forest": "G",
+    }
+
+    def _pool(self):
+        from common.inference.pool_analyzer import ScryfallCard
+
+        scry: dict = {}
+        pool: list[str] = []
+        gih: dict[str, float] = {}
+
+        def add(name, cost, ci, w):
+            scry[name] = ScryfallCard(
+                name=name, mana_cost=cost, cmc=2, type_line="Creature — Hero",
+                oracle_text="", colors=list(ci), color_identity=list(ci),
+                keywords=[], rarity="common",
+            )
+            pool.append(name)
+            gih[name] = w
+
+        # 14 red + 10 white spells -> 24 castable in WR (a full 2-colour deck).
+        for i in range(14):
+            add(f"R{i}", "{1}{R}", ["R"], 0.58)
+        for i in range(10):
+            add(f"W{i}", "{1}{W}", ["W"], 0.56)
+        # 2 strong blue cards: the tempting 3rd-colour splash.
+        for i in range(2):
+            add(f"U{i}", "{1}{U}", ["U"], 0.62)
+        # A universal fixer makes the U/W splash "available".
+        scry["Prism Lens"] = ScryfallCard(
+            name="Prism Lens", mana_cost="", cmc=0, type_line="Land",
+            oracle_text="Add one mana of any color.", colors=[],
+            color_identity=[], keywords=[], rarity="common",
+        )
+        pool.append("Prism Lens")
+        return scry, pool, _card_map(gih), _set_metrics()
+
+    def test_full_two_color_pool_yields_a_40_card_top_deck(self):
+        scry, pool, cm, sm = self._pool()
+        result = suggest_decks(pool, scry, card_map=cm, set_metrics=sm)
+        top = next(iter(result.values()))
+        total = len(top.main_deck) + top.land_count
+        assert total == 40, (
+            f"top deck {top.archetype!r} has {total} cards "
+            f"(main={len(top.main_deck)}, lands={top.land_count}); "
+            f"a full two-colour pool must build a legal 40-card deck"
+        )
+
+    def test_top_deck_plays_only_colors_named_in_its_archetype(self):
+        scry, pool, cm, sm = self._pool()
+        result = suggest_decks(pool, scry, card_map=cm, set_metrics=sm)
+        top_key = next(iter(result))
+        top = result[top_key]
+        label = set(top_key)
+        for n in top.main_deck:
+            ci = set(scry[n].color_identity or [])
+            assert ci.issubset(label), (
+                f"main-deck card {n!r} needs {ci} but archetype is {top_key!r} "
+                f"— a deck must not be labelled for fewer colours than it plays"
+            )
+        for b in top.lands:
+            c = self._BASIC_COLOR.get(b)
+            assert c is None or c in label, (
+                f"basic {b!r} ({c}) present in a {top_key!r} deck — mislabelled"
+            )
+
+    def test_undersized_deck_never_surfaced_as_top_when_complete_exists(self):
+        """The buildable filter must prefer a complete deck for the top slot."""
+        scry, pool, cm, sm = self._pool()
+        result = suggest_decks(pool, scry, card_map=cm, set_metrics=sm)
+        for key, sug in result.items():
+            total = len(sug.main_deck) + sug.land_count
+            assert total >= 40, (
+                f"archetype {key!r} offered with only {total} cards"
+            )
+
+
+class TestArchetypeLabelIncludesSplash:
+    """A deck's archetype label must name every colour it actually plays.
+
+    The MSH bug surfaced a deck labelled 'Mono Red' that ran white cards
+    and Plains. Whatever colours end up in the main deck / mana base, the
+    archetype key must include them so the overlay's colour pips and the
+    Discord summary don't claim the deck is mono when it isn't.
+    """
+
+    def _thin_splash_pool(self):
+        from common.inference.pool_analyzer import ScryfallCard
+
+        scry: dict = {}
+        pool: list[str] = []
+        gih: dict[str, float] = {}
+
+        def add(name, cost, ci, w):
+            scry[name] = ScryfallCard(
+                name=name, mana_cost=cost, cmc=2, type_line="Creature — Hero",
+                oracle_text="", colors=list(ci), color_identity=list(ci),
+                keywords=[], rarity="common",
+            )
+            pool.append(name)
+            gih[name] = w
+
+        for i in range(11):
+            add(f"R{i}", "{1}{R}", ["R"], 0.56)
+        for i in range(10):
+            add(f"W{i}", "{1}{W}", ["W"], 0.55)
+        for i in range(2):
+            add(f"U{i}", "{1}{U}", ["U"], 0.66)  # strong off-colour pair
+        scry["Prism Lens"] = ScryfallCard(
+            name="Prism Lens", mana_cost="", cmc=0, type_line="Land",
+            oracle_text="Add one mana of any color.", colors=[],
+            color_identity=[], keywords=[], rarity="common",
+        )
+        pool.append("Prism Lens")
+        return scry, pool, _card_map(gih), _set_metrics()
+
+    def test_every_suggestion_names_all_colours_it_plays(self):
+        scry, pool, cm, sm = self._thin_splash_pool()
+        result = suggest_decks(pool, scry, card_map=cm, set_metrics=sm)
+        assert result, "expected at least one suggestion"
+        for key, sug in result.items():
+            label = set(key)
+            for n in sug.main_deck:
+                ci = set(scry[n].color_identity or [])
+                assert ci.issubset(label), (
+                    f"suggestion {key!r} plays {n!r} ({ci}) — its archetype "
+                    f"label omits a colour it actually runs"
+                )

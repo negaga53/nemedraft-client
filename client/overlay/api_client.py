@@ -44,6 +44,60 @@ class UserInfo:
     is_vip: bool
 
 
+# Known SeatPayload fields (server/routes/queue.py). Used to filter the
+# nested "seat" dict before constructing SeatStatus so that a server-side
+# field addition can't raise TypeError and brick older clients.
+_SEAT_STATUS_FIELDS = frozenset({
+    "shot_clock_remaining_s", "shot_clock_total_s",
+    "grace_remaining_s", "absent",
+})
+
+
+@dataclass
+class SeatStatus:
+    shot_clock_remaining_s: float = 0.0
+    shot_clock_total_s: float = 0.0
+    grace_remaining_s: float = 0.0
+    absent: bool = False
+
+
+@dataclass
+class QueueStatus:
+    """Mirrors the server's QueueResponse (see server/routes/queue.py)."""
+
+    state: str = "idle"          # idle|queued|offered|seated|cooldown
+    position: int | None = None
+    queue_length: int = 0
+    active_drafters: int = 0
+    capacity: int = 0
+    offer_expires_in_s: float | None = None
+    cooldown_remaining_s: float = 0.0
+    eta_s: int | None = None
+    seat: SeatStatus | None = None
+    reason: str = ""
+
+    @classmethod
+    def from_json(cls, data: dict) -> "QueueStatus":
+        seat_raw = data.get("seat")
+        seat = None
+        if seat_raw:
+            seat = SeatStatus(**{
+                k: v for k, v in seat_raw.items() if k in _SEAT_STATUS_FIELDS
+            })
+        return cls(
+            state=data.get("state", "idle"),
+            position=data.get("position"),
+            queue_length=data.get("queue_length", 0),
+            active_drafters=data.get("active_drafters", 0),
+            capacity=data.get("capacity", 0),
+            offer_expires_in_s=data.get("offer_expires_in_s"),
+            cooldown_remaining_s=data.get("cooldown_remaining_s", 0.0),
+            eta_s=data.get("eta_s"),
+            seat=seat,
+            reason=data.get("reason", ""),
+        )
+
+
 class NemeDraftClient:
     """Synchronous HTTP client for the NemeDraft server API.
 
@@ -55,6 +109,11 @@ class NemeDraftClient:
         self._base = f"{env.server_url}:{env.server_port}"
         self._auth = auth
         self._http = httpx.Client(timeout=httpx.Timeout(10, connect=5))
+        # Set by _authed_request whenever the server refuses a call with
+        # 409 no_seat; cleared on the next successful request. Callers
+        # (a later admission-queue manager) read this after predict()
+        # etc. return their normal empty/None failure value.
+        self.last_no_seat: QueueStatus | None = None
 
     # ------------------------------------------------------------------
     # Public API
@@ -171,6 +230,31 @@ class NemeDraftClient:
             is_vip=data.get("is_vip", False),
         )
 
+    def queue_heartbeat(
+        self,
+        *,
+        want_seat: bool,
+        arena_running: bool,
+        set_code: str,
+        draft_active: bool,
+    ) -> QueueStatus | None:
+        """Call ``POST /api/queue/heartbeat``."""
+        data = self._authed_request("POST", "/api/queue/heartbeat", json={
+            "want_seat": want_seat,
+            "arena_running": arena_running,
+            "set_code": set_code,
+            "draft_active": draft_active,
+        }, timeout=5)
+        if data is None:
+            return None
+        return QueueStatus.from_json(data)
+
+    def queue_release(self) -> bool:
+        """Call ``POST /api/queue/release``. Idempotent server-side."""
+        return self._authed_request(
+            "POST", "/api/queue/release", timeout=5,
+        ) is not None
+
     def close(self) -> None:
         self._http.close()
 
@@ -219,6 +303,19 @@ class NemeDraftClient:
                 logger.warning("Retry failed: %s %s", method, path, exc_info=True)
                 return None
 
+        if resp.status_code == 409:
+            # Admission control refused: we hold no seat. Record the
+            # queue payload so the UI can react without a second call.
+            try:
+                detail = resp.json().get("detail", {})
+                if isinstance(detail, dict) and detail.get("error") == "no_seat":
+                    self.last_no_seat = QueueStatus.from_json(
+                        detail.get("queue", {}),
+                    )
+            except ValueError:
+                logger.warning("409 with non-JSON body for %s %s", method, path)
+            return None
+
         if resp.status_code != 200:
             logger.warning(
                 "Server returned %d for %s %s: %s",
@@ -226,4 +323,5 @@ class NemeDraftClient:
             )
             return None
 
+        self.last_no_seat = None
         return resp.json()

@@ -631,9 +631,9 @@ class OverlayApp:
         self._auth_polling.login("discord")
 
     def _on_login_succeeded(self) -> None:
-        """If a draft is already active and the user is now VIP, switch to
-        the pick view and run a prediction."""
-        if self.state.draft_active and self._is_vip():
+        """If a draft is already active and we hold a seat, switch to the
+        pick view and run a prediction."""
+        if self.state.draft_active and self._has_seat:
             self.window.show_draft_started()
             if self.state.current_pack:
                 self._run_prediction()
@@ -1063,10 +1063,15 @@ class OverlayApp:
         if not self.auth_client.is_authenticated:
             logger.warning("Not authenticated — skipping prediction")
             return
-        session = self.auth_client.session
-        if not session or not session.is_vip:
-            logger.info("VIP required for predictions — skipping")
-            self.window.show_vip_required()
+        # Predictions are gated on holding an admission seat, not on VIP.
+        # The server dropped its is_vip check on /api/predict entirely; a
+        # client-side VIP gate here would block exactly the non-VIP users
+        # the queue exists to admit, and they would never see a single
+        # prediction no matter how long they waited for a seat.
+        if not self._has_seat:
+            logger.info("No admission seat — skipping prediction, requesting one")
+            if self.state.set_code:
+                self._queue.join_queue()
             return
 
         self._prediction.request_prediction()

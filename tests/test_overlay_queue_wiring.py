@@ -235,3 +235,34 @@ def test_draft_start_without_seat_stays_home_and_requests_a_seat(qapp):
     app.window.show_draft_started.assert_not_called()
     app.window.pack_tab.home_widget.set_draft_active.assert_called_with(True)
     app._queue.join_queue.assert_called_once()
+
+
+@pytest.mark.usefixtures("qapp")
+def test_prediction_gated_on_seat_not_vip():
+    """A non-VIP user holding a seat must get predictions.
+
+    _run_prediction used to check ``session.is_vip`` directly. That is not
+    one of the ``_is_vip()`` call sites, so it survived the seat
+    migration. The server dropped its VIP check on /api/predict entirely,
+    so leaving this in would block exactly the users the queue exists to
+    admit: they would queue, get a seat, and still never see a pick.
+    """
+    from client.overlay.main import OverlayApp
+
+    app = _make_app()
+    app._prediction = MagicMock()
+    app.auth_client = MagicMock()
+    app.auth_client.is_authenticated = True
+    app.auth_client.session = MagicMock(is_vip=False)
+    app.state.set_code = "TMT"
+
+    # No seat -> no prediction, but it should ask for one.
+    app._has_seat = False
+    OverlayApp._run_prediction(app)
+    app._prediction.request_prediction.assert_not_called()
+    app._queue.join_queue.assert_called_once()
+
+    # Seat held, still not VIP -> prediction runs.
+    app._has_seat = True
+    OverlayApp._run_prediction(app)
+    app._prediction.request_prediction.assert_called_once()

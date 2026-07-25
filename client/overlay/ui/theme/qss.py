@@ -406,6 +406,21 @@ QProgressBar#predictionLoading {{
     border-radius: 1px;
 }}
 
+QProgressBar#shotClockBar {{
+    max-height: 3px;
+    min-height: 3px;
+    margin: 1px 8px 0 8px;
+    border-radius: 1px;
+    background: {t.L0_WELL};
+}}
+QProgressBar#shotClockBar::chunk {{ background: {t.OK}; }}
+QProgressBar#shotClockBar[severity="warn"]::chunk {{ background: {t.WARN}; }}
+QProgressBar#shotClockBar[severity="crit"]::chunk {{ background: {t.ERR}; }}
+QLabel#shotClockLabel {{
+    color: {t.ERR};
+    font-size: {t.FONT_SIZE_MICRO}px;
+}}
+
 QPushButton#navBtn {{
     background: {t.L2_CARD};
     color: {t.TEXT_PRIMARY};

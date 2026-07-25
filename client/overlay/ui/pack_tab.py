@@ -94,6 +94,13 @@ class PackTab(QWidget):
         self.loading_bar.setVisible(False)
         layout.addWidget(self.loading_bar)
 
+        # Per-pick shot clock. Server-computed (seat_manager); this only
+        # renders. Always visible so the first sight of it isn't at 10 s.
+        from client.overlay.ui.shot_clock_bar import ShotClockBar
+
+        self.shot_clock_bar = ShotClockBar()
+        layout.addWidget(self.shot_clock_bar)
+
         # Column header + scrollable card list.
         self._column_header = _ColumnHeader(show_stats=self._show_stats)
 

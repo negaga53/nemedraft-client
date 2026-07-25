@@ -735,6 +735,49 @@ QLabel#homeHint {{
     border: none;
 }}
 
+QPushButton#queueJoinBtn {{
+    font-size: {t.FONT_SIZE_DENSE}px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: {t.RADIUS_CHIP}px;
+    border: 1px solid {t.ACCENT_DIM};
+    background: {t.ACCENT_WASH};
+    color: {t.ACCENT};
+}}
+QPushButton#queueJoinBtn:hover:enabled {{
+    background: {t.ACCENT_DIM};
+    color: {t.ACCENT_TEXT_ON};
+}}
+QPushButton#queueJoinBtn:disabled {{
+    border-color: {t.L2_STROKE};
+    background: transparent;
+    color: {t.TEXT_FAINT};
+}}
+
+QPushButton#queueLeaveBtn {{
+    font-size: {t.FONT_SIZE_DENSE}px;
+    padding: 4px 12px;
+    border-radius: {t.RADIUS_ROW}px;
+    border: 1px solid {t.L3_STROKE};
+    background: transparent;
+    color: {t.TEXT_MUTED};
+}}
+QPushButton#queueLeaveBtn:hover {{
+    color: {t.ERR};
+    border-color: {t.ERR};
+}}
+
+QProgressBar#queueOfferProgress {{
+    max-height: 4px;
+    min-height: 4px;
+    border-radius: 2px;
+    background: {t.L0_WELL};
+}}
+QProgressBar#queueOfferProgress::chunk {{
+    background: {t.OK};
+    border-radius: 2px;
+}}
+
 /* ---- summary tab ----------------------------------------------------------------- */
 
 QLabel#summaryHeader {{

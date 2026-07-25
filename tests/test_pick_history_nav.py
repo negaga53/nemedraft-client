@@ -61,6 +61,9 @@ def _make_app(mapper_names: list[str]):
     app._auth_polling = MagicMock()
     app._auth_polling.is_vip.return_value = False  # _is_vip() → False
 
+    app._has_seat = False  # seat gate → False, mirrors no admitted seat
+    app._queue = MagicMock()
+
     app.window = MagicMock()
     return app
 

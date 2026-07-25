@@ -47,6 +47,7 @@ class PredictionManager(QObject):
     results_ready = Signal(object, int, int)  # list[Pick], pack, pick
     retrying = Signal(int, int)              # attempt number, delay ms
     gave_up = Signal()
+    no_seat = Signal(object)                 # QueueStatus — 409 no_seat
     signals_ready = Signal(object)           # SignalResult
     deck_suggestions_ready = Signal(object)  # dict[str, DeckSuggestion]
 
@@ -140,6 +141,20 @@ class PredictionManager(QObject):
         self._current_worker = None
 
         if not results:
+            no_seat = self._api_client.last_no_seat
+            if no_seat is not None:
+                # Refused with 409 no_seat — retrying blindly would just
+                # 409 again until the caller re-joins the queue and is
+                # re-admitted. Surface the queue status instead of
+                # burning through the retry/backoff ladder.
+                logger.info(
+                    "Prediction refused (no seat held) for P%dP%d",
+                    pack_number + 1, pick_number + 1,
+                )
+                self._retry_attempt = 0
+                self._retry_start = 0.0
+                self.no_seat.emit(no_seat)
+                return
             logger.warning(
                 "No prediction results from server (attempt %d)",
                 self._retry_attempt + 1,

@@ -114,6 +114,14 @@ class NemeDraftClient:
         # (a later admission-queue manager) read this after predict()
         # etc. return their normal empty/None failure value.
         self.last_no_seat: QueueStatus | None = None
+        # Raw "shot_clock" block from the last successful /api/predict
+        # response (or None). PredictResponse carries the block but
+        # predict() only returns list[Pick] to its callers, so this is
+        # the seam the overlay reads it back through in
+        # OverlayApp._on_prediction_results. Reset on every call
+        # (success or failure) so a stale clock never survives a call
+        # that didn't return one.
+        self.last_shot_clock: dict | None = None
 
     # ------------------------------------------------------------------
     # Public API
@@ -151,6 +159,7 @@ class NemeDraftClient:
         if last_pick is not None:
             body["last_pick"] = last_pick
         data = self._authed_request("POST", "/api/predict", json=body, timeout=5)
+        self.last_shot_clock = data.get("shot_clock") if data is not None else None
         if data is None:
             return []
 

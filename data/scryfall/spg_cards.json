@@ -1,0 +1,215 @@
+[
+  {
+    "name": "Stoneforge Mystic",
+    "oracle_id": "358789f9-7d87-411d-919e-d597da665cbd",
+    "mana_cost": "{1}{W}",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Kor Artificer",
+    "oracle_text": "When this creature enters, you may search your library for an Equipment card, reveal it, put it into your hand, then shuffle.\n{1}{W}, {T}: You may put an Equipment card from your hand onto the battlefield.",
+    "power": "1",
+    "toughness": "2",
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "spg",
+    "arena_id": 90651,
+    "collector_number": "29"
+  },
+  {
+    "name": "Brazen Borrower // Petty Theft",
+    "oracle_id": "c7b044c3-3cfa-407e-bf20-2875e8e04b7b",
+    "mana_cost": "{1}{U}{U} // {1}{U}",
+    "cmc": 3.0,
+    "type_line": "Creature \u2014 Faerie Rogue // Instant \u2014 Adventure",
+    "oracle_text": null,
+    "power": "3",
+    "toughness": "1",
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [
+      "Flying",
+      "Flash"
+    ],
+    "rarity": "mythic",
+    "set": "spg",
+    "arena_id": 90652,
+    "collector_number": "30"
+  },
+  {
+    "name": "Desertion",
+    "oracle_id": "ee3d1f44-e0ca-4ce9-be76-4b675a115156",
+    "mana_cost": "{3}{U}{U}",
+    "cmc": 5.0,
+    "type_line": "Instant",
+    "oracle_text": "Counter target spell. If an artifact or creature spell is countered this way, put that card onto the battlefield under your control instead of into its owner's graveyard.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "spg",
+    "arena_id": 90654,
+    "collector_number": "31"
+  },
+  {
+    "name": "Morbid Opportunist",
+    "oracle_id": "322f44f0-e6da-4ee0-b474-e7d5e9a461c5",
+    "mana_cost": "{2}{B}",
+    "cmc": 3.0,
+    "type_line": "Creature \u2014 Human Rogue",
+    "oracle_text": "Whenever one or more other creatures die, draw a card. This ability triggers only once each turn.",
+    "power": "1",
+    "toughness": "3",
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "spg",
+    "arena_id": 90655,
+    "collector_number": "32"
+  },
+  {
+    "name": "Port Razer",
+    "oracle_id": "653e4b68-3184-4352-ac91-127f7e6d7c12",
+    "mana_cost": "{3}{R}{R}",
+    "cmc": 5.0,
+    "type_line": "Creature \u2014 Orc Pirate",
+    "oracle_text": "Whenever this creature deals combat damage to a player, untap each creature you control. After this phase, there is an additional combat phase.\nThis creature can't attack a player it has already attacked this turn.",
+    "power": "4",
+    "toughness": "4",
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "spg",
+    "arena_id": 90656,
+    "collector_number": "33"
+  },
+  {
+    "name": "Scapeshift",
+    "oracle_id": "c235015e-a7a9-4f8d-bf4a-cf68b3847f83",
+    "mana_cost": "{2}{G}{G}",
+    "cmc": 4.0,
+    "type_line": "Sorcery",
+    "oracle_text": "Sacrifice any number of lands. Search your library for up to that many land cards, put them onto the battlefield tapped, then shuffle.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "spg",
+    "arena_id": 90657,
+    "collector_number": "34"
+  },
+  {
+    "name": "Mystic Snake",
+    "oracle_id": "161b6d06-e6a7-488e-9f9c-d266c1402a3a",
+    "mana_cost": "{1}{G}{U}{U}",
+    "cmc": 4.0,
+    "type_line": "Creature \u2014 Snake",
+    "oracle_text": "Flash\nWhen this creature enters, counter target spell.",
+    "power": "2",
+    "toughness": "2",
+    "colors": [
+      "G",
+      "U"
+    ],
+    "color_identity": [
+      "G",
+      "U"
+    ],
+    "keywords": [
+      "Flash"
+    ],
+    "rarity": "mythic",
+    "set": "spg",
+    "arena_id": 90658,
+    "collector_number": "35"
+  },
+  {
+    "name": "Notion Thief",
+    "oracle_id": "f8dab16e-1d50-443e-9431-8b6f1cf61c9c",
+    "mana_cost": "{2}{U}{B}",
+    "cmc": 4.0,
+    "type_line": "Creature \u2014 Human Rogue",
+    "oracle_text": "Flash\nIf an opponent would draw a card except the first one they draw in each of their draw steps, instead that player skips that draw and you draw a card.",
+    "power": "3",
+    "toughness": "1",
+    "colors": [
+      "B",
+      "U"
+    ],
+    "color_identity": [
+      "B",
+      "U"
+    ],
+    "keywords": [
+      "Flash"
+    ],
+    "rarity": "mythic",
+    "set": "spg",
+    "arena_id": 90659,
+    "collector_number": "36"
+  },
+  {
+    "name": "Desert",
+    "oracle_id": "195107ad-879d-4b02-a44a-a3ba70fedf88",
+    "mana_cost": "",
+    "cmc": 0.0,
+    "type_line": "Land \u2014 Desert",
+    "oracle_text": "{T}: Add {C}.\n{T}: This land deals 1 damage to target attacking creature. Activate only during the end of combat step.",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "spg",
+    "arena_id": 90660,
+    "collector_number": "37"
+  },
+  {
+    "name": "Prismatic Vista",
+    "oracle_id": "032b8a0d-491a-4a12-ab9f-689010054d5b",
+    "mana_cost": "",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a basic land card, put it onto the battlefield, then shuffle.",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "spg",
+    "arena_id": 90661,
+    "collector_number": "38"
+  }
+]

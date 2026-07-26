@@ -69,6 +69,17 @@ reaches into these paths when a new MTG set is added.
   window is `L0_WINDOW_OPAQUE`; only the Settings opacity slider (30–100%, via
   `setWindowOpacity`) controls translucency now. `build_stylesheet()` takes no
   mode argument.
+- **macOS always-on-top needs native re-assertion.** `WindowStaysOnTopHint` maps to a
+  level *below* fullscreen apps on macOS, and a plain `Qt.Tool` panel hides whenever the
+  app deactivates (i.e. the user clicks into Arena). `ui/_macos.py::apply_pinning` raises
+  the NSWindow to `NSStatusWindowLevel`, joins all Spaces, and opts out of
+  hides-on-deactivate — but `QShowEvent` fires before the NSWindow is attached and
+  Qt/AppKit can clobber the level later, so `OverlayWindow._assert_pinning` retries on a
+  0-tick timer and re-asserts on every show + `applicationStateChanged`. The behaviour is
+  user-controlled via the Settings "Keep overlay on top" toggle
+  (`config.overlay.always_on_top`, live-applied through `set_always_on_top`). PyObjC is
+  imported lazily there, so it's listed in the spec's darwin `hiddenimports` — same
+  pattern as pymem/pefile on Windows.
 - **A styled `QTabWidget` does not paint behind its tab-bar row.** A
   `QTabBar { background: transparent }` leaves the row unpainted; the bar must
   paint the window background **and** the `QTabWidget` must be in `documentMode`

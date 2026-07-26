@@ -1,0 +1,2020 @@
+[
+  {
+    "name": "Lotus Ring",
+    "oracle_id": "ca4d3d27-ea3a-44ac-96e9-b52b563129f8",
+    "mana_cost": "{3}",
+    "cmc": 3.0,
+    "type_line": "Artifact \u2014 Equipment",
+    "oracle_text": "Indestructible\nEquipped creature gets +3/+3 and has vigilance and \"{T}, Sacrifice this creature: Add three mana of any one color.\"\nEquip {3}",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [
+      "Indestructible",
+      "Equip"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90685,
+    "collector_number": "24"
+  },
+  {
+    "name": "Grand Abolisher",
+    "oracle_id": "c749f23c-40c0-4159-b84c-a70cbb062c14",
+    "mana_cost": "{W}{W}",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Human Cleric",
+    "oracle_text": "During your turn, your opponents can't cast spells or activate abilities of artifacts, creatures, or enchantments.",
+    "power": "2",
+    "toughness": "2",
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "32"
+  },
+  {
+    "name": "Vaultborn Tyrant",
+    "oracle_id": "e8d0accc-b320-4c07-8a71-a09db860351e",
+    "mana_cost": "{5}{G}{G}",
+    "cmc": 7.0,
+    "type_line": "Creature \u2014 Dinosaur",
+    "oracle_text": "Trample\nWhenever this creature or another creature you control with power 4 or greater enters, you gain 3 life and draw a card.\nWhen this creature dies, if it's not a token, create a token that's a copy of it, except it's an artifact in addition to its other types.",
+    "power": "6",
+    "toughness": "6",
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [
+      "Trample"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "85"
+  },
+  {
+    "name": "Hostile Investigator",
+    "oracle_id": "de83b1a4-0ce0-4cc1-aff3-6d0239d92302",
+    "mana_cost": "{3}{B}",
+    "cmc": 4.0,
+    "type_line": "Creature \u2014 Ogre Rogue Detective",
+    "oracle_text": "When this creature enters, target opponent discards a card.\nWhenever one or more players discard one or more cards, investigate. This ability triggers only once each turn. (Create a Clue token. It's an artifact with \"{2}, Sacrifice this token: Draw a card.\")",
+    "power": "4",
+    "toughness": "3",
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [
+      "Investigate"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "75"
+  },
+  {
+    "name": "Vaultborn Tyrant",
+    "oracle_id": "e8d0accc-b320-4c07-8a71-a09db860351e",
+    "mana_cost": "{5}{G}{G}",
+    "cmc": 7.0,
+    "type_line": "Creature \u2014 Dinosaur",
+    "oracle_text": "Trample\nWhenever this creature or another creature you control with power 4 or greater enters, you gain 3 life and draw a card.\nWhen this creature dies, if it's not a token, create a token that's a copy of it, except it's an artifact in addition to its other types.",
+    "power": "6",
+    "toughness": "6",
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [
+      "Trample"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "61"
+  },
+  {
+    "name": "Loot, the Key to Everything",
+    "oracle_id": "542be13f-b9c0-4b79-b486-be576c531a82",
+    "mana_cost": "{G}{U}{R}",
+    "cmc": 3.0,
+    "type_line": "Legendary Creature \u2014 Beast Noble",
+    "oracle_text": "Ward {1}\nAt the beginning of your upkeep, exile the top X cards of your library, where X is the number of card types among other nonland permanents you control. You may play those cards this turn.",
+    "power": "1",
+    "toughness": "2",
+    "colors": [
+      "G",
+      "R",
+      "U"
+    ],
+    "color_identity": [
+      "G",
+      "R",
+      "U"
+    ],
+    "keywords": [
+      "Ward"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "62"
+  },
+  {
+    "name": "Legion Extruder",
+    "oracle_id": "c77dc11e-d95d-4e7e-bb24-d971c179e9b0",
+    "mana_cost": "{1}{R}",
+    "cmc": 2.0,
+    "type_line": "Artifact",
+    "oracle_text": "When this artifact enters, it deals 2 damage to any target.\n{2}, {T}, Sacrifice another artifact: Create a 3/3 colorless Golem artifact creature token.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "77"
+  },
+  {
+    "name": "Greed's Gambit",
+    "oracle_id": "0868ebbb-2fe9-4f53-9697-acad8cda5ec1",
+    "mana_cost": "{3}{B}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "When this enchantment enters, you draw three cards, gain 6 life, and create three 2/1 black Bat creature tokens with flying.\nAt the beginning of your end step, you discard a card, lose 2 life, and sacrifice a creature.\nWhen this enchantment leaves the battlefield, you discard three cards, lose 6 life, and sacrifice three creatures.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "38"
+  },
+  {
+    "name": "Sandstorm Salvager",
+    "oracle_id": "ec19a9bc-6fc1-4150-976b-37a47b165016",
+    "mana_cost": "{2}{G}",
+    "cmc": 3.0,
+    "type_line": "Creature \u2014 Human Artificer",
+    "oracle_text": "When this creature enters, create a 3/3 colorless Golem artifact creature token.\n{2}, {T}: Put a +1/+1 counter on each creature token you control. They gain trample until end of turn.",
+    "power": "1",
+    "toughness": "1",
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90680,
+    "collector_number": "19"
+  },
+  {
+    "name": "Grand Abolisher",
+    "oracle_id": "c749f23c-40c0-4159-b84c-a70cbb062c14",
+    "mana_cost": "{W}{W}",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Human Cleric",
+    "oracle_text": "During your turn, your opponents can't cast spells or activate abilities of artifacts, creatures, or enchantments.",
+    "power": "2",
+    "toughness": "2",
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "67"
+  },
+  {
+    "name": "Hostile Investigator",
+    "oracle_id": "de83b1a4-0ce0-4cc1-aff3-6d0239d92302",
+    "mana_cost": "{3}{B}",
+    "cmc": 4.0,
+    "type_line": "Creature \u2014 Ogre Rogue Detective",
+    "oracle_text": "When this creature enters, target opponent discards a card.\nWhenever one or more players discard one or more cards, investigate. This ability triggers only once each turn. (Create a Clue token. It's an artifact with \"{2}, Sacrifice this token: Draw a card.\")",
+    "power": "4",
+    "toughness": "3",
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [
+      "Investigate"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90671,
+    "collector_number": "10"
+  },
+  {
+    "name": "Oltec Matterweaver",
+    "oracle_id": "3cb91696-242f-4e91-806b-61b1bb45a20c",
+    "mana_cost": "{2}{W}",
+    "cmc": 3.0,
+    "type_line": "Creature \u2014 Human Artificer",
+    "oracle_text": "Whenever you cast a creature spell, choose one \u2014\n\u2022 Create a 1/1 colorless Gnome artifact creature token.\n\u2022 Create a token that's a copy of target artifact token you control.",
+    "power": "2",
+    "toughness": "4",
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "68"
+  },
+  {
+    "name": "Territory Forge",
+    "oracle_id": "a14d89b6-23eb-4337-8dee-93c39b0efbf1",
+    "mana_cost": "{4}{R}",
+    "cmc": 5.0,
+    "type_line": "Artifact",
+    "oracle_text": "When this artifact enters, if you cast it, exile target artifact or land.\nThis artifact has all activated abilities of the exiled card.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "45"
+  },
+  {
+    "name": "Collector's Cage",
+    "oracle_id": "8f5b71fd-469f-4370-a806-9bfefbae03a2",
+    "mana_cost": "{1}{W}",
+    "cmc": 2.0,
+    "type_line": "Artifact",
+    "oracle_text": "Hideaway 5 (When this artifact enters, look at the top five cards of your library, exile one face down, then put the rest on the bottom in a random order.)\n{1}, {T}: Put a +1/+1 counter on target creature you control. Then if you control three or more creatures with different powers, you may play the exiled card without paying its mana cost.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [
+      "Hideaway"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "66"
+  },
+  {
+    "name": "Lotus Ring",
+    "oracle_id": "ca4d3d27-ea3a-44ac-96e9-b52b563129f8",
+    "mana_cost": "{3}",
+    "cmc": 3.0,
+    "type_line": "Artifact \u2014 Equipment",
+    "oracle_text": "Indestructible\nEquipped creature gets +3/+3 and has vigilance and \"{T}, Sacrifice this creature: Add three mana of any one color.\"\nEquip {3}",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [
+      "Indestructible",
+      "Equip"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "89"
+  },
+  {
+    "name": "Simulacrum Synthesizer",
+    "oracle_id": "eb7a1f21-a66d-415b-8520-710b44890bb6",
+    "mana_cost": "{2}{U}",
+    "cmc": 3.0,
+    "type_line": "Artifact",
+    "oracle_text": "When this artifact enters, scry 2.\nWhenever another artifact you control with mana value 3 or greater enters, create a 0/0 colorless Construct artifact creature token with \"This token gets +1/+1 for each artifact you control.\"",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [
+      "Scry"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "36"
+  },
+  {
+    "name": "Worldwalker Helm",
+    "oracle_id": "9573c85a-e574-4b4e-aae0-2165c45fd27e",
+    "mana_cost": "{2}{U}",
+    "cmc": 3.0,
+    "type_line": "Artifact",
+    "oracle_text": "If you would create one or more artifact tokens, instead create those tokens plus an additional Map token. (It's an artifact with \"{1}, {T}, Sacrifice this token: Target creature you control explores. Activate only as a sorcery.\")\n{1}{U}, {T}: Create a token that's a copy of target artifact token you control.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [
+      "Explore"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "72"
+  },
+  {
+    "name": "Loot, the Key to Everything",
+    "oracle_id": "542be13f-b9c0-4b79-b486-be576c531a82",
+    "mana_cost": "{G}{U}{R}",
+    "cmc": 3.0,
+    "type_line": "Legendary Creature \u2014 Beast Noble",
+    "oracle_text": "Ward {1}\nAt the beginning of your upkeep, exile the top X cards of your library, where X is the number of card types among other nonland permanents you control. You may play those cards this turn.",
+    "power": "1",
+    "toughness": "2",
+    "colors": [
+      "G",
+      "R",
+      "U"
+    ],
+    "color_identity": [
+      "G",
+      "R",
+      "U"
+    ],
+    "keywords": [
+      "Ward"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "86"
+  },
+  {
+    "name": "Memory Vessel",
+    "oracle_id": "0179bc62-823e-46b9-b536-342904fedafc",
+    "mana_cost": "{3}{R}{R}",
+    "cmc": 5.0,
+    "type_line": "Artifact",
+    "oracle_text": "{T}, Exile this artifact: Each player exiles the top seven cards of their library. Until your next turn, players may play cards they exiled this way, and they can't play cards from their hand. Activate only as a sorcery.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90674,
+    "collector_number": "13"
+  },
+  {
+    "name": "Ancient Cornucopia",
+    "oracle_id": "f0950c95-a297-489d-b166-74bba6af5376",
+    "mana_cost": "{2}{G}",
+    "cmc": 3.0,
+    "type_line": "Artifact",
+    "oracle_text": "Whenever you cast a spell that's one or more colors, you may gain 1 life for each of that spell's colors. Do this only once each turn.\n{T}: Add one mana of any color.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "46"
+  },
+  {
+    "name": "Generous Plunderer",
+    "oracle_id": "91c835d1-22ca-4c90-9ba6-c8e01bbc0347",
+    "mana_cost": "{1}{R}",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Human Rogue",
+    "oracle_text": "Menace\nAt the beginning of your upkeep, you may create a Treasure token. When you do, target opponent creates a tapped Treasure token.\nWhenever this creature attacks, it deals damage to defending player equal to the number of artifacts they control.",
+    "power": "2",
+    "toughness": "2",
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [
+      "Treasure",
+      "Menace"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "41"
+  },
+  {
+    "name": "Omenpath Journey",
+    "oracle_id": "8b067e44-2001-4b49-aa4a-2c86f8929751",
+    "mana_cost": "{3}{G}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "When this enchantment enters, search your library for up to five land cards that have different names, exile them, then shuffle.\nAt the beginning of your end step, choose a card at random exiled with this enchantment and put it onto the battlefield tapped.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "48"
+  },
+  {
+    "name": "Generous Plunderer",
+    "oracle_id": "91c835d1-22ca-4c90-9ba6-c8e01bbc0347",
+    "mana_cost": "{1}{R}",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Human Rogue",
+    "oracle_text": "Menace\nAt the beginning of your upkeep, you may create a Treasure token. When you do, target opponent creates a tapped Treasure token.\nWhenever this creature attacks, it deals damage to defending player equal to the number of artifacts they control.",
+    "power": "2",
+    "toughness": "2",
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [
+      "Treasure",
+      "Menace"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "76"
+  },
+  {
+    "name": "Rest in Peace",
+    "oracle_id": "087f9ad7-e74f-40e2-8102-1ed2925d0418",
+    "mana_cost": "{1}{W}",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "oracle_text": "When this enchantment enters, exile all graveyards.\nIf a card or token would be put into a graveyard from anywhere, exile it instead.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "69"
+  },
+  {
+    "name": "Esoteric Duplicator",
+    "oracle_id": "0752fe67-9b8a-42c0-90e3-087d426b2f3b",
+    "mana_cost": "{2}{U}",
+    "cmc": 3.0,
+    "type_line": "Artifact \u2014 Clue",
+    "oracle_text": "Whenever you sacrifice this artifact or another artifact, you may pay {2}. If you do, at the beginning of the next end step, create a token that's a copy of that artifact.\n{2}, Sacrifice this artifact: Draw a card.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90666,
+    "collector_number": "5"
+  },
+  {
+    "name": "Memory Vessel",
+    "oracle_id": "0179bc62-823e-46b9-b536-342904fedafc",
+    "mana_cost": "{3}{R}{R}",
+    "cmc": 5.0,
+    "type_line": "Artifact",
+    "oracle_text": "{T}, Exile this artifact: Each player exiles the top seven cards of their library. Until your next turn, players may play cards they exiled this way, and they can't play cards from their hand. Activate only as a sorcery.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "78"
+  },
+  {
+    "name": "Transmutation Font",
+    "oracle_id": "a68e57f3-f138-4c26-b8d5-55d1adec44a8",
+    "mana_cost": "{5}",
+    "cmc": 5.0,
+    "type_line": "Artifact",
+    "oracle_text": "{T}: Create your choice of a Blood token, a Clue token, or a Food token.\n{3}, {T}, Sacrifice three artifact tokens with different names: Search your library for an artifact card, put it onto the battlefield, then shuffle. Activate only as a sorcery.",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [
+      "Food"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "93"
+  },
+  {
+    "name": "Greed's Gambit",
+    "oracle_id": "0868ebbb-2fe9-4f53-9697-acad8cda5ec1",
+    "mana_cost": "{3}{B}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "When this enchantment enters, you draw three cards, gain 6 life, and create three 2/1 black Bat creature tokens with flying.\nAt the beginning of your end step, you discard a card, lose 2 life, and sacrifice a creature.\nWhen this enchantment leaves the battlefield, you discard three cards, lose 6 life, and sacrifice three creatures.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "73"
+  },
+  {
+    "name": "Generous Plunderer",
+    "oracle_id": "91c835d1-22ca-4c90-9ba6-c8e01bbc0347",
+    "mana_cost": "{1}{R}",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Human Rogue",
+    "oracle_text": "Menace\nAt the beginning of your upkeep, you may create a Treasure token. When you do, target opponent creates a tapped Treasure token.\nWhenever this creature attacks, it deals damage to defending player equal to the number of artifacts they control.",
+    "power": "2",
+    "toughness": "2",
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [
+      "Treasure",
+      "Menace"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90672,
+    "collector_number": "11"
+  },
+  {
+    "name": "Bristlebud Farmer",
+    "oracle_id": "3e44226b-51a2-4099-aff8-a5befab720cb",
+    "mana_cost": "{2}{G}{G}",
+    "cmc": 4.0,
+    "type_line": "Creature \u2014 Plant Druid",
+    "oracle_text": "Trample\nWhen this creature enters, create two Food tokens. (They're artifacts with \"{2}, {T}, Sacrifice this token: You gain 3 life.\")\nWhenever this creature attacks, you may sacrifice a Food. If you do, mill three cards. You may put a permanent card from among them into your hand.",
+    "power": "5",
+    "toughness": "5",
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [
+      "Food",
+      "Trample",
+      "Mill"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "82"
+  },
+  {
+    "name": "Fomori Vault",
+    "oracle_id": "622a53bd-d894-422c-a606-7126041afa02",
+    "mana_cost": "",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "oracle_text": "{T}: Add {C}.\n{3}, {T}, Discard a card: Look at the top X cards of your library, where X is the number of artifacts you control. Put one of those cards into your hand and the rest on the bottom of your library in a random order.",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "94"
+  },
+  {
+    "name": "Sword of Wealth and Power",
+    "oracle_id": "b3a80545-9a8a-46b2-9d8c-b0d66fb68a5d",
+    "mana_cost": "{3}",
+    "cmc": 3.0,
+    "type_line": "Artifact \u2014 Equipment",
+    "oracle_text": "Equipped creature gets +2/+2 and has protection from instants and from sorceries.\nWhenever equipped creature deals combat damage to a player, create a Treasure token. When you next cast an instant or sorcery spell this turn, copy that spell. You may choose new targets for the copy.\nEquip {2}",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [
+      "Treasure",
+      "Equip"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "64"
+  },
+  {
+    "name": "Territory Forge",
+    "oracle_id": "a14d89b6-23eb-4337-8dee-93c39b0efbf1",
+    "mana_cost": "{4}{R}",
+    "cmc": 5.0,
+    "type_line": "Artifact",
+    "oracle_text": "When this artifact enters, if you cast it, exile target artifact or land.\nThis artifact has all activated abilities of the exiled card.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "80"
+  },
+  {
+    "name": "Legion Extruder",
+    "oracle_id": "c77dc11e-d95d-4e7e-bb24-d971c179e9b0",
+    "mana_cost": "{1}{R}",
+    "cmc": 2.0,
+    "type_line": "Artifact",
+    "oracle_text": "When this artifact enters, it deals 2 damage to any target.\n{2}, {T}, Sacrifice another artifact: Create a 3/3 colorless Golem artifact creature token.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90673,
+    "collector_number": "12"
+  },
+  {
+    "name": "Greed's Gambit",
+    "oracle_id": "0868ebbb-2fe9-4f53-9697-acad8cda5ec1",
+    "mana_cost": "{3}{B}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "When this enchantment enters, you draw three cards, gain 6 life, and create three 2/1 black Bat creature tokens with flying.\nAt the beginning of your end step, you discard a card, lose 2 life, and sacrifice a creature.\nWhen this enchantment leaves the battlefield, you discard three cards, lose 6 life, and sacrifice three creatures.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90669,
+    "collector_number": "8"
+  },
+  {
+    "name": "Esoteric Duplicator",
+    "oracle_id": "0752fe67-9b8a-42c0-90e3-087d426b2f3b",
+    "mana_cost": "{2}{U}",
+    "cmc": 3.0,
+    "type_line": "Artifact \u2014 Clue",
+    "oracle_text": "Whenever you sacrifice this artifact or another artifact, you may pay {2}. If you do, at the beginning of the next end step, create a token that's a copy of that artifact.\n{2}, Sacrifice this artifact: Draw a card.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "70"
+  },
+  {
+    "name": "Molten Duplication",
+    "oracle_id": "92b91910-9b65-4421-8eef-a33793161089",
+    "mana_cost": "{1}{R}",
+    "cmc": 2.0,
+    "type_line": "Sorcery",
+    "oracle_text": "Create a token that's a copy of target artifact or creature you control, except it's an artifact in addition to its other types. It gains haste until end of turn. Sacrifice it at the beginning of the next end step.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "79"
+  },
+  {
+    "name": "Vaultborn Tyrant",
+    "oracle_id": "e8d0accc-b320-4c07-8a71-a09db860351e",
+    "mana_cost": "{5}{G}{G}",
+    "cmc": 7.0,
+    "type_line": "Creature \u2014 Dinosaur",
+    "oracle_text": "Trample\nWhenever this creature or another creature you control with power 4 or greater enters, you gain 3 life and draw a card.\nWhen this creature dies, if it's not a token, create a token that's a copy of it, except it's an artifact in addition to its other types.",
+    "power": "6",
+    "toughness": "6",
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [
+      "Trample"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90681,
+    "collector_number": "20"
+  },
+  {
+    "name": "Territory Forge",
+    "oracle_id": "a14d89b6-23eb-4337-8dee-93c39b0efbf1",
+    "mana_cost": "{4}{R}",
+    "cmc": 5.0,
+    "type_line": "Artifact",
+    "oracle_text": "When this artifact enters, if you cast it, exile target artifact or land.\nThis artifact has all activated abilities of the exiled card.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90676,
+    "collector_number": "15"
+  },
+  {
+    "name": "Bristlebud Farmer",
+    "oracle_id": "3e44226b-51a2-4099-aff8-a5befab720cb",
+    "mana_cost": "{2}{G}{G}",
+    "cmc": 4.0,
+    "type_line": "Creature \u2014 Plant Druid",
+    "oracle_text": "Trample\nWhen this creature enters, create two Food tokens. (They're artifacts with \"{2}, {T}, Sacrifice this token: You gain 3 life.\")\nWhenever this creature attacks, you may sacrifice a Food. If you do, mill three cards. You may put a permanent card from among them into your hand.",
+    "power": "5",
+    "toughness": "5",
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [
+      "Food",
+      "Trample",
+      "Mill"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "47"
+  },
+  {
+    "name": "Transmutation Font",
+    "oracle_id": "a68e57f3-f138-4c26-b8d5-55d1adec44a8",
+    "mana_cost": "{5}",
+    "cmc": 5.0,
+    "type_line": "Artifact",
+    "oracle_text": "{T}: Create your choice of a Blood token, a Clue token, or a Food token.\n{3}, {T}, Sacrifice three artifact tokens with different names: Search your library for an artifact card, put it onto the battlefield, then shuffle. Activate only as a sorcery.",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [
+      "Food"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "58"
+  },
+  {
+    "name": "Sandstorm Salvager",
+    "oracle_id": "ec19a9bc-6fc1-4150-976b-37a47b165016",
+    "mana_cost": "{2}{G}",
+    "cmc": 3.0,
+    "type_line": "Creature \u2014 Human Artificer",
+    "oracle_text": "When this creature enters, create a 3/3 colorless Golem artifact creature token.\n{2}, {T}: Put a +1/+1 counter on each creature token you control. They gain trample until end of turn.",
+    "power": "1",
+    "toughness": "1",
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "49"
+  },
+  {
+    "name": "Collector's Cage",
+    "oracle_id": "8f5b71fd-469f-4370-a806-9bfefbae03a2",
+    "mana_cost": "{1}{W}",
+    "cmc": 2.0,
+    "type_line": "Artifact",
+    "oracle_text": "Hideaway 5 (When this artifact enters, look at the top five cards of your library, exile one face down, then put the rest on the bottom in a random order.)\n{1}, {T}: Put a +1/+1 counter on target creature you control. Then if you control three or more creatures with different powers, you may play the exiled card without paying its mana cost.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [
+      "Hideaway"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "31"
+  },
+  {
+    "name": "Sandstorm Salvager",
+    "oracle_id": "ec19a9bc-6fc1-4150-976b-37a47b165016",
+    "mana_cost": "{2}{G}",
+    "cmc": 3.0,
+    "type_line": "Creature \u2014 Human Artificer",
+    "oracle_text": "When this creature enters, create a 3/3 colorless Golem artifact creature token.\n{2}, {T}: Put a +1/+1 counter on each creature token you control. They gain trample until end of turn.",
+    "power": "1",
+    "toughness": "1",
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "84"
+  },
+  {
+    "name": "Torpor Orb",
+    "oracle_id": "97326cad-b13c-4e52-82ce-850a39e5ff08",
+    "mana_cost": "{2}",
+    "cmc": 2.0,
+    "type_line": "Artifact",
+    "oracle_text": "Creatures entering don't cause abilities to trigger.",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "57"
+  },
+  {
+    "name": "Worldwalker Helm",
+    "oracle_id": "9573c85a-e574-4b4e-aae0-2165c45fd27e",
+    "mana_cost": "{2}{U}",
+    "cmc": 3.0,
+    "type_line": "Artifact",
+    "oracle_text": "If you would create one or more artifact tokens, instead create those tokens plus an additional Map token. (It's an artifact with \"{1}, {T}, Sacrifice this token: Target creature you control explores. Activate only as a sorcery.\")\n{1}{U}, {T}: Create a token that's a copy of target artifact token you control.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [
+      "Explore"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "37"
+  },
+  {
+    "name": "Tarnation Vista",
+    "oracle_id": "b0be3f25-edb1-4299-959c-9aad909730ca",
+    "mana_cost": "",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "oracle_text": "This land enters tapped. As it enters, choose a color.\n{T}: Add one mana of the chosen color.\n{1}, {T}: For each color among monocolored permanents you control, add one mana of that color.",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "95"
+  },
+  {
+    "name": "Pest Control",
+    "oracle_id": "072db429-3838-42ba-89b6-e26cbce22af9",
+    "mana_cost": "{W}{B}",
+    "cmc": 2.0,
+    "type_line": "Sorcery",
+    "oracle_text": "Destroy all nonland permanents with mana value 1 or less.\nCycling {2} ({2}, Discard this card: Draw a card.)",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B",
+      "W"
+    ],
+    "color_identity": [
+      "B",
+      "W"
+    ],
+    "keywords": [
+      "Cycling"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "52"
+  },
+  {
+    "name": "Esoteric Duplicator",
+    "oracle_id": "0752fe67-9b8a-42c0-90e3-087d426b2f3b",
+    "mana_cost": "{2}{U}",
+    "cmc": 3.0,
+    "type_line": "Artifact \u2014 Clue",
+    "oracle_text": "Whenever you sacrifice this artifact or another artifact, you may pay {2}. If you do, at the beginning of the next end step, create a token that's a copy of that artifact.\n{2}, Sacrifice this artifact: Draw a card.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "35"
+  },
+  {
+    "name": "Tarnation Vista",
+    "oracle_id": "b0be3f25-edb1-4299-959c-9aad909730ca",
+    "mana_cost": "",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "oracle_text": "This land enters tapped. As it enters, choose a color.\n{T}: Add one mana of the chosen color.\n{1}, {T}: For each color among monocolored permanents you control, add one mana of that color.",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90691,
+    "collector_number": "30"
+  },
+  {
+    "name": "Oltec Matterweaver",
+    "oracle_id": "3cb91696-242f-4e91-806b-61b1bb45a20c",
+    "mana_cost": "{2}{W}",
+    "cmc": 3.0,
+    "type_line": "Creature \u2014 Human Artificer",
+    "oracle_text": "Whenever you cast a creature spell, choose one \u2014\n\u2022 Create a 1/1 colorless Gnome artifact creature token.\n\u2022 Create a token that's a copy of target artifact token you control.",
+    "power": "2",
+    "toughness": "4",
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "33"
+  },
+  {
+    "name": "Harvester of Misery",
+    "oracle_id": "a0d3bb63-2977-41b2-bcc3-2488e6696cb8",
+    "mana_cost": "{3}{B}{B}",
+    "cmc": 5.0,
+    "type_line": "Creature \u2014 Spirit",
+    "oracle_text": "Menace\nWhen this creature enters, other creatures get -2/-2 until end of turn.\n{1}{B}, Discard this card: Target creature gets -2/-2 until end of turn.",
+    "power": "5",
+    "toughness": "4",
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [
+      "Menace"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90670,
+    "collector_number": "9"
+  },
+  {
+    "name": "Collector's Cage",
+    "oracle_id": "8f5b71fd-469f-4370-a806-9bfefbae03a2",
+    "mana_cost": "{1}{W}",
+    "cmc": 2.0,
+    "type_line": "Artifact",
+    "oracle_text": "Hideaway 5 (When this artifact enters, look at the top five cards of your library, exile one face down, then put the rest on the bottom in a random order.)\n{1}, {T}: Put a +1/+1 counter on target creature you control. Then if you control three or more creatures with different powers, you may play the exiled card without paying its mana cost.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [
+      "Hideaway"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90662,
+    "collector_number": "1"
+  },
+  {
+    "name": "Omenpath Journey",
+    "oracle_id": "8b067e44-2001-4b49-aa4a-2c86f8929751",
+    "mana_cost": "{3}{G}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "When this enchantment enters, search your library for up to five land cards that have different names, exile them, then shuffle.\nAt the beginning of your end step, choose a card at random exiled with this enchantment and put it onto the battlefield tapped.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "83"
+  },
+  {
+    "name": "Loot, the Key to Everything",
+    "oracle_id": "542be13f-b9c0-4b79-b486-be576c531a82",
+    "mana_cost": "{G}{U}{R}",
+    "cmc": 3.0,
+    "type_line": "Legendary Creature \u2014 Beast Noble",
+    "oracle_text": "Ward {1}\nAt the beginning of your upkeep, exile the top X cards of your library, where X is the number of card types among other nonland permanents you control. You may play those cards this turn.",
+    "power": "1",
+    "toughness": "2",
+    "colors": [
+      "G",
+      "R",
+      "U"
+    ],
+    "color_identity": [
+      "G",
+      "R",
+      "U"
+    ],
+    "keywords": [
+      "Ward"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "51"
+  },
+  {
+    "name": "Pest Control",
+    "oracle_id": "072db429-3838-42ba-89b6-e26cbce22af9",
+    "mana_cost": "{W}{B}",
+    "cmc": 2.0,
+    "type_line": "Sorcery",
+    "oracle_text": "Destroy all nonland permanents with mana value 1 or less.\nCycling {2} ({2}, Discard this card: Draw a card.)",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B",
+      "W"
+    ],
+    "color_identity": [
+      "B",
+      "W"
+    ],
+    "keywords": [
+      "Cycling"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90683,
+    "collector_number": "22"
+  },
+  {
+    "name": "Lost Jitte",
+    "oracle_id": "a9d72f78-2ab5-4e2e-ab7b-ef875e0a0609",
+    "mana_cost": "{1}",
+    "cmc": 1.0,
+    "type_line": "Legendary Artifact \u2014 Equipment",
+    "oracle_text": "Whenever equipped creature deals combat damage, put a charge counter on Lost Jitte.\nRemove a charge counter from Lost Jitte: Choose one \u2014\n\u2022 Untap target land.\n\u2022 Target creature can't block this turn.\n\u2022 Put a +1/+1 counter on equipped creature.\nEquip {1}",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [
+      "Equip"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "88"
+  },
+  {
+    "name": "Fomori Vault",
+    "oracle_id": "622a53bd-d894-422c-a606-7126041afa02",
+    "mana_cost": "",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "oracle_text": "{T}: Add {C}.\n{3}, {T}, Discard a card: Look at the top X cards of your library, where X is the number of artifacts you control. Put one of those cards into your hand and the rest on the bottom of your library in a random order.",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90690,
+    "collector_number": "29"
+  },
+  {
+    "name": "Lotus Ring",
+    "oracle_id": "ca4d3d27-ea3a-44ac-96e9-b52b563129f8",
+    "mana_cost": "{3}",
+    "cmc": 3.0,
+    "type_line": "Artifact \u2014 Equipment",
+    "oracle_text": "Indestructible\nEquipped creature gets +3/+3 and has vigilance and \"{T}, Sacrifice this creature: Add three mana of any one color.\"\nEquip {3}",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [
+      "Indestructible",
+      "Equip"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "63"
+  },
+  {
+    "name": "Simulacrum Synthesizer",
+    "oracle_id": "eb7a1f21-a66d-415b-8520-710b44890bb6",
+    "mana_cost": "{2}{U}",
+    "cmc": 3.0,
+    "type_line": "Artifact",
+    "oracle_text": "When this artifact enters, scry 2.\nWhenever another artifact you control with mana value 3 or greater enters, create a 0/0 colorless Construct artifact creature token with \"This token gets +1/+1 for each artifact you control.\"",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [
+      "Scry"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90667,
+    "collector_number": "6"
+  },
+  {
+    "name": "Sword of Wealth and Power",
+    "oracle_id": "b3a80545-9a8a-46b2-9d8c-b0d66fb68a5d",
+    "mana_cost": "{3}",
+    "cmc": 3.0,
+    "type_line": "Artifact \u2014 Equipment",
+    "oracle_text": "Equipped creature gets +2/+2 and has protection from instants and from sorceries.\nWhenever equipped creature deals combat damage to a player, create a Treasure token. When you next cast an instant or sorcery spell this turn, copy that spell. You may choose new targets for the copy.\nEquip {2}",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [
+      "Treasure",
+      "Equip"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "56"
+  },
+  {
+    "name": "Rest in Peace",
+    "oracle_id": "087f9ad7-e74f-40e2-8102-1ed2925d0418",
+    "mana_cost": "{1}{W}",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "oracle_text": "When this enchantment enters, exile all graveyards.\nIf a card or token would be put into a graveyard from anywhere, exile it instead.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "34"
+  },
+  {
+    "name": "Fomori Vault",
+    "oracle_id": "622a53bd-d894-422c-a606-7126041afa02",
+    "mana_cost": "",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "oracle_text": "{T}: Add {C}.\n{3}, {T}, Discard a card: Look at the top X cards of your library, where X is the number of artifacts you control. Put one of those cards into your hand and the rest on the bottom of your library in a random order.",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "59"
+  },
+  {
+    "name": "Tarnation Vista",
+    "oracle_id": "b0be3f25-edb1-4299-959c-9aad909730ca",
+    "mana_cost": "",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "oracle_text": "This land enters tapped. As it enters, choose a color.\n{T}: Add one mana of the chosen color.\n{1}, {T}: For each color among monocolored permanents you control, add one mana of that color.",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "60"
+  },
+  {
+    "name": "Molten Duplication",
+    "oracle_id": "92b91910-9b65-4421-8eef-a33793161089",
+    "mana_cost": "{1}{R}",
+    "cmc": 2.0,
+    "type_line": "Sorcery",
+    "oracle_text": "Create a token that's a copy of target artifact or creature you control, except it's an artifact in addition to its other types. It gains haste until end of turn. Sacrifice it at the beginning of the next end step.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "44"
+  },
+  {
+    "name": "Tarnation Vista",
+    "oracle_id": "b0be3f25-edb1-4299-959c-9aad909730ca",
+    "mana_cost": "",
+    "cmc": 0.0,
+    "type_line": "Land",
+    "oracle_text": "This land enters tapped. As it enters, choose a color.\n{T}: Add one mana of the chosen color.\n{1}, {T}: For each color among monocolored permanents you control, add one mana of that color.",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "65"
+  },
+  {
+    "name": "Nexus of Becoming",
+    "oracle_id": "07142ee9-dc2c-4b33-ad20-2f5285225e86",
+    "mana_cost": "{6}",
+    "cmc": 6.0,
+    "type_line": "Artifact",
+    "oracle_text": "At the beginning of combat on your turn, draw a card. Then you may exile an artifact or creature card from your hand. If you do, create a token that's a copy of the exiled card, except it's a 3/3 Golem artifact creature in addition to its other types.",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90686,
+    "collector_number": "25"
+  },
+  {
+    "name": "Ancient Cornucopia",
+    "oracle_id": "f0950c95-a297-489d-b166-74bba6af5376",
+    "mana_cost": "{2}{G}",
+    "cmc": 3.0,
+    "type_line": "Artifact",
+    "oracle_text": "Whenever you cast a spell that's one or more colors, you may gain 1 life for each of that spell's colors. Do this only once each turn.\n{T}: Add one mana of any color.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "81"
+  },
+  {
+    "name": "Pest Control",
+    "oracle_id": "072db429-3838-42ba-89b6-e26cbce22af9",
+    "mana_cost": "{W}{B}",
+    "cmc": 2.0,
+    "type_line": "Sorcery",
+    "oracle_text": "Destroy all nonland permanents with mana value 1 or less.\nCycling {2} ({2}, Discard this card: Draw a card.)",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B",
+      "W"
+    ],
+    "color_identity": [
+      "B",
+      "W"
+    ],
+    "keywords": [
+      "Cycling"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "87"
+  },
+  {
+    "name": "Hostile Investigator",
+    "oracle_id": "de83b1a4-0ce0-4cc1-aff3-6d0239d92302",
+    "mana_cost": "{3}{B}",
+    "cmc": 4.0,
+    "type_line": "Creature \u2014 Ogre Rogue Detective",
+    "oracle_text": "When this creature enters, target opponent discards a card.\nWhenever one or more players discard one or more cards, investigate. This ability triggers only once each turn. (Create a Clue token. It's an artifact with \"{2}, Sacrifice this token: Draw a card.\")",
+    "power": "4",
+    "toughness": "3",
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [
+      "Investigate"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "40"
+  },
+  {
+    "name": "Worldwalker Helm",
+    "oracle_id": "9573c85a-e574-4b4e-aae0-2165c45fd27e",
+    "mana_cost": "{2}{U}",
+    "cmc": 3.0,
+    "type_line": "Artifact",
+    "oracle_text": "If you would create one or more artifact tokens, instead create those tokens plus an additional Map token. (It's an artifact with \"{1}, {T}, Sacrifice this token: Target creature you control explores. Activate only as a sorcery.\")\n{1}{U}, {T}: Create a token that's a copy of target artifact token you control.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [
+      "Explore"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90668,
+    "collector_number": "7"
+  },
+  {
+    "name": "Vaultborn Tyrant",
+    "oracle_id": "e8d0accc-b320-4c07-8a71-a09db860351e",
+    "mana_cost": "{5}{G}{G}",
+    "cmc": 7.0,
+    "type_line": "Creature \u2014 Dinosaur",
+    "oracle_text": "Trample\nWhenever this creature or another creature you control with power 4 or greater enters, you gain 3 life and draw a card.\nWhen this creature dies, if it's not a token, create a token that's a copy of it, except it's an artifact in addition to its other types.",
+    "power": "6",
+    "toughness": "6",
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [
+      "Trample"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "50"
+  },
+  {
+    "name": "Omenpath Journey",
+    "oracle_id": "8b067e44-2001-4b49-aa4a-2c86f8929751",
+    "mana_cost": "{3}{G}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "When this enchantment enters, search your library for up to five land cards that have different names, exile them, then shuffle.\nAt the beginning of your end step, choose a card at random exiled with this enchantment and put it onto the battlefield tapped.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90679,
+    "collector_number": "18"
+  },
+  {
+    "name": "Lost Jitte",
+    "oracle_id": "a9d72f78-2ab5-4e2e-ab7b-ef875e0a0609",
+    "mana_cost": "{1}",
+    "cmc": 1.0,
+    "type_line": "Legendary Artifact \u2014 Equipment",
+    "oracle_text": "Whenever equipped creature deals combat damage, put a charge counter on Lost Jitte.\nRemove a charge counter from Lost Jitte: Choose one \u2014\n\u2022 Untap target land.\n\u2022 Target creature can't block this turn.\n\u2022 Put a +1/+1 counter on equipped creature.\nEquip {1}",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [
+      "Equip"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90684,
+    "collector_number": "23"
+  },
+  {
+    "name": "Torpor Orb",
+    "oracle_id": "97326cad-b13c-4e52-82ce-850a39e5ff08",
+    "mana_cost": "{2}",
+    "cmc": 2.0,
+    "type_line": "Artifact",
+    "oracle_text": "Creatures entering don't cause abilities to trigger.",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "92"
+  },
+  {
+    "name": "Lotus Ring",
+    "oracle_id": "ca4d3d27-ea3a-44ac-96e9-b52b563129f8",
+    "mana_cost": "{3}",
+    "cmc": 3.0,
+    "type_line": "Artifact \u2014 Equipment",
+    "oracle_text": "Indestructible\nEquipped creature gets +3/+3 and has vigilance and \"{T}, Sacrifice this creature: Add three mana of any one color.\"\nEquip {3}",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [
+      "Indestructible",
+      "Equip"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "54"
+  },
+  {
+    "name": "Rest in Peace",
+    "oracle_id": "087f9ad7-e74f-40e2-8102-1ed2925d0418",
+    "mana_cost": "{1}{W}",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "oracle_text": "When this enchantment enters, exile all graveyards.\nIf a card or token would be put into a graveyard from anywhere, exile it instead.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90665,
+    "collector_number": "4"
+  },
+  {
+    "name": "Harvester of Misery",
+    "oracle_id": "a0d3bb63-2977-41b2-bcc3-2488e6696cb8",
+    "mana_cost": "{3}{B}{B}",
+    "cmc": 5.0,
+    "type_line": "Creature \u2014 Spirit",
+    "oracle_text": "Menace\nWhen this creature enters, other creatures get -2/-2 until end of turn.\n{1}{B}, Discard this card: Target creature gets -2/-2 until end of turn.",
+    "power": "5",
+    "toughness": "4",
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [
+      "Menace"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "39"
+  },
+  {
+    "name": "Bristlebud Farmer",
+    "oracle_id": "3e44226b-51a2-4099-aff8-a5befab720cb",
+    "mana_cost": "{2}{G}{G}",
+    "cmc": 4.0,
+    "type_line": "Creature \u2014 Plant Druid",
+    "oracle_text": "Trample\nWhen this creature enters, create two Food tokens. (They're artifacts with \"{2}, {T}, Sacrifice this token: You gain 3 life.\")\nWhenever this creature attacks, you may sacrifice a Food. If you do, mill three cards. You may put a permanent card from among them into your hand.",
+    "power": "5",
+    "toughness": "5",
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [
+      "Food",
+      "Trample",
+      "Mill"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90678,
+    "collector_number": "17"
+  },
+  {
+    "name": "Memory Vessel",
+    "oracle_id": "0179bc62-823e-46b9-b536-342904fedafc",
+    "mana_cost": "{3}{R}{R}",
+    "cmc": 5.0,
+    "type_line": "Artifact",
+    "oracle_text": "{T}, Exile this artifact: Each player exiles the top seven cards of their library. Until your next turn, players may play cards they exiled this way, and they can't play cards from their hand. Activate only as a sorcery.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "43"
+  },
+  {
+    "name": "Nexus of Becoming",
+    "oracle_id": "07142ee9-dc2c-4b33-ad20-2f5285225e86",
+    "mana_cost": "{6}",
+    "cmc": 6.0,
+    "type_line": "Artifact",
+    "oracle_text": "At the beginning of combat on your turn, draw a card. Then you may exile an artifact or creature card from your hand. If you do, create a token that's a copy of the exiled card, except it's a 3/3 Golem artifact creature in addition to its other types.",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "90"
+  },
+  {
+    "name": "Torpor Orb",
+    "oracle_id": "97326cad-b13c-4e52-82ce-850a39e5ff08",
+    "mana_cost": "{2}",
+    "cmc": 2.0,
+    "type_line": "Artifact",
+    "oracle_text": "Creatures entering don't cause abilities to trigger.",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90688,
+    "collector_number": "27"
+  },
+  {
+    "name": "Lost Jitte",
+    "oracle_id": "a9d72f78-2ab5-4e2e-ab7b-ef875e0a0609",
+    "mana_cost": "{1}",
+    "cmc": 1.0,
+    "type_line": "Legendary Artifact \u2014 Equipment",
+    "oracle_text": "Whenever equipped creature deals combat damage, put a charge counter on Lost Jitte.\nRemove a charge counter from Lost Jitte: Choose one \u2014\n\u2022 Untap target land.\n\u2022 Target creature can't block this turn.\n\u2022 Put a +1/+1 counter on equipped creature.\nEquip {1}",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [
+      "Equip"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "53"
+  },
+  {
+    "name": "Harvester of Misery",
+    "oracle_id": "a0d3bb63-2977-41b2-bcc3-2488e6696cb8",
+    "mana_cost": "{3}{B}{B}",
+    "cmc": 5.0,
+    "type_line": "Creature \u2014 Spirit",
+    "oracle_text": "Menace\nWhen this creature enters, other creatures get -2/-2 until end of turn.\n{1}{B}, Discard this card: Target creature gets -2/-2 until end of turn.",
+    "power": "5",
+    "toughness": "4",
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [
+      "Menace"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "74"
+  },
+  {
+    "name": "Sword of Wealth and Power",
+    "oracle_id": "b3a80545-9a8a-46b2-9d8c-b0d66fb68a5d",
+    "mana_cost": "{3}",
+    "cmc": 3.0,
+    "type_line": "Artifact \u2014 Equipment",
+    "oracle_text": "Equipped creature gets +2/+2 and has protection from instants and from sorceries.\nWhenever equipped creature deals combat damage to a player, create a Treasure token. When you next cast an instant or sorcery spell this turn, copy that spell. You may choose new targets for the copy.\nEquip {2}",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [
+      "Treasure",
+      "Equip"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "91"
+  },
+  {
+    "name": "Transmutation Font",
+    "oracle_id": "a68e57f3-f138-4c26-b8d5-55d1adec44a8",
+    "mana_cost": "{5}",
+    "cmc": 5.0,
+    "type_line": "Artifact",
+    "oracle_text": "{T}: Create your choice of a Blood token, a Clue token, or a Food token.\n{3}, {T}, Sacrifice three artifact tokens with different names: Search your library for an artifact card, put it onto the battlefield, then shuffle. Activate only as a sorcery.",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [
+      "Food"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90689,
+    "collector_number": "28"
+  },
+  {
+    "name": "Sword of Wealth and Power",
+    "oracle_id": "b3a80545-9a8a-46b2-9d8c-b0d66fb68a5d",
+    "mana_cost": "{3}",
+    "cmc": 3.0,
+    "type_line": "Artifact \u2014 Equipment",
+    "oracle_text": "Equipped creature gets +2/+2 and has protection from instants and from sorceries.\nWhenever equipped creature deals combat damage to a player, create a Treasure token. When you next cast an instant or sorcery spell this turn, copy that spell. You may choose new targets for the copy.\nEquip {2}",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [
+      "Treasure",
+      "Equip"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90687,
+    "collector_number": "26"
+  },
+  {
+    "name": "Grand Abolisher",
+    "oracle_id": "c749f23c-40c0-4159-b84c-a70cbb062c14",
+    "mana_cost": "{W}{W}",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Human Cleric",
+    "oracle_text": "During your turn, your opponents can't cast spells or activate abilities of artifacts, creatures, or enchantments.",
+    "power": "2",
+    "toughness": "2",
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90663,
+    "collector_number": "2"
+  },
+  {
+    "name": "Simulacrum Synthesizer",
+    "oracle_id": "eb7a1f21-a66d-415b-8520-710b44890bb6",
+    "mana_cost": "{2}{U}",
+    "cmc": 3.0,
+    "type_line": "Artifact",
+    "oracle_text": "When this artifact enters, scry 2.\nWhenever another artifact you control with mana value 3 or greater enters, create a 0/0 colorless Construct artifact creature token with \"This token gets +1/+1 for each artifact you control.\"",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [
+      "Scry"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "71"
+  },
+  {
+    "name": "Legion Extruder",
+    "oracle_id": "c77dc11e-d95d-4e7e-bb24-d971c179e9b0",
+    "mana_cost": "{1}{R}",
+    "cmc": 2.0,
+    "type_line": "Artifact",
+    "oracle_text": "When this artifact enters, it deals 2 damage to any target.\n{2}, {T}, Sacrifice another artifact: Create a 3/3 colorless Golem artifact creature token.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "42"
+  },
+  {
+    "name": "Nexus of Becoming",
+    "oracle_id": "07142ee9-dc2c-4b33-ad20-2f5285225e86",
+    "mana_cost": "{6}",
+    "cmc": 6.0,
+    "type_line": "Artifact",
+    "oracle_text": "At the beginning of combat on your turn, draw a card. Then you may exile an artifact or creature card from your hand. If you do, create a token that's a copy of the exiled card, except it's a 3/3 Golem artifact creature in addition to its other types.",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": null,
+    "collector_number": "55"
+  },
+  {
+    "name": "Oltec Matterweaver",
+    "oracle_id": "3cb91696-242f-4e91-806b-61b1bb45a20c",
+    "mana_cost": "{2}{W}",
+    "cmc": 3.0,
+    "type_line": "Creature \u2014 Human Artificer",
+    "oracle_text": "Whenever you cast a creature spell, choose one \u2014\n\u2022 Create a 1/1 colorless Gnome artifact creature token.\n\u2022 Create a token that's a copy of target artifact token you control.",
+    "power": "2",
+    "toughness": "4",
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90664,
+    "collector_number": "3"
+  },
+  {
+    "name": "Ancient Cornucopia",
+    "oracle_id": "f0950c95-a297-489d-b166-74bba6af5376",
+    "mana_cost": "{2}{G}",
+    "cmc": 3.0,
+    "type_line": "Artifact",
+    "oracle_text": "Whenever you cast a spell that's one or more colors, you may gain 1 life for each of that spell's colors. Do this only once each turn.\n{T}: Add one mana of any color.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90677,
+    "collector_number": "16"
+  },
+  {
+    "name": "Loot, the Key to Everything",
+    "oracle_id": "542be13f-b9c0-4b79-b486-be576c531a82",
+    "mana_cost": "{G}{U}{R}",
+    "cmc": 3.0,
+    "type_line": "Legendary Creature \u2014 Beast Noble",
+    "oracle_text": "Ward {1}\nAt the beginning of your upkeep, exile the top X cards of your library, where X is the number of card types among other nonland permanents you control. You may play those cards this turn.",
+    "power": "1",
+    "toughness": "2",
+    "colors": [
+      "G",
+      "R",
+      "U"
+    ],
+    "color_identity": [
+      "G",
+      "R",
+      "U"
+    ],
+    "keywords": [
+      "Ward"
+    ],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90682,
+    "collector_number": "21"
+  },
+  {
+    "name": "Molten Duplication",
+    "oracle_id": "92b91910-9b65-4421-8eef-a33793161089",
+    "mana_cost": "{1}{R}",
+    "cmc": 2.0,
+    "type_line": "Sorcery",
+    "oracle_text": "Create a token that's a copy of target artifact or creature you control, except it's an artifact in addition to its other types. It gains haste until end of turn. Sacrifice it at the beginning of the next end step.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "big",
+    "arena_id": 90675,
+    "collector_number": "14"
+  }
+]

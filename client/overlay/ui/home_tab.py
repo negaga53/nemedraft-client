@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QProgressBar,
     QPushButton,
     QVBoxLayout,
     QWidget,
@@ -93,6 +94,20 @@ def _detailed_logs_enabled() -> bool | None:
     return None
 
 
+def _fmt_mmss(seconds: float | int | None) -> str:
+    """Format a countdown as ``m:ss`` (e.g. ``125`` -> ``"2:05"``).
+
+    Used for both the cooldown retry timer and the queue ETA. ``None``
+    or a negative value renders as ``"--:--"`` rather than raising or
+    showing a nonsense negative countdown.
+    """
+    if seconds is None or seconds < 0:
+        return "--:--"
+    total = int(round(seconds))
+    minutes, secs = divmod(total, 60)
+    return f"{minutes}:{secs:02d}"
+
+
 class _StatusRow(QWidget):
     """A single status indicator: coloured dot + label."""
 
@@ -131,6 +146,10 @@ class _StatusRow(QWidget):
         set_prop(self._dot, "status", status if status in ("ok", "warn", "err") else "err")
         self._status_label.setText(detail)
 
+    def detail_text(self) -> str:
+        """Return the current right-aligned detail text (test accessor)."""
+        return self._status_label.text()
+
     def retranslate(self) -> None:
         self._label.setText(tr(self._label_key))
 
@@ -154,6 +173,8 @@ class HomeTab(QWidget):
     login_discord_requested = Signal()
     logout_requested = Signal()
     simulator_detected = Signal(str)
+    join_queue_requested = Signal()
+    leave_queue_requested = Signal()
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -187,9 +208,45 @@ class HomeTab(QWidget):
         self._log_row = _StatusRow("home_log_status")
         self._server_row = _StatusRow("home_server_status")
         self._draft_row = _StatusRow("home_draft_status")
-        for row in (self._arena_row, self._log_row, self._server_row, self._draft_row):
+        self._queue_row = _StatusRow("home_queue_status")
+        for row in (
+            self._arena_row, self._log_row, self._server_row,
+            self._draft_row, self._queue_row,
+        ):
             sc_layout.addWidget(row)
         layout.addWidget(self._status_card)
+
+        # --- Draft-access controls (join/leave queue, offer countdown) ---
+        self._queue_controls = QWidget()
+        qc_layout = QHBoxLayout(self._queue_controls)
+        qc_layout.setContentsMargins(20, 4, 20, 4)
+        qc_layout.setSpacing(8)
+
+        self._queue_join_btn = QPushButton(tr("home_queue_join"))
+        self._queue_join_btn.setObjectName("queueJoinBtn")
+        self._queue_join_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._queue_join_btn.clicked.connect(self.join_queue_requested.emit)
+        self._queue_join_btn.hide()
+        qc_layout.addWidget(self._queue_join_btn)
+
+        self._queue_leave_btn = QPushButton(tr("home_queue_leave"))
+        self._queue_leave_btn.setObjectName("queueLeaveBtn")
+        self._queue_leave_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._queue_leave_btn.clicked.connect(self.leave_queue_requested.emit)
+        self._queue_leave_btn.hide()
+        qc_layout.addWidget(self._queue_leave_btn)
+
+        # Offer countdown — range 0..1000 gives smooth sub-second motion
+        # over the server's fixed 60s claim window without needing float
+        # precision from QProgressBar (which is int-only).
+        self._queue_progress = QProgressBar()
+        self._queue_progress.setObjectName("queueOfferProgress")
+        self._queue_progress.setRange(0, 1000)
+        self._queue_progress.setTextVisible(False)
+        self._queue_progress.hide()
+        qc_layout.addWidget(self._queue_progress, stretch=1)
+
+        layout.addWidget(self._queue_controls)
 
         # --- Login section (visible when not authenticated) ---
         self._login_section = QWidget()
@@ -283,6 +340,15 @@ class HomeTab(QWidget):
         self._unsupported_format = False
         self._simulator_active = False
         self._maintenance = False
+        self._arena_process_running = False
+
+        # Draft-access (admission queue) state. ``_queue_status`` is None
+        # until the parent app has wired a QueueManager and received a
+        # first heartbeat reply — the row must render something sane in
+        # that window, not crash.
+        self._queue_status = None
+        self._arena_running_now = False
+        self._set_detected = False
 
         # Periodic poll timer.
         self._timer = QTimer(self)
@@ -292,6 +358,7 @@ class HomeTab(QWidget):
 
         # Run an immediate check.
         self._poll()
+        self._update_queue_row()
 
     # -- public API ----------------------------------------------------------
 
@@ -365,6 +432,48 @@ class HomeTab(QWidget):
         self._microsoft_btn.setEnabled(enabled)
         self._discord_btn.setEnabled(enabled)
 
+    def set_draft_intent(self, *, arena_running: bool, set_detected: bool) -> None:
+        """Mirror the server's intent gate so a click is never rejected.
+
+        The Join button must only be enabled when the player could
+        actually be admitted into a draft right now — Arena running and
+        a supported set detected — matching the same gate the server
+        applies to ``want_seat`` heartbeats.
+        """
+        self._arena_running_now = arena_running
+        self._set_detected = set_detected
+        self._update_queue_row()
+
+    def set_queue_status(self, status) -> None:  # noqa: ANN001 — QueueStatus
+        """Render the draft-access row for the given admission-queue state.
+
+        *status* may be ``None`` (no heartbeat has landed yet) — the row
+        must still render without raising.
+        """
+        self._queue_status = status
+        self._update_queue_row()
+
+    def arena_running(self) -> bool:
+        """Cached result of the row's own Arena process poll (``_poll``)."""
+        return self._arena_process_running
+
+    # -- test accessors --------------------------------------------------
+
+    def queue_detail_text(self) -> str:
+        return self._queue_row.detail_text()
+
+    def join_button_enabled(self) -> bool:
+        return (
+            self._queue_join_btn.isVisibleTo(self)
+            and self._queue_join_btn.isEnabled()
+        )
+
+    def leave_button_visible(self) -> bool:
+        return self._queue_leave_btn.isVisibleTo(self)
+
+    def offer_progress_visible(self) -> bool:
+        return self._queue_progress.isVisibleTo(self)
+
     def retranslate(self) -> None:
         """Refresh all labels after a language change."""
         self._brand_label.setText(tr("home_title"))
@@ -379,6 +488,10 @@ class HomeTab(QWidget):
         self._log_row.retranslate()
         self._server_row.retranslate()
         self._draft_row.retranslate()
+        self._queue_row.retranslate()
+        self._queue_join_btn.setText(tr("home_queue_join"))
+        self._queue_leave_btn.setText(tr("home_queue_leave"))
+        self._update_queue_row()
 
     # -- internal ------------------------------------------------------------
 
@@ -389,6 +502,7 @@ class HomeTab(QWidget):
         if sim_lock:
             log_path = sim_lock.get("log_path", "")
             self._arena_row.set_status("ok", "Simulator")
+            self._arena_process_running = True
             if log_path and Path(log_path).exists():
                 self._log_row.set_status("ok", "Simulator log")
                 self._log_found = True
@@ -402,6 +516,7 @@ class HomeTab(QWidget):
             arena_running = _is_arena_running()
             log_exists = _log_file_exists()
             self._log_found = log_exists
+            self._arena_process_running = arena_running
 
             if arena_running:
                 self._arena_row.set_status("ok", tr("home_status_running"))
@@ -495,3 +610,64 @@ class HomeTab(QWidget):
             self._draft_row.set_status("ok", tr("home_status_ready"))
         else:
             self._draft_row.set_status("err", tr("home_status_waiting"))
+
+    def _update_queue_row(self) -> None:
+        """Render the draft-access row + join/leave/offer controls.
+
+        Queue *position* is not monotonic (a resumed draft is inserted
+        ahead via the priority lane), so nothing here implies steady
+        progress — the ETA is shown as the friendlier signal and
+        position is secondary, matching the server's own guidance.
+        """
+        status = self._queue_status
+        join_visible = False
+        leave_visible = False
+        progress_visible = False
+
+        if status is None:
+            # No heartbeat has landed yet (manager not wired, or first
+            # request still in flight) — render a neutral placeholder
+            # rather than crashing or showing a stale state.
+            self._queue_row.set_status("warn", tr("home_queue_unknown"))
+        elif status.state == "seated":
+            self._queue_row.set_status("ok", tr("home_queue_drafting"))
+        elif status.state == "offered":
+            self._queue_row.set_status("ok", tr("home_queue_your_turn"))
+            progress_visible = True
+            remaining = status.offer_expires_in_s
+            fraction = 0.0 if remaining is None else max(0.0, min(1.0, remaining / 60.0))
+            self._queue_progress.setValue(int(round(fraction * 1000)))
+        elif status.state == "queued":
+            position = status.position if status.position is not None else "?"
+            detail = tr(
+                "home_queue_position",
+                position=position,
+                total=status.queue_length,
+                eta=_fmt_mmss(status.eta_s),
+            )
+            self._queue_row.set_status("warn", detail)
+            leave_visible = True
+        elif status.state == "cooldown":
+            detail = tr(
+                "home_queue_cooldown",
+                remaining=_fmt_mmss(status.cooldown_remaining_s),
+            )
+            self._queue_row.set_status("err", detail)
+        else:
+            # "idle" (or any other/future state) — gate on capacity.
+            if status.capacity > 0 and status.active_drafters >= status.capacity:
+                self._queue_row.set_status(
+                    "warn", tr("home_queue_full", active=status.active_drafters),
+                )
+                join_visible = True
+            else:
+                self._queue_row.set_status("ok", tr("home_queue_ready"))
+
+        self._queue_join_btn.setVisible(join_visible)
+        self._queue_join_btn.setEnabled(
+            join_visible and self._arena_running_now and self._set_detected,
+        )
+        self._queue_leave_btn.setVisible(leave_visible)
+        self._queue_progress.setVisible(progress_visible)
+        if not progress_visible:
+            self._queue_progress.setValue(0)

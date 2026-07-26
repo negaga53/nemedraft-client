@@ -285,16 +285,60 @@ def test_overlay_window_has_minimize_button(qapp):
     )
 
 
-def test_elevate_to_floating_is_noop_off_darwin():
+def test_apply_pinning_is_noop_off_darwin():
     """On non-Mac platforms (including the WSL test machine) the helper must not raise."""
-    from client.overlay.ui._macos import elevate_to_floating
+    from client.overlay.ui._macos import apply_pinning
 
     # Pass a dummy object; the function should bail out before touching it.
     class _Dummy:
         def winId(self) -> int:
             raise AssertionError("should not be called off-darwin")
 
-    elevate_to_floating(_Dummy())
+    # True = "applied / nothing to retry"; only a missing NSWindow on
+    # macOS reports False so the caller can retry after the event loop.
+    assert apply_pinning(_Dummy()) is True
+    assert apply_pinning(_Dummy(), enabled=False) is True
+
+
+def test_window_stays_on_top_follows_config(qapp):
+    """The Qt hint is set from config.overlay.always_on_top at construction."""
+    from PySide6.QtCore import Qt
+    from client.overlay.config import OverlayConfig
+    from client.overlay.ui.window import OverlayWindow
+
+    on = OverlayWindow(OverlayConfig(), show_art=False)
+    assert on.windowFlags() & Qt.WindowType.WindowStaysOnTopHint
+
+    cfg = OverlayConfig()
+    cfg.overlay.always_on_top = False
+    off = OverlayWindow(cfg, show_art=False)
+    assert not (off.windowFlags() & Qt.WindowType.WindowStaysOnTopHint)
+
+
+def test_set_always_on_top_live_toggle(qapp):
+    """set_always_on_top flips the Qt hint, keeps visibility, and persists
+    to the config object (the settings tab emits, the app applies)."""
+    from PySide6.QtCore import Qt
+    from client.overlay.config import OverlayConfig
+    from client.overlay.ui.window import OverlayWindow
+
+    cfg = OverlayConfig()
+    w = OverlayWindow(cfg, show_art=False)
+    w.show()
+    qapp.processEvents()
+
+    w.set_always_on_top(False)
+    qapp.processEvents()
+    assert not (w.windowFlags() & Qt.WindowType.WindowStaysOnTopHint)
+    assert cfg.overlay.always_on_top is False
+    # Re-shown after the flag change (changing flags hides the window).
+    assert w.isVisible()
+
+    w.set_always_on_top(True)
+    qapp.processEvents()
+    assert w.windowFlags() & Qt.WindowType.WindowStaysOnTopHint
+    assert cfg.overlay.always_on_top is True
+    assert w.isVisible()
 
 
 def test_window_edge_resize_hit_testing(qapp):

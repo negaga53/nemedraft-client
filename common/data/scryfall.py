@@ -19,7 +19,16 @@ SCRYFALL_DIR = Path(__file__).resolve().parents[2] / "data" / "scryfall"
 
 # Sets currently shipped with per-set JSONs in SCRYFALL_DIR. Used as the
 # default filter target when callers don't pass --sets.
-DEFAULT_SETS = ["ECL", "EOE", "FDN", "FIN", "SOS", "TLA", "TMT", "MKM", "BLB", "DSK", "MSH"]
+#
+# OTP ("Breaking News") and BIG ("The Big Score") are bonus sheets drafted inside
+# OTJ; they are fixed one-wave sets, so filtering them by code is exact. The
+# *rolling* bonus sheets MAR and SPG are deliberately absent — their codes span
+# every expansion's wave, so this date-blind filter would pull all of them and
+# clobber the intersected files that scripts/filter_bonus_sheet.py writes.
+DEFAULT_SETS = [
+    "ECL", "EOE", "FDN", "FIN", "SOS", "TLA", "TMT", "MKM", "BLB", "DSK", "MSH",
+    "OTJ", "OTP", "BIG",
+]
 
 _FILTERED_FIELDS = [
     "name", "oracle_id", "mana_cost", "cmc", "type_line", "oracle_text",

@@ -55,6 +55,7 @@ class OverlaySettings:
 
     opacity: float = 0.85
     show_art: bool = True
+    always_on_top: bool = True
     geometry: str = ""  # legacy single-geometry slot (pre-0.6 fallback)
     view_mode: str = "full"      # "full" | "compact" — restored per draft
     geometry_full: str = ""      # persisted geometry per view mode

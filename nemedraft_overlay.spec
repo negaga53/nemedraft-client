@@ -143,6 +143,17 @@ if sys.platform == "win32":
         "pefile",
     ])
 
+# PyObjC is imported lazily inside client.overlay.ui._macos (keeps the
+# module importable on Windows/Linux), so it needs the same hidden-import
+# treatment as pymem above. Without it the frozen .app silently loses the
+# NSWindow elevation and the overlay stops staying above Arena.
+if sys.platform == "darwin":
+    hiddenimports.extend([
+        "objc",
+        "AppKit",
+        "Foundation",
+    ])
+
 a = Analysis(
     [str(ROOT / "scripts" / "run_overlay.py")],
     pathex=[str(ROOT)],

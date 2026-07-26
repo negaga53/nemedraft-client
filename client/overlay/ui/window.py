@@ -36,7 +36,7 @@ from client.overlay.config import OverlayConfig
 from client.overlay.i18n import Translator, card_name, tr
 from client.overlay.notifications import NotificationBus
 from common.inference.signals import SignalResult
-from client.overlay.ui._macos import elevate_to_floating
+from client.overlay.ui._macos import apply_pinning
 from client.overlay.ui.deck_tab import DeckTab
 from client.overlay.ui.pack_tab import PackTab
 from client.overlay.ui.settings_tab import SettingsTab
@@ -109,10 +109,11 @@ class OverlayWindow(QWidget):
         self.setWindowTitle(f"{tr('app_title')} — v{__version__}")
 
         flags = (
-            Qt.WindowType.WindowStaysOnTopHint
-            | Qt.WindowType.Tool
+            Qt.WindowType.Tool
             | Qt.WindowType.FramelessWindowHint
         )
+        if config.overlay.always_on_top:
+            flags |= Qt.WindowType.WindowStaysOnTopHint
         self.setWindowFlags(flags)
         self.setMinimumWidth(600)
         self.setMaximumWidth(1100)
@@ -145,6 +146,15 @@ class OverlayWindow(QWidget):
         # the icon must exist before the minimize button can use it.
         self._tray_icon: QSystemTrayIcon | None = None
         self._build_tray_icon()
+
+        # macOS: Qt/AppKit can clobber the elevated NSWindow level (and
+        # the hides-on-deactivate opt-out) around app activation changes
+        # — exactly what happens when the user clicks into Arena. Re-
+        # assert on every state change; apply_pinning is a no-op off
+        # darwin and a handful of objc messages on it.
+        app = QApplication.instance()
+        if app is not None:
+            app.applicationStateChanged.connect(self._on_app_state_changed)
 
     # -- UI construction -----------------------------------------------------
 
@@ -667,9 +677,53 @@ class OverlayWindow(QWidget):
         QApplication.instance().quit()
 
     def showEvent(self, event: QShowEvent) -> None:  # noqa: N802
-        """Elevate the macOS NSWindow level after the native window exists."""
+        """(Re-)assert the macOS NSWindow pinning on every show."""
         super().showEvent(event)
-        elevate_to_floating(self)
+        self._assert_pinning()
+
+    # -- always-on-top (Qt hint + macOS NSWindow level) -----------------------
+
+    def _assert_pinning(self) -> None:
+        """Apply the native pinning tweaks for the current setting.
+
+        ``QShowEvent`` is delivered before the platform window is
+        ordered in, so on the first show the NSWindow may not exist yet
+        — in that case retry once the event loop has turned and the
+        native window is attached.
+        """
+        if not apply_pinning(self, self._config.overlay.always_on_top):
+            # Re-read the setting at fire time — a toggle may land between
+            # the failed attempt and the retry.
+            QTimer.singleShot(
+                0,
+                lambda: apply_pinning(
+                    self, self._config.overlay.always_on_top,
+                ),
+            )
+
+    def _on_app_state_changed(self, _state: object) -> None:
+        """Re-assert pinning when the app activates/deactivates (macOS)."""
+        if self.isVisible():
+            self._assert_pinning()
+
+    def set_always_on_top(self, enabled: bool) -> None:
+        """Live-apply the always-on-top toggle.
+
+        Updates the Qt hint (cross-platform) and the macOS NSWindow
+        level. Changing a window flag hides the window, so it is
+        re-shown when it was visible — which re-runs ``showEvent`` and
+        re-asserts the native pinning.
+        """
+        self._config.overlay.always_on_top = enabled
+        has_hint = bool(
+            self.windowFlags() & Qt.WindowType.WindowStaysOnTopHint,
+        )
+        if has_hint != enabled:
+            was_visible = self.isVisible()
+            self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint, enabled)
+            if was_visible:
+                self.show()
+        self._assert_pinning()
 
     # -- thread-safe update entry points -------------------------------------
 

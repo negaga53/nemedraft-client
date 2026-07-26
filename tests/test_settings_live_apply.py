@@ -46,6 +46,31 @@ def test_setting_changed_not_emitted_for_unchanged_keys(qapp):
     assert "data.user_group" not in keys
 
 
+def test_always_on_top_toggle_emits_setting_changed(qapp):
+    tab, config = _make_settings_tab(qapp)
+    changes: list[tuple[str, object]] = []
+    tab.setting_changed.connect(lambda k, v: changes.append((k, v)))
+
+    assert tab._on_top_checkbox.isChecked() is config.overlay.always_on_top
+
+    new_value = not config.overlay.always_on_top
+    tab._on_top_checkbox.setChecked(new_value)
+    assert ("overlay.always_on_top", new_value) in changes
+    assert config.overlay.always_on_top is new_value
+
+
+def test_always_on_top_persists_in_config_roundtrip(tmp_path):
+    from client.overlay.config import OverlayConfig, load_config, save_config
+
+    cfg = OverlayConfig()
+    cfg.overlay.always_on_top = False
+    path = tmp_path / "config.json"
+    save_config(cfg, path)
+
+    loaded = load_config(path)
+    assert loaded.overlay.always_on_top is False
+
+
 def test_window_set_show_art_rerenders_cached_results(qapp):
     from client.overlay.config import OverlayConfig
     from client.overlay.ui.window import OverlayWindow

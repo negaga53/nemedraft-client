@@ -127,6 +127,7 @@ class OverlayApp:
         self._prediction.results_ready.connect(self._on_prediction_results)
         self._prediction.retrying.connect(self._on_prediction_retrying)
         self._prediction.gave_up.connect(self._on_server_failure)
+        self._prediction.no_seat.connect(self._on_prediction_no_seat)
         self._prediction.signals_ready.connect(self._on_signals_ready)
         self._prediction.deck_suggestions_ready.connect(
             self._on_deck_suggestions_ready,
@@ -186,6 +187,30 @@ class OverlayApp:
         # Start polling + set initial server status.
         self._auth_polling.start()
 
+        # Admission queue: adaptive heartbeat poller that reports arena/
+        # draft intent and receives queue position / seat / shot-clock
+        # state. ``_has_seat`` mirrors the last-known admission state so
+        # the draft-view gate (formerly _is_vip()) and the prediction
+        # path can both check a plain bool.
+        from client.overlay.managers.queue import QueueManager
+
+        self._has_seat = False
+        # Set just before a deliberate leave_queue() call so the status
+        # update that reports the seat/offer gone can tell "user clicked
+        # Leave" apart from "server took the seat away" — only the
+        # latter should auto-rejoin (see _on_queue_status).
+        self._user_initiated_leave = False
+        self._queue = QueueManager(
+            self.api_client,
+            arena_running=lambda: self.window.pack_tab.home_widget.arena_running(),
+            current_set=lambda: self.state.set_code or "",
+            draft_active=lambda: bool(self.state.set_code),
+        )
+        self._queue.status_changed.connect(self._on_queue_status)
+
+        home.join_queue_requested.connect(self._queue.join_queue)
+        home.leave_queue_requested.connect(self._on_leave_queue_requested)
+
     def start(self) -> None:
         self.watcher.start()
         if self.memory_watcher is not None:
@@ -198,12 +223,14 @@ class OverlayApp:
                     severity=Severity.WARNING,
                     key="memwatch-start-failed",
                 )
+        self._queue.start()
         self.window.show()
 
     def stop(self) -> None:
         self._prediction.cancel()
         self._auth_polling.stop()
         self._arena_poller.stop()
+        self._queue.stop()
         self.watcher.stop()
         if self.memory_watcher is not None:
             self.memory_watcher.stop()
@@ -297,6 +324,77 @@ class OverlayApp:
     def _on_supported_sets(self, supported: list) -> None:
         """Refresh the supported-sets list from the server health endpoint."""
         self._server_supported_sets = supported
+
+    # -- admission queue -------------------------------------------------
+
+    def _on_leave_queue_requested(self) -> None:
+        """Handle the home tab's Leave button.
+
+        Recorded *before* the manager's own release/heartbeat sequence so
+        the status update that eventually reports the seat/offer gone can
+        tell a deliberate leave apart from an involuntary one (see
+        ``_on_queue_status``) and skip the auto-rejoin in that case.
+        """
+        self._user_initiated_leave = True
+        self._queue.leave_queue()
+
+    def _on_queue_status(self, status: object) -> None:
+        """Push admission state to the home tab and the shot-clock bar."""
+        from client.overlay.api_client import QueueStatus
+
+        if not isinstance(status, QueueStatus):
+            return
+        home = self.window.pack_tab.home_widget
+        home.set_queue_status(status)
+        home.set_draft_intent(
+            arena_running=home.arena_running(),
+            set_detected=bool(self.state.set_code),
+        )
+
+        if status.seat is not None:
+            self.window.pack_tab.shot_clock_bar.set_remaining(
+                status.seat.shot_clock_remaining_s,
+                status.seat.shot_clock_total_s,
+            )
+
+        had_seat = self._has_seat
+        self._has_seat = status.state in ("offered", "seated")
+
+        # Consume the deliberate-leave flag the moment we observe the
+        # seat/offer actually gone, whether or not this exact call is the
+        # had_seat->not edge (a stale heartbeat can land after the click
+        # but before the release worker's follow-up poll). Leaving it set
+        # past this point would risk swallowing a *later*, genuinely
+        # involuntary seat loss.
+        user_left = False
+        if not self._has_seat:
+            user_left = self._user_initiated_leave
+            self._user_initiated_leave = False
+
+        if had_seat and not self._has_seat:
+            self.window.pack_tab.shot_clock_bar.clear()
+            self.window.show_draft_ended()
+            if user_left:
+                logger.info("Seat released by user request — not re-queueing")
+            else:
+                # Seat lost mid-draft (shot clock, grace, restart). The
+                # Arena draft is still open, so re-join immediately — the
+                # server puts us in the priority lane.
+                logger.info("Seat lost — returning to home and re-queueing")
+                if self.state.set_code:
+                    self._queue.join_queue()
+
+    def _on_prediction_no_seat(self, status: object) -> None:
+        """A predict() call was refused with 409 no_seat.
+
+        This is often the *fastest* signal that a seat was lost —
+        quicker than waiting for the next queue heartbeat — so route it
+        through the same status handler that drives the home view and
+        the auto-rejoin.
+        """
+        logger.info("Prediction refused — no seat held")
+        self.window.pack_tab.hide_loading()
+        self._on_queue_status(status)
 
     # -- lazy set data loading -----------------------------------------------
 
@@ -533,9 +631,9 @@ class OverlayApp:
         self._auth_polling.login("discord")
 
     def _on_login_succeeded(self) -> None:
-        """If a draft is already active and the user is now VIP, switch to
-        the pick view and run a prediction."""
-        if self.state.draft_active and self._is_vip():
+        """If a draft is already active and we hold a seat, switch to the
+        pick view and run a prediction."""
+        if self.state.draft_active and self._has_seat:
             self.window.show_draft_started()
             if self.state.current_pack:
                 self._run_prediction()
@@ -677,11 +775,12 @@ class OverlayApp:
                 self.state.draft_active = False
 
             if self.state.draft_active:
-                if self._is_vip():
+                if self._has_seat:
                     self.window.show_draft_started()
                 else:
-                    logger.info("Draft active after replay but user is not VIP — staying on home")
+                    logger.info("Draft detected but no seat — staying on home")
                     self.window.pack_tab.home_widget.set_draft_active(True)
+                    self._queue.join_queue()
                 if self.state.set_code:
                     self.window.load_card_translations_async(self.state.set_code)
                 if self.state.current_pack and self._set_data.is_ready:
@@ -808,12 +907,13 @@ class OverlayApp:
                 self._ensure_set_data(self.state.set_code)
 
             if not replaying:
-                if self._is_vip():
+                if self._has_seat:
                     self.window.show_draft_started()
                     self.window.show_waiting()
                 else:
-                    logger.info("Draft detected but user is not VIP — staying on home")
+                    logger.info("Draft detected but no seat — staying on home")
                     self.window.pack_tab.home_widget.set_draft_active(True)
+                    self._queue.join_queue()
 
             self.window._draft_set_code = self.state.set_code
 
@@ -854,11 +954,12 @@ class OverlayApp:
                 self.state.on_draft_start(event_name)
                 self.window._draft_set_code = self.state.set_code
                 if not replaying:
-                    if self._is_vip():
+                    if self._has_seat:
                         self.window.show_draft_started()
                     else:
-                        logger.info("Draft detected but user is not VIP — staying on home")
+                        logger.info("Draft detected but no seat — staying on home")
                         self.window.pack_tab.home_widget.set_draft_active(True)
+                        self._queue.join_queue()
                     if self.state.set_code:
                         self.window.load_card_translations_async(self.state.set_code)
 
@@ -962,10 +1063,15 @@ class OverlayApp:
         if not self.auth_client.is_authenticated:
             logger.warning("Not authenticated — skipping prediction")
             return
-        session = self.auth_client.session
-        if not session or not session.is_vip:
-            logger.info("VIP required for predictions — skipping")
-            self.window.show_vip_required()
+        # Predictions are gated on holding an admission seat, not on VIP.
+        # The server dropped its is_vip check on /api/predict entirely; a
+        # client-side VIP gate here would block exactly the non-VIP users
+        # the queue exists to admit, and they would never see a single
+        # prediction no matter how long they waited for a seat.
+        if not self._has_seat:
+            logger.info("No admission seat — skipping prediction, requesting one")
+            if self.state.set_code:
+                self._queue.join_queue()
             return
 
         self._prediction.request_prediction()
@@ -1022,6 +1128,15 @@ class OverlayApp:
                 self.state.pack_number + 1, self.state.pick_number + 1,
             )
             return
+
+        # A successful predict() also carries the shot clock — apply it
+        # here so the bar updates on every pick, not just on the queue
+        # heartbeat's slower (15s while seated) cadence.
+        sc = self.api_client.last_shot_clock
+        if sc:
+            self.window.pack_tab.shot_clock_bar.set_remaining(
+                sc.get("remaining_s", 0.0), sc.get("total_s", 0.0),
+            )
 
         art_paths: dict[str, Path | None] = {}
         if self.art_cache.enabled:
@@ -1148,6 +1263,8 @@ class OverlayApp:
         if key == "overlay.show_art":
             self.art_cache.enabled = bool(value)
             self.window.set_show_art(bool(value))
+        elif key == "overlay.always_on_top":
+            self.window.set_always_on_top(bool(value))
 
     def _on_settings_changed(self) -> None:
         """Persist settings and apply changes."""

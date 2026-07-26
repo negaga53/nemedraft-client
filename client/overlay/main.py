@@ -1263,6 +1263,8 @@ class OverlayApp:
         if key == "overlay.show_art":
             self.art_cache.enabled = bool(value)
             self.window.set_show_art(bool(value))
+        elif key == "overlay.always_on_top":
+            self.window.set_always_on_top(bool(value))
 
     def _on_settings_changed(self) -> None:
         """Persist settings and apply changes."""

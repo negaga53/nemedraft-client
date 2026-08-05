@@ -507,6 +507,14 @@ QLabel#rowStat[medal="1"] {{ color: {t.MEDAL_GOLD}; font-weight: 700; }}
 QLabel#rowStat[medal="2"] {{ color: {t.MEDAL_SILVER}; font-weight: 700; }}
 QLabel#rowStat[medal="3"] {{ color: {t.MEDAL_BRONZE}; font-weight: 700; }}
 QLabel#rowStat[empty="true"] {{ color: {t.TEXT_MUTED}; font-weight: 400; }}
+/* Proxy stat (GP WR / ALSA standing in for a suppressed GIH WR / ATA):
+   readable but visibly softer than a real number, and italic so it can't be
+   mistaken for one at a glance. */
+QLabel#rowStat[proxy="true"] {{
+    color: {t.TEXT_MUTED};
+    font-weight: 500;
+    font-style: italic;
+}}
 QLabel#rowStat[skeleton="true"] {{
     background: rgba(120, 140, 180, 0.25);
     border-radius: 3px;

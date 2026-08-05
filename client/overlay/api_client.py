@@ -24,6 +24,11 @@ class Pick:
     gihwr: float = 0.0
     ata: float = 0.0
     iwd: float = 0.0
+    # Stand-ins for gihwr/ata when 17Lands has suppressed those for want of
+    # samples (routine in a set's first weeks): alsa = average last seen at,
+    # gpwr = game-play win rate. Rendered marked as estimates.
+    alsa: float = 0.0
+    gpwr: float = 0.0
     mana_cost: str = ""
     colors: list[str] = field(default_factory=list)
     type_line: str = ""
@@ -173,6 +178,8 @@ class NemeDraftClient:
                 gihwr=p.get("gihwr", 0.0),
                 ata=p.get("ata", 0.0),
                 iwd=p.get("iwd", 0.0),
+                alsa=p.get("alsa", 0.0),
+                gpwr=p.get("gpwr", 0.0),
                 mana_cost=p.get("mana_cost", ""),
                 colors=p.get("colors", []),
                 type_line=p.get("type_line", ""),

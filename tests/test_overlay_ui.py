@@ -92,6 +92,72 @@ def test_card_row_has_art_and_scorebar(qapp):
     assert row.height() == 36
 
 
+def test_card_row_shows_gpwr_and_alsa_as_marked_proxies(qapp):
+    """A fresh set (MSH at launch) has no gihwr/ata for most cards but does
+    have gpwr/alsa. Show them, marked as estimates — never bare, or they
+    read as the real stat."""
+    from client.overlay.ui.pack_widgets import CardRow
+    from client.overlay.api_client import Pick
+
+    pick = Pick(
+        card="Stark Industries", score=0.7, rank=2, colors=[],
+        mana_cost="{2}", type_line="Artifact",
+        gihwr=0.0, ata=0.0, iwd=0.0, alsa=5.31, gpwr=0.558,
+        stats_loaded=True, stats_format="QuickDraft",
+    )
+    row = CardRow(show_stats=True)
+    row.set_data(pick, max_score=1.0)
+
+    assert row.gihwr_label.text() == "~55.8"
+    assert row.gihwr_label.property("proxy") is True
+    assert row.gihwr_label.property("medal") == 0  # proxies never medal
+    assert row.ata_label.text() == "~5.3"
+    assert row.ata_label.property("proxy") is True
+
+    tip = row.toolTip()
+    assert "GP WR" in tip and "55.8%" in tip
+    assert "ALSA" in tip and "5.3" in tip
+    assert "QuickDraft" in tip
+
+
+def test_card_row_prefers_real_stats_over_proxies(qapp):
+    from client.overlay.ui.pack_widgets import CardRow
+    from client.overlay.api_client import Pick
+
+    pick = Pick(
+        card="Giant-Sized Flying Ant", score=0.6, rank=3, colors=["G"],
+        gihwr=0.595, ata=8.34, iwd=0.01, alsa=5.96, gpwr=0.582,
+        stats_loaded=True,
+    )
+    row = CardRow(show_stats=True)
+    row.set_data(pick, max_score=1.0)
+
+    assert row.gihwr_label.text() == "59.5"
+    assert row.ata_label.text() == "8.3"
+    assert row.gihwr_label.property("proxy") is False
+    assert row.ata_label.property("proxy") is False
+    assert "GIH WR" in row.toolTip()
+
+
+def test_card_row_dash_when_even_proxies_are_missing(qapp):
+    from client.overlay.ui.pack_widgets import CardRow
+    from client.overlay.api_client import Pick
+
+    pick = Pick(
+        card="Super-Skrull", score=0.5, rank=4, colors=["B"],
+        gihwr=0.0, ata=0.0, iwd=0.0, alsa=0.0, gpwr=0.0,
+        stats_loaded=True,
+    )
+    row = CardRow(show_stats=True)
+    row.set_data(pick, max_score=1.0)
+
+    assert row.gihwr_label.text() == "—"
+    assert row.ata_label.text() == "—"
+    assert row.gihwr_label.property("empty") is True
+    assert row.gihwr_label.property("proxy") is False
+    assert "17Lands" in row.toolTip()
+
+
 def test_card_row_medal_color_for_top_gihwr(qapp):
     from client.overlay.ui.pack_widgets import CardRow
     from client.overlay.api_client import Pick

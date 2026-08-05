@@ -157,12 +157,13 @@ class CardRow(QFrame):
 
     @staticmethod
     def _set_stat(label: QLabel, *, text: str, medal: int = 0,
-                  empty: bool = False) -> None:
+                  empty: bool = False, proxy: bool = False) -> None:
         label.setGraphicsEffect(None)
         label.setText(text)
         set_prop(label, "skeleton", False)
         set_prop(label, "medal", medal)
         set_prop(label, "empty", empty)
+        set_prop(label, "proxy", proxy)
 
     def set_data(
         self,
@@ -208,6 +209,13 @@ class CardRow(QFrame):
         pct = pick.score / max_score if max_score > 0 else 0.0
         self.score_bar.set_score(pct)
 
+        # 17Lands suppresses a field until it clears its sample floor, so on
+        # a young set most cards have no GIH WR / ATA but do have a game-play
+        # WR / ALSA. Those fill the columns prefixed "~" and styled as
+        # proxies; the tooltip names the stat actually being shown.
+        gpwr_proxy = pick.gihwr <= 0 < getattr(pick, "gpwr", 0.0)
+        alsa_proxy = pick.ata <= 0 < getattr(pick, "alsa", 0.0)
+
         if self.gihwr_label:
             if not pick.stats_loaded:
                 self._set_skeleton(self.gihwr_label)
@@ -218,6 +226,13 @@ class CardRow(QFrame):
                     text=f"{pick.gihwr * 100:.1f}",
                     medal=gihwr_rank if tokens.medal_color(gihwr_rank) else 0,
                 )
+            elif gpwr_proxy:
+                # No medal: a proxy must never win the column's ranking.
+                self._set_stat(
+                    self.gihwr_label,
+                    text=f"~{pick.gpwr * 100:.1f}",
+                    proxy=True,
+                )
             else:
                 self._set_stat(self.gihwr_label, text="—", empty=True)
         if self.ata_label:
@@ -225,21 +240,34 @@ class CardRow(QFrame):
                 self._set_skeleton(self.ata_label)
             elif pick.ata > 0:
                 self._set_stat(self.ata_label, text=f"{pick.ata:.1f}")
+            elif alsa_proxy:
+                self._set_stat(
+                    self.ata_label, text=f"~{pick.alsa:.1f}", proxy=True,
+                )
             else:
                 self._set_stat(self.ata_label, text="—", empty=True)
 
+        tip_parts: list[str] = []
         if pick.gihwr > 0:
-            tip_parts = [f"GIH WR: {pick.gihwr:.1%}"]
-            if pick.ata > 0:
-                tip_parts.append(f"ATA: {pick.ata:.1f}")
-            if pick.iwd != 0:
-                tip_parts.append(f"IWD: {pick.iwd:+.1f}pp")
+            tip_parts.append(f"GIH WR: {pick.gihwr:.1%}")
+        elif gpwr_proxy:
+            tip_parts.append(f"GP WR: {pick.gpwr:.1%} (no GIH WR yet)")
+        if pick.ata > 0:
+            tip_parts.append(f"ATA: {pick.ata:.1f}")
+        elif alsa_proxy:
+            tip_parts.append(f"ALSA: {pick.alsa:.1f} (no ATA yet)")
+        if pick.gihwr > 0 and pick.iwd != 0:
+            tip_parts.append(f"IWD: {pick.iwd:+.1f}pp")
+
+        if tip_parts:
             # Surface the source format when stats came from the fallback
             # bundle, so the player knows the numbers aren't from the
             # format they're actually drafting.
             if pick.stats_format:
                 tip_parts.append(f"src: {pick.stats_format}")
             self.setToolTip(" · ".join(tip_parts))
+        elif pick.stats_loaded:
+            self.setToolTip("No 17Lands data for this card yet")
         else:
             self.setToolTip("")
 

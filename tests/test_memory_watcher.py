@@ -458,6 +458,74 @@ def test_lookup_stats_returns_ata_only_when_no_gihwr_anywhere():
     assert stats["ata"] == 11.08
 
 
+def test_lookup_stats_returns_alsa_only_when_no_gihwr_or_ata():
+    """New sets get ALSA long before GIHWR/ATA clear 17Lands' 500-sample
+    floor — that bundle is still usable, so don't discard it."""
+    mgr = _make_mgr_with_bundles({
+        ("MSH", "QuickDraft"): _StubBundle({
+            "Foo": _StubCardRatings({"gihwr": 0.0, "ata": 0.0, "alsa": 3.59}),
+        }),
+        ("MSH", "PremierDraft"): _StubBundle({
+            "Foo": _StubCardRatings({"gihwr": 0.0, "ata": 0.0, "alsa": 0.0}),
+        }),
+    })
+    stats, source = mgr.lookup_stats(
+        "MSH", "Foo", formats=["QuickDraft", "PremierDraft"],
+    )
+    assert source == "QuickDraft"
+    assert stats["alsa"] == 3.59
+
+
+def test_lookup_stats_returns_gpwr_only_when_no_gihwr_ata_or_alsa():
+    mgr = _make_mgr_with_bundles({
+        ("MSH", "QuickDraft"): _StubBundle({
+            "Foo": _StubCardRatings({"gihwr": 0.0, "ata": 0.0, "alsa": 0.0,
+                                     "gpwr": 0.0}),
+        }),
+        ("MSH", "PremierDraft"): _StubBundle({
+            "Foo": _StubCardRatings({"gihwr": 0.0, "ata": 0.0, "alsa": 0.0,
+                                     "gpwr": 0.554}),
+        }),
+    })
+    stats, source = mgr.lookup_stats(
+        "MSH", "Foo", formats=["QuickDraft", "PremierDraft"],
+    )
+    assert source == "PremierDraft"
+    assert stats["gpwr"] == 0.554
+
+
+def test_lookup_stats_prefers_gihwr_over_a_richer_proxy_only_bundle():
+    """A real GIHWR anywhere beats ALSA/GPWR proxies in the primary."""
+    mgr = _make_mgr_with_bundles({
+        ("MSH", "QuickDraft"): _StubBundle({
+            "Foo": _StubCardRatings({"gihwr": 0.0, "ata": 0.0, "alsa": 3.0,
+                                     "gpwr": 0.55}),
+        }),
+        ("MSH", "PremierDraft"): _StubBundle({
+            "Foo": _StubCardRatings({"gihwr": 0.601, "ata": 0.0, "alsa": 4.05}),
+        }),
+    })
+    stats, source = mgr.lookup_stats(
+        "MSH", "Foo", formats=["QuickDraft", "PremierDraft"],
+    )
+    assert source == "PremierDraft"
+    assert stats["gihwr"] == 0.601
+
+
+def test_lookup_stats_returns_empty_when_every_field_is_suppressed():
+    """Present-but-all-zero bundles are still 'no data' — don't hand the
+    UI a dict of zeros to render."""
+    mgr = _make_mgr_with_bundles({
+        ("MSH", "QuickDraft"): _StubBundle({
+            "Foo": _StubCardRatings({"gihwr": 0.0, "ata": 0.0, "alsa": 0.0,
+                                     "gpwr": 0.0, "iwd": 0.0}),
+        }),
+    })
+    stats, source = mgr.lookup_stats("MSH", "Foo", formats=["QuickDraft"])
+    assert stats == {}
+    assert source == ""
+
+
 def test_lookup_stats_returns_empty_when_card_missing_everywhere():
     mgr = _make_mgr_with_bundles({
         ("EOE", "QuickDraft"): _StubBundle({}),

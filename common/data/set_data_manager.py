@@ -18,6 +18,10 @@ logger = logging.getLogger(__name__)
 
 _Callback = Callable[[str, bool], None]
 
+# Stats that stand in for gihwr when 17Lands has suppressed it. Ordered by
+# how much a drafter can lean on them: pick order first, then game-play WR.
+_PROXY_STAT_KEYS: tuple[str, ...] = ("ata", "alsa", "gpwr")
+
 # How long a cached bundle is considered fresh before refresh_all() will
 # re-fetch it. ensure_set() within this window is a no-op.
 DEFAULT_REFRESH_INTERVAL_S: float = 24 * 60 * 60
@@ -209,9 +213,16 @@ class SetDataManager:
         The fallback ladder is **gihwr-driven**: the first format whose
         bundle has ``gihwr > 0`` for *card_name* wins. When no format
         has a usable gihwr, the first format whose bundle has *any*
-        signal (``ata > 0``) is returned as a last-resort estimate so
-        the player still sees an ATA — same source format, no
-        cross-format mixing.
+        signal (``ata``, ``alsa`` or ``gpwr`` > 0) is returned as a
+        last-resort estimate — same source format, no cross-format
+        mixing.
+
+        That last rung matters most on a freshly released set: 17Lands
+        nulls each field until it clears ~500 samples, and the pick-order
+        and game-play counts cross that line long before games-in-hand
+        does. On MSH at launch only 42/334 cards had a gihwr while 219
+        had an alsa, so gating the fallback on ``ata`` alone threw away
+        usable data for two thirds of the set.
 
         Args:
             set_code: Three-letter set code.
@@ -228,7 +239,7 @@ class SetDataManager:
             the format that supplied the data, or ``({}, "")`` when no
             format had any signal for *card_name*.
         """
-        ata_only: tuple[dict[str, float], str] | None = None
+        proxy_only: tuple[dict[str, float], str] | None = None
         for fmt in formats:
             with self._lock:
                 bundle = self._sets.get((set_code, fmt))
@@ -240,10 +251,12 @@ class SetDataManager:
             stats = cr.deck_colors.get(archetype, {})
             if stats.get("gihwr", 0.0) > 0.0:
                 return stats, fmt
-            if ata_only is None and stats.get("ata", 0.0) > 0.0:
-                ata_only = (stats, fmt)
-        if ata_only is not None:
-            return ata_only
+            if proxy_only is None and any(
+                stats.get(k, 0.0) > 0.0 for k in _PROXY_STAT_KEYS
+            ):
+                proxy_only = (stats, fmt)
+        if proxy_only is not None:
+            return proxy_only
         return {}, ""
 
     def refresh_all(self) -> None:

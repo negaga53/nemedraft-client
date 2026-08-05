@@ -128,3 +128,62 @@ def test_unset_queue_status_does_not_crash():
     assert tab.join_button_enabled() is False
     assert tab.leave_button_visible() is False
     assert tab.offer_progress_visible() is False
+
+
+@pytest.mark.usefixtures("qapp")
+def test_draft_row_does_not_demand_vip():
+    """A signed-in non-VIP user with a live draft must not be told VIP is
+    required.
+
+    Predictions are gated on an admission seat, not on VIP (server-side
+    ``require_seat``; client-side ``_has_seat``). The draft row's old
+    ``_is_vip`` gate outlived that migration, so every newly registered
+    user saw "Draft detected — VIP required" the moment a draft started —
+    a demand the rest of the system no longer makes. Admission state is
+    the draft-access row's job, not this row's.
+    """
+    from client.overlay.ui.home_tab import HomeTab
+
+    tab = HomeTab()
+    tab.set_server_status(
+        reachable=True, authenticated=True, email="new@example.com",
+        is_vip=False, has_arena_player_id=True,
+    )
+    tab.set_draft_active(True)
+
+    detail = tab.draft_detail_text()
+    assert "VIP" not in detail, f"draft row still demands VIP: {detail!r}"
+
+
+@pytest.mark.usefixtures("qapp")
+def test_draft_row_prompts_sign_in_when_unauthenticated():
+    """Not signed in is a real blocker and must still be surfaced."""
+    from client.overlay.ui.home_tab import HomeTab
+
+    tab = HomeTab()
+    tab.set_server_status(
+        reachable=True, authenticated=False, has_arena_player_id=True,
+    )
+    tab.set_draft_active(True)
+
+    detail = tab.draft_detail_text()
+    assert detail != ""
+    assert "VIP" not in detail
+
+
+def test_no_vip_gate_strings_remain():
+    """The retired VIP copy must be gone from every language, so a stale
+    translation can never resurrect the demand."""
+    import json
+    from pathlib import Path
+
+    path = (
+        Path(__file__).resolve().parents[1]
+        / "client" / "overlay" / "i18n" / "translations.json"
+    )
+    data = json.loads(path.read_text(encoding="utf-8"))
+    for lang, strings in data.items():
+        assert "vip_required" not in strings, f"{lang} still has vip_required"
+        assert "home_status_active_no_vip" not in strings, (
+            f"{lang} still has home_status_active_no_vip"
+        )

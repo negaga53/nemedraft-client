@@ -239,10 +239,6 @@ class OverlayApp:
 
     # -- auth helpers --------------------------------------------------------
 
-    def _is_vip(self) -> bool:
-        """Return True if the user is authenticated with VIP status."""
-        return self._auth_polling.is_vip()
-
     def _on_identity_resolved(self, identity: ArenaIdentityResolution) -> None:
         """Apply an Arena identity discovered after startup."""
         self._has_arena_player_id = True

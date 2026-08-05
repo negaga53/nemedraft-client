@@ -360,10 +360,6 @@ class OverlayWindow(QWidget):
     def show_waiting(self) -> None:
         self._show_status(tr("waiting_for_draft"))
 
-    def show_vip_required(self) -> None:
-        """Show a message indicating VIP is required for predictions."""
-        self._show_status(tr("vip_required"))
-
     def show_draft_started(self) -> None:
         """Switch the pack tab to the predictions page when a draft begins."""
         self.pack_tab.home_widget.set_draft_active(True)

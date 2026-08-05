@@ -379,8 +379,8 @@ class HomeTab(QWidget):
         self._has_arena_player_id = has_arena_player_id
         self._maintenance = maintenance
         self._update_server_status(email, is_vip=is_vip)
-        # Refresh the draft row so the "VIP required" warning clears
-        # immediately when VIP is granted (and vice-versa).
+        # Refresh the draft row so the sign-in prompt clears the moment a
+        # session is established (and reappears on logout).
         self._update_draft_status()
 
     def set_draft_active(self, active: bool) -> None:
@@ -461,6 +461,9 @@ class HomeTab(QWidget):
 
     def queue_detail_text(self) -> str:
         return self._queue_row.detail_text()
+
+    def draft_detail_text(self) -> str:
+        return self._draft_row.detail_text()
 
     def join_button_enabled(self) -> bool:
         return (
@@ -602,10 +605,15 @@ class HomeTab(QWidget):
                 "ok", tr("home_status_untrained"),
             )
         elif self._draft_active:
-            if self._authenticated and self._is_vip:
+            # Gated on being signed in, NOT on VIP. Predictions are
+            # rationed by admission seats (server ``require_seat`` /
+            # client ``_has_seat``), and the draft-access row below
+            # already reports that state — so a non-VIP user with a live
+            # draft is in a perfectly good position here.
+            if self._authenticated:
                 self._draft_row.set_status("ok", tr("home_status_active"))
             else:
-                self._draft_row.set_status("warn", tr("home_status_active_no_vip"))
+                self._draft_row.set_status("warn", tr("home_status_active_no_auth"))
         elif self._lobby_ready:
             self._draft_row.set_status("ok", tr("home_status_ready"))
         else:

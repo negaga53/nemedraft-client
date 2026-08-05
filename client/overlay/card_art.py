@@ -10,11 +10,20 @@ from pathlib import Path
 
 import httpx
 
+from client.overlay import __version__ as _client_version
+
 logger = logging.getLogger(__name__)
 
 # Scryfall image API base — art_crop is 626×457, "small" is 146×204.
 # We use "small" for the overlay thumbnails (lightweight, fast).
 _SCRYFALL_IMAGE_BASE = "https://api.scryfall.com/cards/named"
+
+# Scryfall's API guidelines require an identifying User-Agent. api.scryfall.com
+# still answers anonymous requests, but the image CDN that ``format=image``
+# redirects to (cards.scryfall.io) rejects httpx's default
+# ``python-httpx/x.y`` UA with 400 Bad Request — so every uncached thumbnail
+# died at the redirect hop. Send a real UA on every art request.
+USER_AGENT = f"NemeDraft/{_client_version} (Educational Tool)"
 
 # Scryfall asks for 50–100 ms between requests. We pace at 100 ms and
 # share the timer across all CardArtCache instances so the simulator's
@@ -151,7 +160,11 @@ class CardArtCache:
             if wait > 0:
                 time.sleep(wait)
             try:
-                with httpx.Client(timeout=10, follow_redirects=True) as client:
+                with httpx.Client(
+                    timeout=10,
+                    follow_redirects=True,
+                    headers={"User-Agent": USER_AGENT},
+                ) as client:
                     resp = client.get(
                         _SCRYFALL_IMAGE_BASE,
                         params={

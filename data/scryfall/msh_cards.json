@@ -16,7 +16,9 @@
       "B",
       "U"
     ],
-    "keywords": [],
+    "keywords": [
+      "Photographic Reflexes"
+    ],
     "rarity": "rare",
     "set": "msh",
     "arena_id": null,
@@ -57,7 +59,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105176,
     "collector_number": "290"
   },
   {
@@ -77,7 +79,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105169,
     "collector_number": "273"
   },
   {
@@ -100,7 +102,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105121,
     "collector_number": "225"
   },
   {
@@ -125,7 +127,7 @@
     ],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105107,
     "collector_number": "212"
   },
   {
@@ -188,7 +190,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104951,
     "collector_number": "57"
   },
   {
@@ -208,7 +210,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105165,
     "collector_number": "269"
   },
   {
@@ -229,7 +231,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104981,
     "collector_number": "86"
   },
   {
@@ -249,7 +251,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105162,
     "collector_number": "266"
   },
   {
@@ -274,7 +276,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105118,
     "collector_number": "222"
   },
   {
@@ -435,10 +437,12 @@
       "B",
       "U"
     ],
-    "keywords": [],
+    "keywords": [
+      "Photographic Reflexes"
+    ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105128,
     "collector_number": "232"
   },
   {
@@ -488,7 +492,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105130,
     "collector_number": "234"
   },
   {
@@ -581,7 +585,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104914,
     "collector_number": "22"
   },
   {
@@ -602,7 +606,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104907,
     "collector_number": "16"
   },
   {
@@ -625,7 +629,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104941,
     "collector_number": "48"
   },
   {
@@ -648,7 +652,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104892,
     "collector_number": "1"
   },
   {
@@ -672,7 +676,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105073,
     "collector_number": "178"
   },
   {
@@ -721,7 +725,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105098,
     "collector_number": "203"
   },
   {
@@ -748,7 +752,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105010,
     "collector_number": "115"
   },
   {
@@ -788,7 +792,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104938,
     "collector_number": "45"
   },
   {
@@ -811,7 +815,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104895,
     "collector_number": "4"
   },
   {
@@ -834,7 +838,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104977,
     "collector_number": "82"
   },
   {
@@ -855,7 +859,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104923,
     "collector_number": "30"
   },
   {
@@ -874,7 +878,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105149,
     "collector_number": "253"
   },
   {
@@ -895,12 +899,13 @@
       "W"
     ],
     "keywords": [
+      "Radar Sense",
       "Vigilance",
       "Haste"
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105108,
     "collector_number": "213"
   },
   {
@@ -924,7 +929,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105063,
     "collector_number": "168"
   },
   {
@@ -947,7 +952,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104986,
     "collector_number": "91"
   },
   {
@@ -1016,7 +1021,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104960,
     "collector_number": "66"
   },
   {
@@ -1082,7 +1087,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105059,
     "collector_number": "164"
   },
   {
@@ -1105,7 +1110,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105002,
     "collector_number": "107"
   },
   {
@@ -1122,7 +1127,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105157,
     "collector_number": "261"
   },
   {
@@ -1166,7 +1171,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104930,
     "collector_number": "37"
   },
   {
@@ -1190,7 +1195,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105072,
     "collector_number": "177"
   },
   {
@@ -1213,7 +1218,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105084,
     "collector_number": "189"
   },
   {
@@ -1275,7 +1280,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105167,
     "collector_number": "271"
   },
   {
@@ -1299,7 +1304,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105055,
     "collector_number": "160"
   },
   {
@@ -1349,7 +1354,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105122,
     "collector_number": "226"
   },
   {
@@ -1395,7 +1400,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104947,
     "collector_number": "53"
   },
   {
@@ -1415,7 +1420,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105166,
     "collector_number": "270"
   },
   {
@@ -1436,6 +1441,7 @@
       "W"
     ],
     "keywords": [
+      "Radar Sense",
       "Vigilance",
       "Haste"
     ],
@@ -1465,7 +1471,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104899,
     "collector_number": "8"
   },
   {
@@ -1484,7 +1490,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105181,
     "collector_number": "295"
   },
   {
@@ -1503,7 +1509,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105282,
     "collector_number": "284"
   },
   {
@@ -1520,7 +1526,7 @@
     "keywords": [],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105147,
     "collector_number": "251"
   },
   {
@@ -1541,7 +1547,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104959,
     "collector_number": "65"
   },
   {
@@ -1606,7 +1612,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105028,
     "collector_number": "133"
   },
   {
@@ -1629,7 +1635,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105096,
     "collector_number": "201"
   },
   {
@@ -1672,11 +1678,12 @@
     ],
     "keywords": [
       "Flying",
-      "Vigilance"
+      "Vigilance",
+      "Cosmic Awareness"
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104903,
     "collector_number": "12"
   },
   {
@@ -1691,12 +1698,15 @@
     "colors": [],
     "color_identity": [],
     "keywords": [
+      "Density Control",
       "Flying",
-      "Vigilance"
+      "Vigilance",
+      "Technopathy",
+      "Solar Beam"
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105151,
     "collector_number": "255"
   },
   {
@@ -1719,7 +1729,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105079,
     "collector_number": "184"
   },
   {
@@ -1774,7 +1784,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105049,
     "collector_number": "154"
   },
   {
@@ -1849,7 +1859,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105093,
     "collector_number": "198"
   },
   {
@@ -1870,7 +1880,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104920,
     "collector_number": "27"
   },
   {
@@ -1893,7 +1903,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104958,
     "collector_number": "64"
   },
   {
@@ -1937,7 +1947,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105043,
     "collector_number": "148"
   },
   {
@@ -1958,7 +1968,7 @@
     "keywords": [],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105082,
     "collector_number": "187"
   },
   {
@@ -1981,7 +1991,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104908,
     "collector_number": "17"
   },
   {
@@ -2119,7 +2129,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105023,
     "collector_number": "128"
   },
   {
@@ -2143,7 +2153,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104919,
     "collector_number": "26"
   },
   {
@@ -2216,7 +2226,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105067,
     "collector_number": "172"
   },
   {
@@ -2233,7 +2243,7 @@
     "keywords": [],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105148,
     "collector_number": "252"
   },
   {
@@ -2256,7 +2266,7 @@
     ],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104900,
     "collector_number": "9"
   },
   {
@@ -2275,7 +2285,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105139,
     "collector_number": "243"
   },
   {
@@ -2294,7 +2304,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105143,
     "collector_number": "247"
   },
   {
@@ -2318,7 +2328,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104953,
     "collector_number": "59"
   },
   {
@@ -2366,7 +2376,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105132,
     "collector_number": "236"
   },
   {
@@ -2404,7 +2414,7 @@
     ],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105144,
     "collector_number": "248"
   },
   {
@@ -2424,7 +2434,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105145,
     "collector_number": "249"
   },
   {
@@ -2468,7 +2478,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104944,
     "collector_number": "50"
   },
   {
@@ -2491,7 +2501,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105030,
     "collector_number": "135"
   },
   {
@@ -2510,13 +2520,14 @@
       "B"
     ],
     "keywords": [
+      "Mental Organism",
       "Flying",
       "Lifelink",
       "Connive"
     ],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105001,
     "collector_number": "106"
   },
   {
@@ -2540,7 +2551,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104954,
     "collector_number": "60"
   },
   {
@@ -2589,7 +2600,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104918,
     "collector_number": "25"
   },
   {
@@ -2607,10 +2618,12 @@
     "color_identity": [
       "W"
     ],
-    "keywords": [],
+    "keywords": [
+      "Unbreakable Skin"
+    ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104912,
     "collector_number": "20"
   },
   {
@@ -2654,7 +2667,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105100,
     "collector_number": "205"
   },
   {
@@ -2677,7 +2690,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105026,
     "collector_number": "131"
   },
   {
@@ -2698,7 +2711,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105071,
     "collector_number": "176"
   },
   {
@@ -2740,7 +2753,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105178,
     "collector_number": "292"
   },
   {
@@ -2788,7 +2801,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105097,
     "collector_number": "202"
   },
   {
@@ -2828,7 +2841,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105085,
     "collector_number": "190"
   },
   {
@@ -2853,7 +2866,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104928,
     "collector_number": "35"
   },
   {
@@ -2878,7 +2891,7 @@
     ],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104915,
     "collector_number": "23"
   },
   {
@@ -2903,7 +2916,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104911,
     "collector_number": "19"
   },
   {
@@ -2924,7 +2937,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105046,
     "collector_number": "151"
   },
   {
@@ -2947,7 +2960,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104939,
     "collector_number": "46"
   },
   {
@@ -2970,7 +2983,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104996,
     "collector_number": "101"
   },
   {
@@ -2993,7 +3006,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104922,
     "collector_number": "29"
   },
   {
@@ -3013,7 +3026,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105158,
     "collector_number": "262"
   },
   {
@@ -3080,7 +3093,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105134,
     "collector_number": "238"
   },
   {
@@ -3125,7 +3138,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104985,
     "collector_number": "90"
   },
   {
@@ -3187,10 +3200,13 @@
     "color_identity": [
       "G"
     ],
-    "keywords": [],
+    "keywords": [
+      "Brontosaurus",
+      "Tyrannosaurus Rex"
+    ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105077,
     "collector_number": "182"
   },
   {
@@ -3230,7 +3246,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105137,
     "collector_number": "241"
   },
   {
@@ -3249,7 +3265,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105284,
     "collector_number": "286"
   },
   {
@@ -3295,11 +3311,12 @@
     ],
     "keywords": [
       "Flying",
+      "Wasp's Sting",
       "Flash"
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104979,
     "collector_number": "84"
   },
   {
@@ -3322,7 +3339,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105027,
     "collector_number": "132"
   },
   {
@@ -3346,7 +3363,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104929,
     "collector_number": "36"
   },
   {
@@ -3371,7 +3388,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105116,
     "collector_number": "220"
   },
   {
@@ -3392,7 +3409,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104988,
     "collector_number": "93"
   },
   {
@@ -3439,7 +3456,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104933,
     "collector_number": "40"
   },
   {
@@ -3460,7 +3477,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104993,
     "collector_number": "98"
   },
   {
@@ -3481,7 +3498,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104905,
     "collector_number": "14"
   },
   {
@@ -3501,7 +3518,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105140,
     "collector_number": "244"
   },
   {
@@ -3520,7 +3537,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105179,
     "collector_number": "293"
   },
   {
@@ -3585,7 +3602,7 @@
     ],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104974,
     "collector_number": "80"
   },
   {
@@ -3608,7 +3625,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105120,
     "collector_number": "224"
   },
   {
@@ -3655,7 +3672,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105054,
     "collector_number": "159"
   },
   {
@@ -3675,7 +3692,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105150,
     "collector_number": "254"
   },
   {
@@ -3698,7 +3715,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105113,
     "collector_number": "218"
   },
   {
@@ -3719,7 +3736,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105029,
     "collector_number": "134"
   },
   {
@@ -3789,7 +3806,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104932,
     "collector_number": "39"
   },
   {
@@ -3896,7 +3913,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105038,
     "collector_number": "143"
   },
   {
@@ -3941,7 +3958,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105053,
     "collector_number": "158"
   },
   {
@@ -3968,7 +3985,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105080,
     "collector_number": "185"
   },
   {
@@ -3989,7 +4006,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104935,
     "collector_number": "42"
   },
   {
@@ -4055,7 +4072,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105175,
     "collector_number": "289"
   },
   {
@@ -4099,7 +4116,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105004,
     "collector_number": "109"
   },
   {
@@ -4120,7 +4137,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104957,
     "collector_number": "63"
   },
   {
@@ -4141,7 +4158,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105033,
     "collector_number": "138"
   },
   {
@@ -4164,7 +4181,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104978,
     "collector_number": "83"
   },
   {
@@ -4187,7 +4204,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105099,
     "collector_number": "204"
   },
   {
@@ -4223,7 +4240,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105173,
     "collector_number": "287"
   },
   {
@@ -4244,7 +4261,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104973,
     "collector_number": "79"
   },
   {
@@ -4265,7 +4282,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105052,
     "collector_number": "157"
   },
   {
@@ -4289,7 +4306,7 @@
     ],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104909,
     "collector_number": "18"
   },
   {
@@ -4309,7 +4326,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105164,
     "collector_number": "268"
   },
   {
@@ -4333,7 +4350,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105056,
     "collector_number": "161"
   },
   {
@@ -4356,7 +4373,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104976,
     "collector_number": "81"
   },
   {
@@ -4406,7 +4423,7 @@
     ],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104984,
     "collector_number": "89"
   },
   {
@@ -4429,7 +4446,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104997,
     "collector_number": "102"
   },
   {
@@ -4450,7 +4467,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104969,
     "collector_number": "75"
   },
   {
@@ -4475,7 +4492,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105105,
     "collector_number": "210"
   },
   {
@@ -4498,7 +4515,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105011,
     "collector_number": "116"
   },
   {
@@ -4519,7 +4536,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105000,
     "collector_number": "105"
   },
   {
@@ -4546,7 +4563,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105008,
     "collector_number": "113"
   },
   {
@@ -4573,7 +4590,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105110,
     "collector_number": "215"
   },
   {
@@ -4592,7 +4609,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105276,
     "collector_number": "278"
   },
   {
@@ -4611,7 +4628,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105280,
     "collector_number": "282"
   },
   {
@@ -4628,7 +4645,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105159,
     "collector_number": "263"
   },
   {
@@ -4671,7 +4688,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105003,
     "collector_number": "108"
   },
   {
@@ -4692,7 +4709,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105040,
     "collector_number": "145"
   },
   {
@@ -4763,7 +4780,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104906,
     "collector_number": "15"
   },
   {
@@ -4784,7 +4801,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105016,
     "collector_number": "121"
   },
   {
@@ -4830,7 +4847,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105048,
     "collector_number": "153"
   },
   {
@@ -4855,7 +4872,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105094,
     "collector_number": "199"
   },
   {
@@ -4902,7 +4919,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105081,
     "collector_number": "186"
   },
   {
@@ -4923,7 +4940,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105019,
     "collector_number": "124"
   },
   {
@@ -4975,7 +4992,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105086,
     "collector_number": "191"
   },
   {
@@ -5017,7 +5034,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105177,
     "collector_number": "291"
   },
   {
@@ -5062,7 +5079,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105161,
     "collector_number": "265"
   },
   {
@@ -5111,7 +5128,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105024,
     "collector_number": "129"
   },
   {
@@ -5181,7 +5198,7 @@
     ],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104956,
     "collector_number": "62"
   },
   {
@@ -5228,7 +5245,7 @@
     ],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104963,
     "collector_number": "69"
   },
   {
@@ -5380,7 +5397,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105074,
     "collector_number": "179"
   },
   {
@@ -5403,7 +5420,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105039,
     "collector_number": "144"
   },
   {
@@ -5469,7 +5486,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105172,
     "collector_number": "276"
   },
   {
@@ -5518,7 +5535,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105045,
     "collector_number": "150"
   },
   {
@@ -5539,7 +5556,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105020,
     "collector_number": "125"
   },
   {
@@ -5562,7 +5579,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104931,
     "collector_number": "38"
   },
   {
@@ -5583,7 +5600,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104980,
     "collector_number": "85"
   },
   {
@@ -5599,11 +5616,12 @@
     "color_identity": [],
     "keywords": [
       "Flying",
-      "Power-up"
+      "Power-up",
+      "Cybernetic Senses"
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105152,
     "collector_number": "256"
   },
   {
@@ -5668,7 +5686,8 @@
     "keywords": [
       "Reach",
       "Vigilance",
-      "Flash"
+      "Flash",
+      "No One Dies!"
     ],
     "rarity": "uncommon",
     "set": "msh",
@@ -5715,7 +5734,7 @@
     ],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104913,
     "collector_number": "21"
   },
   {
@@ -5757,7 +5776,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105037,
     "collector_number": "142"
   },
   {
@@ -5774,7 +5793,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105156,
     "collector_number": "260"
   },
   {
@@ -5869,7 +5888,7 @@
     "keywords": [],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104962,
     "collector_number": "68"
   },
   {
@@ -5909,7 +5928,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104904,
     "collector_number": "13"
   },
   {
@@ -5928,7 +5947,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105277,
     "collector_number": "279"
   },
   {
@@ -5951,7 +5970,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105119,
     "collector_number": "223"
   },
   {
@@ -5991,11 +6010,12 @@
     ],
     "keywords": [
       "Flying",
-      "Surveil"
+      "Surveil",
+      "Avian Telepathy"
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104946,
     "collector_number": "52"
   },
   {
@@ -6064,7 +6084,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104968,
     "collector_number": "74"
   },
   {
@@ -6090,7 +6110,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105111,
     "collector_number": "216"
   },
   {
@@ -6114,7 +6134,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105031,
     "collector_number": "136"
   },
   {
@@ -6133,7 +6153,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105170,
     "collector_number": "274"
   },
   {
@@ -6181,7 +6201,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105068,
     "collector_number": "173"
   },
   {
@@ -6204,7 +6224,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105092,
     "collector_number": "197"
   },
   {
@@ -6225,7 +6245,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105089,
     "collector_number": "194"
   },
   {
@@ -6269,7 +6289,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104965,
     "collector_number": "71"
   },
   {
@@ -6290,7 +6310,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104964,
     "collector_number": "70"
   },
   {
@@ -6308,10 +6328,12 @@
     "color_identity": [
       "W"
     ],
-    "keywords": [],
+    "keywords": [
+      "Seismic Takedown"
+    ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104925,
     "collector_number": "32"
   },
   {
@@ -6330,7 +6352,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105278,
     "collector_number": "280"
   },
   {
@@ -6375,8 +6397,12 @@
       "R"
     ],
     "keywords": [
+      "Explosive",
       "Reach",
-      "First strike"
+      "First strike",
+      "Trick Arrows",
+      "Boomerang",
+      "Net"
     ],
     "rarity": "rare",
     "set": "msh",
@@ -6422,11 +6448,13 @@
       "W"
     ],
     "keywords": [
+      "Street Justice",
+      "Legal Justice",
       "Teamwork"
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104917,
     "collector_number": "24"
   },
   {
@@ -6445,12 +6473,16 @@
       "R"
     ],
     "keywords": [
+      "Explosive",
       "Reach",
-      "First strike"
+      "First strike",
+      "Trick Arrows",
+      "Boomerang",
+      "Net"
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105025,
     "collector_number": "130"
   },
   {
@@ -6471,7 +6503,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104934,
     "collector_number": "41"
   },
   {
@@ -6494,7 +6526,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104921,
     "collector_number": "28"
   },
   {
@@ -6515,7 +6547,7 @@
     "keywords": [],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104990,
     "collector_number": "95"
   },
   {
@@ -6536,7 +6568,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104991,
     "collector_number": "96"
   },
   {
@@ -6559,7 +6591,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105090,
     "collector_number": "195"
   },
   {
@@ -6578,7 +6610,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105281,
     "collector_number": "283"
   },
   {
@@ -6599,7 +6631,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104952,
     "collector_number": "58"
   },
   {
@@ -6619,11 +6651,12 @@
     ],
     "keywords": [
       "Reach",
-      "Vigilance"
+      "Vigilance",
+      "Embiggen Fist"
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104961,
     "collector_number": "67"
   },
   {
@@ -6646,7 +6679,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104994,
     "collector_number": "99"
   },
   {
@@ -6669,7 +6702,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105102,
     "collector_number": "207"
   },
   {
@@ -6690,7 +6723,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104893,
     "collector_number": "2"
   },
   {
@@ -6715,7 +6748,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105125,
     "collector_number": "229"
   },
   {
@@ -6736,7 +6769,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105087,
     "collector_number": "192"
   },
   {
@@ -6757,7 +6790,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105075,
     "collector_number": "180"
   },
   {
@@ -6778,7 +6811,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104949,
     "collector_number": "55"
   },
   {
@@ -6799,6 +6832,7 @@
       "W"
     ],
     "keywords": [
+      "Radar Sense",
       "Vigilance",
       "Haste"
     ],
@@ -6827,7 +6861,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105101,
     "collector_number": "206"
   },
   {
@@ -6850,7 +6884,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104948,
     "collector_number": "54"
   },
   {
@@ -6873,7 +6907,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104894,
     "collector_number": "3"
   },
   {
@@ -6921,7 +6955,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105103,
     "collector_number": "208"
   },
   {
@@ -6948,7 +6982,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104937,
     "collector_number": "44"
   },
   {
@@ -6971,7 +7005,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104992,
     "collector_number": "97"
   },
   {
@@ -6995,7 +7029,7 @@
     ],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105114,
     "collector_number": "219"
   },
   {
@@ -7015,7 +7049,8 @@
     ],
     "keywords": [
       "Reach",
-      "Vigilance"
+      "Vigilance",
+      "Embiggen Fist"
     ],
     "rarity": "rare",
     "set": "msh",
@@ -7065,7 +7100,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105064,
     "collector_number": "169"
   },
   {
@@ -7109,7 +7144,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105006,
     "collector_number": "111"
   },
   {
@@ -7176,7 +7211,7 @@
     ],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105060,
     "collector_number": "165"
   },
   {
@@ -7197,7 +7232,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105034,
     "collector_number": "139"
   },
   {
@@ -7272,7 +7307,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105036,
     "collector_number": "141"
   },
   {
@@ -7298,7 +7333,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104898,
     "collector_number": "7"
   },
   {
@@ -7359,7 +7394,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105275,
     "collector_number": "277"
   },
   {
@@ -7399,6 +7434,7 @@
       "B"
     ],
     "keywords": [
+      "Mental Organism",
       "Flying",
       "Lifelink",
       "Connive"
@@ -7428,7 +7464,7 @@
     ],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104897,
     "collector_number": "6"
   },
   {
@@ -7451,7 +7487,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105133,
     "collector_number": "237"
   },
   {
@@ -7494,7 +7530,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105142,
     "collector_number": "246"
   },
   {
@@ -7517,7 +7553,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104927,
     "collector_number": "34"
   },
   {
@@ -7540,7 +7576,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105091,
     "collector_number": "196"
   },
   {
@@ -7560,7 +7596,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105160,
     "collector_number": "264"
   },
   {
@@ -7581,12 +7617,13 @@
       "R"
     ],
     "keywords": [
+      "Heal",
       "Haste",
       "Fight"
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105136,
     "collector_number": "240"
   },
   {
@@ -7628,11 +7665,12 @@
       "U"
     ],
     "keywords": [
+      "Intangibility",
       "Flash"
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105109,
     "collector_number": "214"
   },
   {
@@ -7657,7 +7695,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105131,
     "collector_number": "235"
   },
   {
@@ -7681,7 +7719,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104982,
     "collector_number": "87"
   },
   {
@@ -7733,7 +7771,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104995,
     "collector_number": "100"
   },
   {
@@ -7756,7 +7794,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104967,
     "collector_number": "73"
   },
   {
@@ -7777,7 +7815,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104940,
     "collector_number": "47"
   },
   {
@@ -7800,7 +7838,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105021,
     "collector_number": "126"
   },
   {
@@ -7820,7 +7858,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105155,
     "collector_number": "259"
   },
   {
@@ -7838,10 +7876,12 @@
     "color_identity": [
       "B"
     ],
-    "keywords": [],
+    "keywords": [
+      "Sonic Attack"
+    ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104998,
     "collector_number": "103"
   },
   {
@@ -7866,7 +7906,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104901,
     "collector_number": "10"
   },
   {
@@ -7909,7 +7949,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105163,
     "collector_number": "267"
   },
   {
@@ -7929,7 +7969,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105171,
     "collector_number": "275"
   },
   {
@@ -7948,7 +7988,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105182,
     "collector_number": "296"
   },
   {
@@ -7969,6 +8009,7 @@
       "W"
     ],
     "keywords": [
+      "Radar Sense",
       "Vigilance",
       "Haste"
     ],
@@ -7994,7 +8035,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105153,
     "collector_number": "257"
   },
   {
@@ -8015,7 +8056,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105069,
     "collector_number": "174"
   },
   {
@@ -8076,7 +8117,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104945,
     "collector_number": "51"
   },
   {
@@ -8099,7 +8140,7 @@
     ],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105051,
     "collector_number": "156"
   },
   {
@@ -8123,7 +8164,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105014,
     "collector_number": "119"
   },
   {
@@ -8146,7 +8187,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105058,
     "collector_number": "163"
   },
   {
@@ -8169,7 +8210,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105047,
     "collector_number": "152"
   },
   {
@@ -8188,7 +8229,7 @@
     ],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105141,
     "collector_number": "245"
   },
   {
@@ -8264,7 +8305,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105083,
     "collector_number": "188"
   },
   {
@@ -8300,8 +8341,11 @@
     "colors": [],
     "color_identity": [],
     "keywords": [
+      "Density Control",
       "Flying",
-      "Vigilance"
+      "Vigilance",
+      "Technopathy",
+      "Solar Beam"
     ],
     "rarity": "rare",
     "set": "msh",
@@ -8329,7 +8373,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105061,
     "collector_number": "166"
   },
   {
@@ -8349,7 +8393,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105154,
     "collector_number": "258"
   },
   {
@@ -8372,7 +8416,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105066,
     "collector_number": "171"
   },
   {
@@ -8395,7 +8439,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105076,
     "collector_number": "181"
   },
   {
@@ -8418,7 +8462,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105065,
     "collector_number": "170"
   },
   {
@@ -8460,7 +8504,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104989,
     "collector_number": "94"
   },
   {
@@ -8483,7 +8527,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104987,
     "collector_number": "92"
   },
   {
@@ -8501,10 +8545,12 @@
     "color_identity": [
       "G"
     ],
-    "keywords": [],
+    "keywords": [
+      "I LOVE Squirrels!"
+    ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105088,
     "collector_number": "193"
   },
   {
@@ -8550,7 +8596,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105018,
     "collector_number": "123"
   },
   {
@@ -8571,7 +8617,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104896,
     "collector_number": "5"
   },
   {
@@ -8595,7 +8641,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104950,
     "collector_number": "56"
   },
   {
@@ -8654,7 +8700,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105050,
     "collector_number": "155"
   },
   {
@@ -8678,7 +8724,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105009,
     "collector_number": "114"
   },
   {
@@ -8722,7 +8768,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105078,
     "collector_number": "183"
   },
   {
@@ -8745,7 +8791,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105017,
     "collector_number": "122"
   },
   {
@@ -8812,7 +8858,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105279,
     "collector_number": "281"
   },
   {
@@ -8833,6 +8879,7 @@
       "R"
     ],
     "keywords": [
+      "Heal",
       "Haste",
       "Fight"
     ],
@@ -8859,6 +8906,7 @@
       "W"
     ],
     "keywords": [
+      "Radar Sense",
       "Vigilance",
       "Haste"
     ],
@@ -8885,7 +8933,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105057,
     "collector_number": "162"
   },
   {
@@ -8933,7 +8981,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104924,
     "collector_number": "31"
   },
   {
@@ -8973,7 +9021,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105123,
     "collector_number": "227"
   },
   {
@@ -8996,7 +9044,7 @@
     ],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105041,
     "collector_number": "146"
   },
   {
@@ -9022,7 +9070,7 @@
     ],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104942,
     "collector_number": "49"
   },
   {
@@ -9047,7 +9095,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105044,
     "collector_number": "149"
   },
   {
@@ -9070,7 +9118,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104966,
     "collector_number": "72"
   },
   {
@@ -9091,7 +9139,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105032,
     "collector_number": "137"
   },
   {
@@ -9110,7 +9158,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105283,
     "collector_number": "285"
   },
   {
@@ -9133,11 +9181,12 @@
     "keywords": [
       "Reach",
       "Vigilance",
-      "Flash"
+      "Flash",
+      "No One Dies!"
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105124,
     "collector_number": "228"
   },
   {
@@ -9193,7 +9242,7 @@
     ],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105129,
     "collector_number": "233"
   },
   {
@@ -9214,7 +9263,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105035,
     "collector_number": "140"
   },
   {
@@ -9238,7 +9287,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104936,
     "collector_number": "43"
   },
   {
@@ -9285,7 +9334,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104972,
     "collector_number": "78"
   },
   {
@@ -9310,7 +9359,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105126,
     "collector_number": "230"
   },
   {
@@ -9333,7 +9382,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105117,
     "collector_number": "221"
   },
   {
@@ -9376,7 +9425,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104983,
     "collector_number": "88"
   },
   {
@@ -9402,7 +9451,7 @@
     ],
     "rarity": "mythic",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104902,
     "collector_number": "11"
   },
   {
@@ -9454,7 +9503,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105135,
     "collector_number": "239"
   },
   {
@@ -9498,7 +9547,8 @@
     ],
     "keywords": [
       "Flying",
-      "Vigilance"
+      "Vigilance",
+      "Cosmic Awareness"
     ],
     "rarity": "uncommon",
     "set": "msh",
@@ -9568,7 +9618,9 @@
     "color_identity": [
       "G"
     ],
-    "keywords": [],
+    "keywords": [
+      "I LOVE Squirrels!"
+    ],
     "rarity": "rare",
     "set": "msh",
     "arena_id": null,
@@ -9617,7 +9669,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104955,
     "collector_number": "61"
   },
   {
@@ -9664,7 +9716,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104971,
     "collector_number": "77"
   },
   {
@@ -9683,7 +9735,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105174,
     "collector_number": "288"
   },
   {
@@ -9702,7 +9754,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105138,
     "collector_number": "242"
   },
   {
@@ -9725,7 +9777,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105022,
     "collector_number": "127"
   },
   {
@@ -9748,7 +9800,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105070,
     "collector_number": "175"
   },
   {
@@ -9771,7 +9823,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105095,
     "collector_number": "200"
   },
   {
@@ -9794,7 +9846,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105013,
     "collector_number": "118"
   },
   {
@@ -9817,7 +9869,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105012,
     "collector_number": "117"
   },
   {
@@ -9840,7 +9892,7 @@
     ],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105005,
     "collector_number": "110"
   },
   {
@@ -9863,7 +9915,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104999,
     "collector_number": "104"
   },
   {
@@ -9884,7 +9936,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105007,
     "collector_number": "112"
   },
   {
@@ -9903,7 +9955,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105180,
     "collector_number": "294"
   },
   {
@@ -9924,7 +9976,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105042,
     "collector_number": "147"
   },
   {
@@ -9945,7 +9997,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105015,
     "collector_number": "120"
   },
   {
@@ -9966,7 +10018,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104926,
     "collector_number": "33"
   },
   {
@@ -9992,7 +10044,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105106,
     "collector_number": "211"
   },
   {
@@ -10040,7 +10092,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105112,
     "collector_number": "217"
   },
   {
@@ -10057,7 +10109,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105146,
     "collector_number": "250"
   },
   {
@@ -10082,7 +10134,7 @@
     ],
     "rarity": "rare",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105127,
     "collector_number": "231"
   },
   {
@@ -10105,7 +10157,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105104,
     "collector_number": "209"
   },
   {
@@ -10126,7 +10178,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105062,
     "collector_number": "167"
   },
   {
@@ -10146,7 +10198,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 105168,
     "collector_number": "272"
   },
   {
@@ -10169,7 +10221,7 @@
     ],
     "rarity": "uncommon",
     "set": "msh",
-    "arena_id": null,
+    "arena_id": 104970,
     "collector_number": "76"
   },
   {

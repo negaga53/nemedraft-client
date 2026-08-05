@@ -41,8 +41,12 @@ env/
 *.tmp
 *.temp
 
-# Scryfall bulk export (~500 MB, regenerated on demand by common.data.scryfall)
+# Scryfall bulk export (regenerated on demand by common.data.scryfall).
+# Scryfall publishes gzipped JSON Lines now (~77 MB); the legacy JSON array
+# (~550 MB) is still readable if an old one is lying around.
 data/scryfall/default_cards.json
+data/scryfall/default_cards.jsonl
+data/scryfall/default_cards.jsonl.gz
 
 # Card name translation cache — populated on demand from the Scryfall API
 client/overlay/i18n/card_cache/

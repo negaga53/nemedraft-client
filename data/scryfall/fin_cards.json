@@ -20,7 +20,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96150,
     "collector_number": "272"
   },
   {
@@ -41,7 +41,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95890,
     "collector_number": "35"
   },
   {
@@ -59,11 +59,13 @@
       "R"
     ],
     "keywords": [
-      "Transform"
+      "Transform",
+      "Flare Star",
+      "Double"
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96106,
     "collector_number": "232"
   },
   {
@@ -88,7 +90,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96886,
     "collector_number": "418"
   },
   {
@@ -161,7 +163,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96057,
     "collector_number": "190"
   },
   {
@@ -205,7 +207,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96033,
     "collector_number": "167"
   },
   {
@@ -231,7 +233,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95949,
     "collector_number": "91"
   },
   {
@@ -254,7 +256,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95987,
     "collector_number": "125"
   },
   {
@@ -275,7 +277,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96012,
     "collector_number": "147"
   },
   {
@@ -294,7 +296,7 @@
     ],
     "rarity": "mythic",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96131,
     "collector_number": "253"
   },
   {
@@ -334,7 +336,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96139,
     "collector_number": "261"
   },
   {
@@ -384,7 +386,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95989,
     "collector_number": "126"
   },
   {
@@ -426,7 +428,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96202,
     "collector_number": "559"
   },
   {
@@ -445,7 +447,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96162,
     "collector_number": "283"
   },
   {
@@ -468,7 +470,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95889,
     "collector_number": "34"
   },
   {
@@ -543,7 +545,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95875,
     "collector_number": "21"
   },
   {
@@ -563,7 +565,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96161,
     "collector_number": "282"
   },
   {
@@ -584,7 +586,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95929,
     "collector_number": "72"
   },
   {
@@ -603,7 +605,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96187,
     "collector_number": "302"
   },
   {
@@ -623,7 +625,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96130,
     "collector_number": "252"
   },
   {
@@ -696,7 +698,8 @@
       "Lifelink",
       "Stagger",
       "First strike",
-      "Trample"
+      "Trample",
+      "Double"
     ],
     "rarity": "mythic",
     "set": "fin",
@@ -723,7 +726,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95874,
     "collector_number": "20"
   },
   {
@@ -769,7 +772,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96068,
     "collector_number": "201"
   },
   {
@@ -790,7 +793,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96053,
     "collector_number": "186"
   },
   {
@@ -902,7 +905,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95933,
     "collector_number": "75"
   },
   {
@@ -1001,7 +1004,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96051,
     "collector_number": "185"
   },
   {
@@ -1022,7 +1025,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96076,
     "collector_number": "208"
   },
   {
@@ -1043,7 +1046,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95955,
     "collector_number": "96"
   },
   {
@@ -1063,7 +1066,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96174,
     "collector_number": "291"
   },
   {
@@ -1087,11 +1090,12 @@
       "Lifelink",
       "Stagger",
       "First strike",
-      "Trample"
+      "Trample",
+      "Double"
     ],
     "rarity": "mythic",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96108,
     "collector_number": "233"
   },
   {
@@ -1135,7 +1139,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96019,
     "collector_number": "154"
   },
   {
@@ -1159,7 +1163,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96018,
     "collector_number": "153"
   },
   {
@@ -1180,7 +1184,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96036,
     "collector_number": "170"
   },
   {
@@ -1204,7 +1208,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95956,
     "collector_number": "97"
   },
   {
@@ -1228,7 +1232,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95999,
     "collector_number": "134"
   },
   {
@@ -1270,7 +1274,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95941,
     "collector_number": "83"
   },
   {
@@ -1293,7 +1297,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96045,
     "collector_number": "179"
   },
   {
@@ -1361,7 +1365,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95945,
     "collector_number": "87"
   },
   {
@@ -1381,6 +1385,7 @@
     ],
     "keywords": [
       "Trample",
+      "Double",
       "Landfall"
     ],
     "rarity": "rare",
@@ -1405,6 +1410,7 @@
     ],
     "keywords": [
       "Trample",
+      "Double",
       "Landfall"
     ],
     "rarity": "rare",
@@ -1430,7 +1436,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95900,
     "collector_number": "44"
   },
   {
@@ -1457,7 +1463,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96110,
     "collector_number": "235"
   },
   {
@@ -1480,7 +1486,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96064,
     "collector_number": "197"
   },
   {
@@ -1501,7 +1507,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95899,
     "collector_number": "43"
   },
   {
@@ -1524,7 +1530,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95993,
     "collector_number": "129"
   },
   {
@@ -1547,7 +1553,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95855,
     "collector_number": "3"
   },
   {
@@ -1594,7 +1600,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95984,
     "collector_number": "122"
   },
   {
@@ -1617,7 +1623,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96090,
     "collector_number": "220"
   },
   {
@@ -1688,7 +1694,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96204,
     "collector_number": "561"
   },
   {
@@ -1736,7 +1742,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95919,
     "collector_number": "62"
   },
   {
@@ -1754,10 +1760,12 @@
     "color_identity": [
       "G"
     ],
-    "keywords": [],
+    "keywords": [
+      "Double"
+    ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96066,
     "collector_number": "199"
   },
   {
@@ -1778,7 +1786,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96004,
     "collector_number": "139"
   },
   {
@@ -1799,7 +1807,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95914,
     "collector_number": "58"
   },
   {
@@ -1910,7 +1918,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95937,
     "collector_number": "79"
   },
   {
@@ -1959,7 +1967,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95861,
     "collector_number": "9"
   },
   {
@@ -1980,7 +1988,7 @@
     "keywords": [],
     "rarity": "mythic",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96078,
     "collector_number": "210"
   },
   {
@@ -1999,14 +2007,16 @@
       "G"
     ],
     "keywords": [
+      "Triple",
       "Final Heaven",
       "Meteor Strikes",
       "Somersault",
-      "Tiered"
+      "Tiered",
+      "Double"
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96075,
     "collector_number": "207"
   },
   {
@@ -2027,7 +2037,7 @@
     "keywords": [],
     "rarity": "mythic",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95953,
     "collector_number": "94"
   },
   {
@@ -2115,7 +2125,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95894,
     "collector_number": "39"
   },
   {
@@ -2139,7 +2149,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95985,
     "collector_number": "123"
   },
   {
@@ -2258,7 +2268,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95876,
     "collector_number": "22"
   },
   {
@@ -2286,7 +2296,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96006,
     "collector_number": "141"
   },
   {
@@ -2310,7 +2320,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96040,
     "collector_number": "174"
   },
   {
@@ -2376,7 +2386,8 @@
       "Lifelink",
       "Stagger",
       "First strike",
-      "Trample"
+      "Trample",
+      "Double"
     ],
     "rarity": "mythic",
     "set": "fin",
@@ -2405,7 +2416,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96877,
     "collector_number": "409"
   },
   {
@@ -2430,7 +2441,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96888,
     "collector_number": "420"
   },
   {
@@ -2470,7 +2481,7 @@
     "keywords": [],
     "rarity": "mythic",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95862,
     "collector_number": "10"
   },
   {
@@ -2495,7 +2506,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96124,
     "collector_number": "247"
   },
   {
@@ -2516,7 +2527,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95897,
     "collector_number": "41"
   },
   {
@@ -2612,7 +2623,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95898,
     "collector_number": "42"
   },
   {
@@ -2636,7 +2647,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95857,
     "collector_number": "5"
   },
   {
@@ -2655,11 +2666,12 @@
     "keywords": [
       "Double Overdrive",
       "Transform",
-      "Equip"
+      "Equip",
+      "Double"
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96023,
     "collector_number": "158"
   },
   {
@@ -2680,7 +2692,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96070,
     "collector_number": "202"
   },
   {
@@ -2720,7 +2732,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96184,
     "collector_number": "299"
   },
   {
@@ -2789,7 +2801,7 @@
     "keywords": [],
     "rarity": "mythic",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96128,
     "collector_number": "250"
   },
   {
@@ -2813,7 +2825,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95948,
     "collector_number": "90"
   },
   {
@@ -2837,7 +2849,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96015,
     "collector_number": "150"
   },
   {
@@ -2855,7 +2867,9 @@
     "color_identity": [
       "G"
     ],
-    "keywords": [],
+    "keywords": [
+      "Double"
+    ],
     "rarity": "rare",
     "set": "fin",
     "arena_id": null,
@@ -2899,7 +2913,9 @@
       "R"
     ],
     "keywords": [
-      "Transform"
+      "Transform",
+      "Flare Star",
+      "Double"
     ],
     "rarity": "rare",
     "set": "fin",
@@ -2922,7 +2938,7 @@
     ],
     "rarity": "mythic",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96133,
     "collector_number": "255"
   },
   {
@@ -2964,7 +2980,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95893,
     "collector_number": "38"
   },
   {
@@ -2989,7 +3005,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96885,
     "collector_number": "417"
   },
   {
@@ -3012,7 +3028,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95888,
     "collector_number": "33"
   },
   {
@@ -3032,6 +3048,7 @@
     ],
     "keywords": [
       "Trample",
+      "Double",
       "Landfall"
     ],
     "rarity": "rare",
@@ -3103,7 +3120,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96005,
     "collector_number": "140"
   },
   {
@@ -3191,7 +3208,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96192,
     "collector_number": "307"
   },
   {
@@ -3214,7 +3231,7 @@
     ],
     "rarity": "mythic",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96011,
     "collector_number": "146"
   },
   {
@@ -3237,7 +3254,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96088,
     "collector_number": "219"
   },
   {
@@ -3313,7 +3330,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96083,
     "collector_number": "215"
   },
   {
@@ -3334,7 +3351,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96065,
     "collector_number": "198"
   },
   {
@@ -3404,7 +3421,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96001,
     "collector_number": "136"
   },
   {
@@ -3541,7 +3558,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96096,
     "collector_number": "224"
   },
   {
@@ -3565,7 +3582,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95882,
     "collector_number": "28"
   },
   {
@@ -3586,7 +3603,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95918,
     "collector_number": "61"
   },
   {
@@ -3609,7 +3626,7 @@
     ],
     "rarity": "mythic",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95891,
     "collector_number": "36"
   },
   {
@@ -3632,7 +3649,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95926,
     "collector_number": "69"
   },
   {
@@ -3656,7 +3673,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96101,
     "collector_number": "229"
   },
   {
@@ -3680,7 +3697,8 @@
       "Lifelink",
       "Stagger",
       "First strike",
-      "Trample"
+      "Trample",
+      "Double"
     ],
     "rarity": "mythic",
     "set": "fin",
@@ -3726,7 +3744,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95947,
     "collector_number": "89"
   },
   {
@@ -3771,7 +3789,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95884,
     "collector_number": "30"
   },
   {
@@ -3821,7 +3839,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96077,
     "collector_number": "209"
   },
   {
@@ -3842,7 +3860,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95916,
     "collector_number": "59"
   },
   {
@@ -3865,7 +3883,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96203,
     "collector_number": "560"
   },
   {
@@ -3890,7 +3908,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96882,
     "collector_number": "414"
   },
   {
@@ -3915,7 +3933,7 @@
     ],
     "rarity": "mythic",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96038,
     "collector_number": "172"
   },
   {
@@ -3940,7 +3958,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96013,
     "collector_number": "148"
   },
   {
@@ -3986,7 +4004,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96056,
     "collector_number": "189"
   },
   {
@@ -4008,7 +4026,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95963,
     "collector_number": "104"
   },
   {
@@ -4029,7 +4047,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96061,
     "collector_number": "194"
   },
   {
@@ -4100,7 +4118,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96034,
     "collector_number": "168"
   },
   {
@@ -4146,7 +4164,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95928,
     "collector_number": "71"
   },
   {
@@ -4215,7 +4233,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96100,
     "collector_number": "228"
   },
   {
@@ -4234,7 +4252,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96158,
     "collector_number": "279"
   },
   {
@@ -4277,7 +4295,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96166,
     "collector_number": "285"
   },
   {
@@ -4303,7 +4321,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96109,
     "collector_number": "234"
   },
   {
@@ -4322,7 +4340,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96141,
     "collector_number": "263"
   },
   {
@@ -4386,7 +4404,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95946,
     "collector_number": "88"
   },
   {
@@ -4453,7 +4471,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95878,
     "collector_number": "24"
   },
   {
@@ -4502,7 +4520,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96880,
     "collector_number": "412"
   },
   {
@@ -4574,7 +4592,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96072,
     "collector_number": "204"
   },
   {
@@ -4637,7 +4655,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96154,
     "collector_number": "275"
   },
   {
@@ -4685,7 +4703,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95865,
     "collector_number": "13"
   },
   {
@@ -4758,7 +4776,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95923,
     "collector_number": "66"
   },
   {
@@ -4779,7 +4797,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95883,
     "collector_number": "29"
   },
   {
@@ -4801,7 +4819,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96115,
     "collector_number": "240"
   },
   {
@@ -4818,7 +4836,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96155,
     "collector_number": "276"
   },
   {
@@ -4836,7 +4854,9 @@
       "R"
     ],
     "keywords": [
-      "Transform"
+      "Transform",
+      "Flare Star",
+      "Double"
     ],
     "rarity": "rare",
     "set": "fin",
@@ -4867,7 +4887,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96118,
     "collector_number": "242"
   },
   {
@@ -4912,7 +4932,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95934,
     "collector_number": "76"
   },
   {
@@ -4957,7 +4977,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95880,
     "collector_number": "26"
   },
   {
@@ -4978,7 +4998,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95952,
     "collector_number": "93"
   },
   {
@@ -5026,7 +5046,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96095,
     "collector_number": "223"
   },
   {
@@ -5072,7 +5092,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95924,
     "collector_number": "67"
   },
   {
@@ -5093,7 +5113,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96010,
     "collector_number": "145"
   },
   {
@@ -5169,7 +5189,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96049,
     "collector_number": "183"
   },
   {
@@ -5257,7 +5277,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95986,
     "collector_number": "124"
   },
   {
@@ -5277,7 +5297,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96152,
     "collector_number": "273"
   },
   {
@@ -5300,7 +5320,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96016,
     "collector_number": "151"
   },
   {
@@ -5341,7 +5361,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96148,
     "collector_number": "270"
   },
   {
@@ -5385,7 +5405,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95994,
     "collector_number": "130"
   },
   {
@@ -5472,7 +5492,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95979,
     "collector_number": "118"
   },
   {
@@ -5499,7 +5519,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95863,
     "collector_number": "11"
   },
   {
@@ -5520,7 +5540,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95972,
     "collector_number": "112"
   },
   {
@@ -5604,7 +5624,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96147,
     "collector_number": "269"
   },
   {
@@ -5627,7 +5647,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96046,
     "collector_number": "180"
   },
   {
@@ -5651,7 +5671,7 @@
     ],
     "rarity": "mythic",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96086,
     "collector_number": "218"
   },
   {
@@ -5672,7 +5692,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95864,
     "collector_number": "12"
   },
   {
@@ -5693,7 +5713,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96022,
     "collector_number": "157"
   },
   {
@@ -5719,7 +5739,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96127,
     "collector_number": "249"
   },
   {
@@ -5742,7 +5762,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95860,
     "collector_number": "8"
   },
   {
@@ -5763,7 +5783,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96048,
     "collector_number": "182"
   },
   {
@@ -5830,7 +5850,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95970,
     "collector_number": "110"
   },
   {
@@ -5850,7 +5870,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96171,
     "collector_number": "288"
   },
   {
@@ -5870,7 +5890,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96159,
     "collector_number": "280"
   },
   {
@@ -5944,7 +5964,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96887,
     "collector_number": "419"
   },
   {
@@ -5993,7 +6013,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96025,
     "collector_number": "159"
   },
   {
@@ -6018,7 +6038,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96084,
     "collector_number": "216"
   },
   {
@@ -6134,7 +6154,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96879,
     "collector_number": "411"
   },
   {
@@ -6201,7 +6221,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95938,
     "collector_number": "80"
   },
   {
@@ -6222,7 +6242,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96027,
     "collector_number": "161"
   },
   {
@@ -6247,7 +6267,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96097,
     "collector_number": "225"
   },
   {
@@ -6270,7 +6290,7 @@
     ],
     "rarity": "mythic",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95975,
     "collector_number": "115"
   },
   {
@@ -6312,7 +6332,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95962,
     "collector_number": "103"
   },
   {
@@ -6379,7 +6399,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96176,
     "collector_number": "293"
   },
   {
@@ -6425,7 +6445,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95909,
     "collector_number": "53"
   },
   {
@@ -6444,7 +6464,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96168,
     "collector_number": "286"
   },
   {
@@ -6465,7 +6485,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96026,
     "collector_number": "160"
   },
   {
@@ -6488,7 +6508,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95930,
     "collector_number": "73"
   },
   {
@@ -6509,7 +6529,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95983,
     "collector_number": "121"
   },
   {
@@ -6550,7 +6570,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96205,
     "collector_number": "562"
   },
   {
@@ -6573,7 +6593,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95869,
     "collector_number": "16"
   },
   {
@@ -6691,7 +6711,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95996,
     "collector_number": "132"
   },
   {
@@ -6878,7 +6898,7 @@
     ],
     "rarity": "mythic",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96104,
     "collector_number": "231"
   },
   {
@@ -6924,7 +6944,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96047,
     "collector_number": "181"
   },
   {
@@ -6945,7 +6965,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95873,
     "collector_number": "19"
   },
   {
@@ -6963,7 +6983,9 @@
       "R"
     ],
     "keywords": [
-      "Transform"
+      "Transform",
+      "Flare Star",
+      "Double"
     ],
     "rarity": "rare",
     "set": "fin",
@@ -7036,7 +7058,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96079,
     "collector_number": "211"
   },
   {
@@ -7124,7 +7146,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96132,
     "collector_number": "254"
   },
   {
@@ -7149,7 +7171,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95903,
     "collector_number": "47"
   },
   {
@@ -7170,7 +7192,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96071,
     "collector_number": "203"
   },
   {
@@ -7193,7 +7215,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95974,
     "collector_number": "114"
   },
   {
@@ -7216,7 +7238,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95907,
     "collector_number": "51"
   },
   {
@@ -7235,7 +7257,7 @@
     ],
     "rarity": "mythic",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95853,
     "collector_number": "1"
   },
   {
@@ -7285,7 +7307,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95871,
     "collector_number": "17"
   },
   {
@@ -7303,7 +7325,9 @@
       "R"
     ],
     "keywords": [
-      "Transform"
+      "Transform",
+      "Flare Star",
+      "Double"
     ],
     "rarity": "rare",
     "set": "fin",
@@ -7328,7 +7352,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96002,
     "collector_number": "137"
   },
   {
@@ -7347,7 +7371,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96144,
     "collector_number": "266"
   },
   {
@@ -7368,7 +7392,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96164,
     "collector_number": "284"
   },
   {
@@ -7389,7 +7413,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96009,
     "collector_number": "144"
   },
   {
@@ -7412,7 +7436,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96003,
     "collector_number": "138"
   },
   {
@@ -7438,7 +7462,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96114,
     "collector_number": "239"
   },
   {
@@ -7458,7 +7482,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96143,
     "collector_number": "265"
   },
   {
@@ -7478,7 +7502,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96157,
     "collector_number": "278"
   },
   {
@@ -7524,7 +7548,7 @@
     ],
     "rarity": "mythic",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95997,
     "collector_number": "133"
   },
   {
@@ -7549,7 +7573,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96111,
     "collector_number": "236"
   },
   {
@@ -7593,7 +7617,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95992,
     "collector_number": "128"
   },
   {
@@ -7616,7 +7640,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96021,
     "collector_number": "156"
   },
   {
@@ -7662,7 +7686,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96197,
     "collector_number": "554"
   },
   {
@@ -7688,7 +7712,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95912,
     "collector_number": "56"
   },
   {
@@ -7707,7 +7731,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96179,
     "collector_number": "294"
   },
   {
@@ -7754,7 +7778,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96031,
     "collector_number": "165"
   },
   {
@@ -7820,6 +7844,7 @@
     ],
     "keywords": [
       "Job select",
+      "Diana",
       "Equip"
     ],
     "rarity": "rare",
@@ -7845,7 +7870,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96200,
     "collector_number": "557"
   },
   {
@@ -7870,7 +7895,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95927,
     "collector_number": "70"
   },
   {
@@ -7891,7 +7916,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96059,
     "collector_number": "192"
   },
   {
@@ -7910,7 +7935,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96188,
     "collector_number": "303"
   },
   {
@@ -7976,7 +8001,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96085,
     "collector_number": "217"
   },
   {
@@ -8001,7 +8026,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96875,
     "collector_number": "407"
   },
   {
@@ -8039,7 +8064,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96134,
     "collector_number": "256"
   },
   {
@@ -8060,7 +8085,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95961,
     "collector_number": "102"
   },
   {
@@ -8105,7 +8130,8 @@
       "R"
     ],
     "keywords": [
-      "Surveil"
+      "Surveil",
+      "Double"
     ],
     "rarity": "rare",
     "set": "fin",
@@ -8132,7 +8158,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96120,
     "collector_number": "244"
   },
   {
@@ -8157,7 +8183,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95968,
     "collector_number": "108"
   },
   {
@@ -8180,7 +8206,7 @@
     "keywords": [],
     "rarity": "mythic",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96195,
     "collector_number": "552"
   },
   {
@@ -8203,7 +8229,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96020,
     "collector_number": "155"
   },
   {
@@ -8247,7 +8273,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95920,
     "collector_number": "63"
   },
   {
@@ -8268,7 +8294,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95922,
     "collector_number": "65"
   },
   {
@@ -8287,7 +8313,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96186,
     "collector_number": "301"
   },
   {
@@ -8308,7 +8334,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95936,
     "collector_number": "78"
   },
   {
@@ -8383,7 +8409,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96876,
     "collector_number": "408"
   },
   {
@@ -8431,7 +8457,7 @@
     ],
     "rarity": "mythic",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96080,
     "collector_number": "212"
   },
   {
@@ -8454,7 +8480,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95982,
     "collector_number": "120"
   },
   {
@@ -8477,7 +8503,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95940,
     "collector_number": "82"
   },
   {
@@ -8521,7 +8547,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96123,
     "collector_number": "246"
   },
   {
@@ -8594,7 +8620,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96099,
     "collector_number": "227"
   },
   {
@@ -8644,7 +8670,7 @@
     ],
     "rarity": "mythic",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96196,
     "collector_number": "553"
   },
   {
@@ -8716,7 +8742,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95911,
     "collector_number": "55"
   },
   {
@@ -8760,7 +8786,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95969,
     "collector_number": "109"
   },
   {
@@ -8784,7 +8810,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95913,
     "collector_number": "57"
   },
   {
@@ -8808,7 +8834,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95917,
     "collector_number": "60"
   },
   {
@@ -8829,7 +8855,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95908,
     "collector_number": "52"
   },
   {
@@ -8850,7 +8876,7 @@
     "keywords": [],
     "rarity": "mythic",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95944,
     "collector_number": "86"
   },
   {
@@ -8875,7 +8901,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96081,
     "collector_number": "213"
   },
   {
@@ -8918,7 +8944,9 @@
       "R"
     ],
     "keywords": [
-      "Transform"
+      "Transform",
+      "Flare Star",
+      "Double"
     ],
     "rarity": "rare",
     "set": "fin",
@@ -8964,7 +8992,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95995,
     "collector_number": "131"
   },
   {
@@ -9010,7 +9038,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95942,
     "collector_number": "84"
   },
   {
@@ -9056,7 +9084,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95954,
     "collector_number": "95"
   },
   {
@@ -9098,7 +9126,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95973,
     "collector_number": "113"
   },
   {
@@ -9119,7 +9147,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95879,
     "collector_number": "25"
   },
   {
@@ -9140,7 +9168,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96199,
     "collector_number": "556"
   },
   {
@@ -9164,7 +9192,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95990,
     "collector_number": "127"
   },
   {
@@ -9189,7 +9217,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96883,
     "collector_number": "415"
   },
   {
@@ -9231,7 +9259,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96055,
     "collector_number": "188"
   },
   {
@@ -9301,7 +9329,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96094,
     "collector_number": "222"
   },
   {
@@ -9364,7 +9392,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96206,
     "collector_number": "563"
   },
   {
@@ -9383,7 +9411,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96182,
     "collector_number": "297"
   },
   {
@@ -9428,7 +9456,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95906,
     "collector_number": "50"
   },
   {
@@ -9453,7 +9481,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96112,
     "collector_number": "237"
   },
   {
@@ -9521,7 +9549,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95960,
     "collector_number": "101"
   },
   {
@@ -9542,7 +9570,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96054,
     "collector_number": "187"
   },
   {
@@ -9563,7 +9591,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96007,
     "collector_number": "142"
   },
   {
@@ -9585,7 +9613,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95885,
     "collector_number": "31"
   },
   {
@@ -9609,7 +9637,8 @@
       "Lifelink",
       "Stagger",
       "First strike",
-      "Trample"
+      "Trample",
+      "Double"
     ],
     "rarity": "mythic",
     "set": "fin",
@@ -9632,7 +9661,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96191,
     "collector_number": "306"
   },
   {
@@ -9671,11 +9700,12 @@
     ],
     "keywords": [
       "Job select",
+      "Diana",
       "Equip"
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95902,
     "collector_number": "46"
   },
   {
@@ -9719,7 +9749,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96062,
     "collector_number": "195"
   },
   {
@@ -9743,7 +9773,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95939,
     "collector_number": "81"
   },
   {
@@ -9766,7 +9796,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96014,
     "collector_number": "149"
   },
   {
@@ -9788,7 +9818,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95980,
     "collector_number": "119"
   },
   {
@@ -9808,7 +9838,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96170,
     "collector_number": "287"
   },
   {
@@ -9831,7 +9861,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96198,
     "collector_number": "555"
   },
   {
@@ -9873,7 +9903,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96193,
     "collector_number": "308"
   },
   {
@@ -9920,7 +9950,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96201,
     "collector_number": "558"
   },
   {
@@ -9937,7 +9967,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96194,
     "collector_number": "309"
   },
   {
@@ -9977,7 +10007,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96029,
     "collector_number": "163"
   },
   {
@@ -9997,7 +10027,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96175,
     "collector_number": "292"
   },
   {
@@ -10066,7 +10096,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95951,
     "collector_number": "92"
   },
   {
@@ -10089,7 +10119,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95932,
     "collector_number": "74"
   },
   {
@@ -10136,7 +10166,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95896,
     "collector_number": "40"
   },
   {
@@ -10157,7 +10187,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95881,
     "collector_number": "27"
   },
   {
@@ -10181,7 +10211,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96035,
     "collector_number": "169"
   },
   {
@@ -10235,7 +10265,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96881,
     "collector_number": "413"
   },
   {
@@ -10260,7 +10290,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96119,
     "collector_number": "243"
   },
   {
@@ -10281,7 +10311,7 @@
     "keywords": [],
     "rarity": "mythic",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95910,
     "collector_number": "54"
   },
   {
@@ -10304,7 +10334,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96008,
     "collector_number": "143"
   },
   {
@@ -10322,7 +10352,9 @@
       "R"
     ],
     "keywords": [
-      "Transform"
+      "Transform",
+      "Flare Star",
+      "Double"
     ],
     "rarity": "rare",
     "set": "fin",
@@ -10419,7 +10451,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95977,
     "collector_number": "116"
   },
   {
@@ -10461,7 +10493,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96189,
     "collector_number": "304"
   },
   {
@@ -10480,11 +10512,12 @@
       "R"
     ],
     "keywords": [
-      "Surveil"
+      "Surveil",
+      "Double"
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96028,
     "collector_number": "162"
   },
   {
@@ -10505,7 +10538,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96063,
     "collector_number": "196"
   },
   {
@@ -10572,6 +10605,7 @@
     ],
     "keywords": [
       "Trample",
+      "Double",
       "Landfall"
     ],
     "rarity": "rare",
@@ -10595,7 +10629,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96135,
     "collector_number": "257"
   },
   {
@@ -10639,7 +10673,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95867,
     "collector_number": "14"
   },
   {
@@ -10662,7 +10696,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96043,
     "collector_number": "177"
   },
   {
@@ -10681,7 +10715,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95854,
     "collector_number": "2"
   },
   {
@@ -10702,7 +10736,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96050,
     "collector_number": "184"
   },
   {
@@ -10720,7 +10754,9 @@
       "R"
     ],
     "keywords": [
-      "Transform"
+      "Transform",
+      "Flare Star",
+      "Double"
     ],
     "rarity": "rare",
     "set": "fin",
@@ -10745,7 +10781,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96060,
     "collector_number": "193"
   },
   {
@@ -10764,7 +10800,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96140,
     "collector_number": "262"
   },
   {
@@ -10831,7 +10867,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96041,
     "collector_number": "175"
   },
   {
@@ -10951,7 +10987,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95905,
     "collector_number": "49"
   },
   {
@@ -10972,7 +11008,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96032,
     "collector_number": "166"
   },
   {
@@ -10997,7 +11033,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96073,
     "collector_number": "205"
   },
   {
@@ -11018,7 +11054,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95887,
     "collector_number": "32"
   },
   {
@@ -11066,7 +11102,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96058,
     "collector_number": "191"
   },
   {
@@ -11157,7 +11193,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96145,
     "collector_number": "267"
   },
   {
@@ -11202,7 +11238,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96092,
     "collector_number": "221"
   },
   {
@@ -11225,7 +11261,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96067,
     "collector_number": "200"
   },
   {
@@ -11355,7 +11391,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96160,
     "collector_number": "281"
   },
   {
@@ -11379,7 +11415,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96017,
     "collector_number": "152"
   },
   {
@@ -11419,7 +11455,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96146,
     "collector_number": "268"
   },
   {
@@ -11442,7 +11478,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95943,
     "collector_number": "85"
   },
   {
@@ -11511,7 +11547,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95872,
     "collector_number": "18"
   },
   {
@@ -11532,7 +11568,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95959,
     "collector_number": "100"
   },
   {
@@ -11551,7 +11587,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96156,
     "collector_number": "277"
   },
   {
@@ -11575,7 +11611,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95921,
     "collector_number": "64"
   },
   {
@@ -11621,7 +11657,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96129,
     "collector_number": "251"
   },
   {
@@ -11644,7 +11680,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95892,
     "collector_number": "37"
   },
   {
@@ -11671,7 +11707,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95966,
     "collector_number": "106"
   },
   {
@@ -11692,7 +11728,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96138,
     "collector_number": "260"
   },
   {
@@ -11742,7 +11778,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96884,
     "collector_number": "416"
   },
   {
@@ -11769,7 +11805,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96039,
     "collector_number": "173"
   },
   {
@@ -11836,7 +11872,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96180,
     "collector_number": "295"
   },
   {
@@ -11924,7 +11960,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95856,
     "collector_number": "4"
   },
   {
@@ -11943,7 +11979,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96190,
     "collector_number": "305"
   },
   {
@@ -11987,7 +12023,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96000,
     "collector_number": "135"
   },
   {
@@ -12033,7 +12069,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95935,
     "collector_number": "77"
   },
   {
@@ -12054,7 +12090,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95957,
     "collector_number": "98"
   },
   {
@@ -12077,7 +12113,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95925,
     "collector_number": "68"
   },
   {
@@ -12098,7 +12134,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95904,
     "collector_number": "48"
   },
   {
@@ -12119,7 +12155,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96042,
     "collector_number": "176"
   },
   {
@@ -12142,7 +12178,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96037,
     "collector_number": "171"
   },
   {
@@ -12207,7 +12243,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96181,
     "collector_number": "296"
   },
   {
@@ -12226,7 +12262,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96183,
     "collector_number": "298"
   },
   {
@@ -12268,7 +12304,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96137,
     "collector_number": "259"
   },
   {
@@ -12314,7 +12350,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96117,
     "collector_number": "241"
   },
   {
@@ -12335,7 +12371,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95978,
     "collector_number": "117"
   },
   {
@@ -12373,7 +12409,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96149,
     "collector_number": "271"
   },
   {
@@ -12442,7 +12478,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95901,
     "collector_number": "45"
   },
   {
@@ -12489,7 +12525,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95858,
     "collector_number": "6"
   },
   {
@@ -12580,7 +12616,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95868,
     "collector_number": "15"
   },
   {
@@ -12647,7 +12683,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96113,
     "collector_number": "238"
   },
   {
@@ -12668,7 +12704,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96030,
     "collector_number": "164"
   },
   {
@@ -12688,7 +12724,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96173,
     "collector_number": "290"
   },
   {
@@ -12707,7 +12743,7 @@
     "keywords": [],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96185,
     "collector_number": "300"
   },
   {
@@ -12798,7 +12834,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96136,
     "collector_number": "258"
   },
   {
@@ -12819,7 +12855,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95958,
     "collector_number": "99"
   },
   {
@@ -12838,7 +12874,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96153,
     "collector_number": "274"
   },
   {
@@ -12885,7 +12921,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95965,
     "collector_number": "105"
   },
   {
@@ -12951,7 +12987,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95967,
     "collector_number": "107"
   },
   {
@@ -12976,7 +13012,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96103,
     "collector_number": "230"
   },
   {
@@ -13127,11 +13163,12 @@
     ],
     "keywords": [
       "Trample",
+      "Double",
       "Landfall"
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96074,
     "collector_number": "206"
   },
   {
@@ -13159,7 +13196,7 @@
     ],
     "rarity": "mythic",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96121,
     "collector_number": "245"
   },
   {
@@ -13185,7 +13222,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96098,
     "collector_number": "226"
   },
   {
@@ -13204,7 +13241,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96142,
     "collector_number": "264"
   },
   {
@@ -13229,7 +13266,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96878,
     "collector_number": "410"
   },
   {
@@ -13246,7 +13283,7 @@
     "keywords": [],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96172,
     "collector_number": "289"
   },
   {
@@ -13416,7 +13453,7 @@
     ],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96082,
     "collector_number": "214"
   },
   {
@@ -13488,7 +13525,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95971,
     "collector_number": "111"
   },
   {
@@ -13511,7 +13548,7 @@
     ],
     "rarity": "common",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 96044,
     "collector_number": "178"
   },
   {
@@ -13536,7 +13573,7 @@
     ],
     "rarity": "rare",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95877,
     "collector_number": "23"
   },
   {
@@ -13557,7 +13594,7 @@
     "keywords": [],
     "rarity": "uncommon",
     "set": "fin",
-    "arena_id": null,
+    "arena_id": 95859,
     "collector_number": "7"
   }
 ]

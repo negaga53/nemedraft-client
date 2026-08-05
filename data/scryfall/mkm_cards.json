@@ -1814,7 +1814,9 @@
     "color_identity": [
       "U"
     ],
-    "keywords": [],
+    "keywords": [
+      "Suspect"
+    ],
     "rarity": "common",
     "set": "mkm",
     "arena_id": 88988,
@@ -2080,8 +2082,7 @@
     "colors": [],
     "color_identity": [],
     "keywords": [
-      "Solved",
-      "Double strike"
+      "Solved"
     ],
     "rarity": "uncommon",
     "set": "mkm",
@@ -2293,6 +2294,7 @@
       "R"
     ],
     "keywords": [
+      "Suspect",
       "Enchant"
     ],
     "rarity": "uncommon",
@@ -2341,7 +2343,8 @@
       "B"
     ],
     "keywords": [
-      "Surveil"
+      "Surveil",
+      "Suspect"
     ],
     "rarity": "uncommon",
     "set": "mkm",
@@ -3898,7 +3901,9 @@
       "B",
       "R"
     ],
-    "keywords": [],
+    "keywords": [
+      "Suspect"
+    ],
     "rarity": "uncommon",
     "set": "mkm",
     "arena_id": 89142,
@@ -8141,7 +8146,8 @@
       "W"
     ],
     "keywords": [
-      "Flying"
+      "Flying",
+      "Suspect"
     ],
     "rarity": "uncommon",
     "set": "mkm",
@@ -9337,6 +9343,7 @@
       "R"
     ],
     "keywords": [
+      "Suspect",
       "Enchant"
     ],
     "rarity": "uncommon",
@@ -9360,7 +9367,8 @@
       "B"
     ],
     "keywords": [
-      "Surveil"
+      "Surveil",
+      "Suspect"
     ],
     "rarity": "uncommon",
     "set": "mkm",

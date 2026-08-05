@@ -303,29 +303,31 @@ class Translator:
         local_to_en: dict[str, str],
     ) -> None:
         """Last-resort: bridge English↔foreign via oracle_id in the bulk file."""
-        bulk_path = scryfall_dir / "default_cards.json"
-        if not bulk_path.exists():
-            return
+        from common.data.scryfall import find_bulk_file, iter_bulk_cards
 
-        try:
-            with open(bulk_path, encoding="utf-8") as f:
-                cards = json.load(f)
-        except (json.JSONDecodeError, OSError):
+        # Format-agnostic: Scryfall ships gzipped JSON Lines now, but a
+        # previously downloaded JSON-array export still works.
+        bulk_path = find_bulk_file(scryfall_dir)
+        if bulk_path is None:
             return
 
         oracle_en: dict[str, str] = {}
         oracle_foreign: dict[str, str] = {}
-        for card in cards:
-            oid = card.get("oracle_id")
-            if not oid:
-                continue
-            card_lang = card.get("lang", "en")
-            name = card.get("name", "")
-            printed = card.get("printed_name", "")
-            if card_lang == "en" and name:
-                oracle_en.setdefault(oid, name)
-            elif card_lang == target_lang and (printed or name):
-                oracle_foreign.setdefault(oid, printed or name)
+        try:
+            cards = iter_bulk_cards(bulk_path)
+            for card in cards:
+                oid = card.get("oracle_id")
+                if not oid:
+                    continue
+                card_lang = card.get("lang", "en")
+                name = card.get("name", "")
+                printed = card.get("printed_name", "")
+                if card_lang == "en" and name:
+                    oracle_en.setdefault(oid, name)
+                elif card_lang == target_lang and (printed or name):
+                    oracle_foreign.setdefault(oid, printed or name)
+        except (json.JSONDecodeError, OSError):
+            return
 
         for oid, foreign_name in oracle_foreign.items():
             en_name = oracle_en.get(oid)

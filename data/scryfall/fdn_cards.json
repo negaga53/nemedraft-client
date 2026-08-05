@@ -432,7 +432,8 @@
       "R"
     ],
     "keywords": [
-      "Flying"
+      "Flying",
+      "Double"
     ],
     "rarity": "mythic",
     "set": "fdn",
@@ -873,7 +874,9 @@
       "G",
       "U"
     ],
-    "keywords": [],
+    "keywords": [
+      "Double"
+    ],
     "rarity": "mythic",
     "set": "fdn",
     "arena_id": null,
@@ -2012,7 +2015,8 @@
       "R"
     ],
     "keywords": [
-      "Flying"
+      "Flying",
+      "Double"
     ],
     "rarity": "mythic",
     "set": "fdn",
@@ -2231,7 +2235,9 @@
       "G",
       "U"
     ],
-    "keywords": [],
+    "keywords": [
+      "Double"
+    ],
     "rarity": "mythic",
     "set": "fdn",
     "arena_id": 93839,
@@ -2876,6 +2882,7 @@
     ],
     "keywords": [
       "Trample",
+      "Double",
       "Landfall"
     ],
     "rarity": "rare",
@@ -6662,7 +6669,9 @@
       "G",
       "U"
     ],
-    "keywords": [],
+    "keywords": [
+      "Double"
+    ],
     "rarity": "mythic",
     "set": "fdn",
     "arena_id": null,
@@ -7818,6 +7827,7 @@
     ],
     "keywords": [
       "Trample",
+      "Double",
       "Landfall"
     ],
     "rarity": "rare",
@@ -8122,7 +8132,8 @@
       "R"
     ],
     "keywords": [
-      "Flying"
+      "Flying",
+      "Double"
     ],
     "rarity": "mythic",
     "set": "fdn",
@@ -9366,7 +9377,8 @@
       "R"
     ],
     "keywords": [
-      "Flying"
+      "Flying",
+      "Double"
     ],
     "rarity": "mythic",
     "set": "fdn",
@@ -10186,7 +10198,8 @@
       "R"
     ],
     "keywords": [
-      "Flashback"
+      "Flashback",
+      "Double"
     ],
     "rarity": "uncommon",
     "set": "fdn",
@@ -11192,6 +11205,7 @@
     ],
     "keywords": [
       "Trample",
+      "Double",
       "Landfall"
     ],
     "rarity": "rare",
@@ -11608,7 +11622,8 @@
       "R"
     ],
     "keywords": [
-      "Flying"
+      "Flying",
+      "Double"
     ],
     "rarity": "mythic",
     "set": "fdn",
@@ -12240,6 +12255,7 @@
     ],
     "keywords": [
       "Trample",
+      "Double",
       "Landfall"
     ],
     "rarity": "rare",
@@ -13014,7 +13030,9 @@
       "G",
       "U"
     ],
-    "keywords": [],
+    "keywords": [
+      "Double"
+    ],
     "rarity": "mythic",
     "set": "fdn",
     "arena_id": null,
@@ -15427,7 +15445,9 @@
     "color_identity": [
       "R"
     ],
-    "keywords": [],
+    "keywords": [
+      "Double"
+    ],
     "rarity": "rare",
     "set": "fdn",
     "arena_id": 94143,
@@ -15652,7 +15672,9 @@
     "color_identity": [
       "G"
     ],
-    "keywords": [],
+    "keywords": [
+      "Double"
+    ],
     "rarity": "uncommon",
     "set": "fdn",
     "arena_id": 93702,
@@ -16570,7 +16592,8 @@
       "R"
     ],
     "keywords": [
-      "Flying"
+      "Flying",
+      "Double"
     ],
     "rarity": "mythic",
     "set": "fdn",

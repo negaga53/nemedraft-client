@@ -1232,7 +1232,11 @@ class OverlayApp:
             self._update_deck_suggestions()
 
     def _on_prediction_retrying(self, attempt: int, delay_ms: int) -> None:
-        """Surface persistent retries (first retry is silent to avoid noise)."""
+        """Surface persistent retries (toast is silent on the first retry
+        to avoid noise, but the loading indicator's text is updated every
+        time so it never idles on a stale "getting picks" message while
+        the server is visibly struggling)."""
+        self.window.pack_tab.show_loading(tr("prediction_retrying", attempt=attempt))
         if attempt >= 2:
             NotificationBus.instance().post(
                 f"Server error — retrying prediction (attempt {attempt})",

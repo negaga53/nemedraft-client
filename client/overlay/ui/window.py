@@ -359,6 +359,11 @@ class OverlayWindow(QWidget):
 
     def show_waiting(self) -> None:
         self._show_status(tr("waiting_for_draft"))
+        # A draft just started but no pack has arrived yet — the pack tab
+        # is already showing the (empty) predictions page via
+        # show_draft_started(), so surface the spinner there too rather
+        # than leaving a bare card list that reads as a hang.
+        self.pack_tab.show_loading(tr("waiting_first_pack"))
 
     def show_draft_started(self) -> None:
         """Switch the pack tab to the predictions page when a draft begins."""
@@ -420,13 +425,14 @@ class OverlayWindow(QWidget):
     def show_prediction_loading(self, pack_number: int, pick_number: int) -> None:
         """Surface a loading indicator while a prediction is in flight.
 
-        Called when a new pack opens; hidden once the prediction lands
-        on ``_on_prediction``. The pack/pick are passed for future use
-        (e.g. updating the context pill to "Predicting P{n}P{m}…") but
-        are not strictly required by the current bar UI.
+        Called when a new pack opens; hidden once the prediction lands on
+        ``_on_prediction``. Replaces whatever the indicator was showing
+        before (e.g. the "waiting for the first pack" message from
+        ``show_waiting``) with the current pack/pick.
         """
-        del pack_number, pick_number  # reserved for future affordances
-        self.pack_tab.show_loading()
+        self.pack_tab.show_loading(
+            tr("predicting_pack_pick", pack=pack_number + 1, pick=pick_number + 1)
+        )
 
     # -- system tray (minimize-to-tray) --------------------------------------
 

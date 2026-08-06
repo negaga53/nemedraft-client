@@ -10,7 +10,6 @@ from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
     QLabel,
-    QProgressBar,
     QPushButton,
     QScrollArea,
     QStackedWidget,
@@ -30,6 +29,7 @@ from client.overlay.ui.pack_widgets import (
     _ColumnHeader,
 )
 from client.overlay.ui.theme import set_prop
+from client.overlay.ui.widgets.loading_indicator import LoadingIndicator
 
 
 class PackTab(QWidget):
@@ -81,18 +81,15 @@ class PackTab(QWidget):
         pill_row.addStretch()
         layout.addLayout(pill_row)
 
-        # Indeterminate loading bar shown while a prediction is in flight.
-        # Sits between the context pill and the card list so users get
-        # immediate visual feedback when a new pack opens; the existing
-        # ranking stays on screen until the new prediction lands, but the
-        # bar makes clear that a fresher one is on the way.
-        self.loading_bar = QProgressBar()
-        self.loading_bar.setObjectName("predictionLoading")
-        self.loading_bar.setRange(0, 0)  # indeterminate — Qt animates it
-        self.loading_bar.setTextVisible(False)
-        self.loading_bar.setFixedHeight(3)
-        self.loading_bar.setVisible(False)
-        layout.addWidget(self.loading_bar)
+        # Spinner + status text shown while a prediction is in flight (or
+        # while a draft has started but no pack has arrived yet). Sits
+        # between the context pill and the card list, above the shot clock
+        # and the scrollable rankings, so it's the first thing users see —
+        # the existing ranking stays on screen until the new prediction
+        # lands, but the indicator makes clear that a fresher one is on
+        # the way and the app hasn't hung.
+        self.loading_indicator = LoadingIndicator()
+        layout.addWidget(self.loading_indicator)
 
         # Per-pick shot clock. Server-computed (seat_manager); this only
         # renders. Always visible so the first sight of it isn't at 10 s.
@@ -204,13 +201,18 @@ class PackTab(QWidget):
         """True when the pack predictions page is visible."""
         return self._stack.currentIndex() == 1
 
-    def show_loading(self) -> None:
-        """Show the prediction-in-flight loading bar."""
-        self.loading_bar.setVisible(True)
+    def show_loading(self, message: str = "") -> None:
+        """Show the prediction-in-flight loading indicator with *message*.
+
+        Called while a prediction request is in flight, on a retry, and
+        while a draft has started but no pack has arrived yet — each case
+        passes its own translated status text.
+        """
+        self.loading_indicator.show_message(message)
 
     def hide_loading(self) -> None:
-        """Hide the prediction loading bar (called when results arrive)."""
-        self.loading_bar.setVisible(False)
+        """Hide the loading indicator (called when results arrive)."""
+        self.loading_indicator.hide_indicator()
 
     def _on_scroll_range_changed(self, _min: int, _max: int) -> None:
         """Keep the column header pixel-aligned with the rows by padding

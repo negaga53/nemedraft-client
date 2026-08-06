@@ -399,11 +399,13 @@ CardRow[recommended="true"] {{
 
 /* ---- pack tab chrome ----------------------------------------------------------- */
 
-QProgressBar#predictionLoading {{
-    max-height: 3px;
-    min-height: 3px;
-    margin: 1px 8px 0 8px;
-    border-radius: 1px;
+QWidget#loadingIndicator {{
+    background: transparent;
+}}
+QLabel#loadingLabel {{
+    color: {t.TEXT_SECONDARY};
+    font-size: {t.FONT_SIZE_SMALL}px;
+    background: transparent;
 }}
 
 QProgressBar#shotClockBar {{

@@ -44,7 +44,8 @@ from client.overlay.managers.arena_poller import ArenaMemoryPoller
 from client.overlay.managers.auth_polling import AuthPollingManager, ServerStatus
 from client.overlay.managers.prediction import PredictionManager, PredictionRequest
 from client.overlay.managers.set_data import SetDataManager
-from client.overlay.managers.workers import SetDataResult
+from client.overlay.managers.worker_pool import WorkerPool
+from client.overlay.managers.workers import ArtPrefetchWorker, SetDataResult
 from client.overlay.memory_watcher import MemoryWatcher
 from client.overlay.notifications import NotificationBus, Severity
 from client.overlay.single_instance import SingleInstance
@@ -96,6 +97,9 @@ class OverlayApp:
         self._set_data.progress.connect(self._on_set_data_progress)
         self._set_data.ready.connect(self._on_set_data_ready)
         self._set_data.failed.connect(self._on_set_data_error)
+        # Card art is fetched on background threads (see _prefetch_art);
+        # the pool keeps refs to in-flight ArtPrefetchWorkers.
+        self._art_pool = WorkerPool()
         # Whether the current set is untrained (no model support).
         self._set_untrained = False
         # Current lobby context (e.g. "TMT_Quick_Draft"), empty when not in a lobby.
@@ -591,8 +595,16 @@ class OverlayApp:
             self.window.load_card_translations_async(self.state.set_code)
 
         if self.art_cache.enabled:
-            art_paths = {name: self.art_cache.get(name) for name in self.state.pool}
+            # Only what is already on disk — a ~45-card pool used to mean a
+            # 10-20s freeze here. Misses are fetched by a worker below.
+            art_paths = {
+                name: self.art_cache.get_cached(name) for name in self.state.pool
+            }
             self.window.deck_tab.set_art_paths(art_paths)
+            self._prefetch_art(
+                [n for n, p in art_paths.items() if p is None],
+                deck_tab=True,
+            )
 
         try:
             from common.inference.pool_analyzer import analyze_pool
@@ -1101,6 +1113,32 @@ class OverlayApp:
         """
         return extract_draft_format(self.state.event_name) or ""
 
+    # -- card art ------------------------------------------------------------
+
+    def _prefetch_art(self, names: list[str], *, deck_tab: bool = False) -> None:
+        """Fetch art for *names* on a worker thread, patching rows as it lands.
+
+        The UI is always rendered first from the on-disk cache
+        (``get_cached``); this fills the misses. ``deck_tab`` also feeds
+        the deck tab's hover-preview map, which the pack path gets for
+        free from ``update_predictions``.
+        """
+        if not self.art_cache.enabled or not names:
+            return
+        worker = ArtPrefetchWorker(self.art_cache, names)
+        # update_card_art is a thread-safe emit; the widget touch happens
+        # in the window's slot on the UI thread.
+        worker.art_ready.connect(self.window.update_card_art)
+        if deck_tab:
+            worker.art_ready.connect(self._on_deck_pool_art_ready)
+        self._art_pool.launch(worker)
+        logger.debug("Prefetching art for %d cards", len(names))
+
+    def _on_deck_pool_art_ready(self, card_name: str, path: Path | None) -> None:
+        """Add one freshly fetched thumbnail to the deck tab's art map."""
+        # set_art_paths ignores None values, so misses are simply dropped.
+        self.window.deck_tab.set_art_paths({card_name: path})
+
     def _on_prediction_loading(self, pack_number: int, pick_number: int) -> None:
         """Surface a spinner while a prediction call is in flight."""
         self.window.show_prediction_loading(pack_number, pick_number)
@@ -1136,8 +1174,11 @@ class OverlayApp:
 
         art_paths: dict[str, Path | None] = {}
         if self.art_cache.enabled:
+            # Cached hits only: rendering must not wait on Scryfall (up to
+            # 14 paced HTTP fetches per pack). Missing thumbnails pop in
+            # afterwards via _prefetch_art below.
             art_paths = {
-                r.card: self.art_cache.get(r.card) for r in results
+                r.card: self.art_cache.get_cached(r.card) for r in results
             }
         self.window.update_predictions(
             results=results,
@@ -1147,6 +1188,7 @@ class OverlayApp:
             pool_size=len(self.state.pool),
             art_paths=art_paths if art_paths else None,
         )
+        self._prefetch_art([n for n, p in art_paths.items() if p is None])
 
         # Record pick history for the navigator.
         key = (self.state.pack_number, self.state.pick_number)

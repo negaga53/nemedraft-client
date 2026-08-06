@@ -11,6 +11,7 @@ from PySide6.QtCore import QObject, QThread, Signal
 from client.overlay.api_client import NemeDraftClient
 from client.overlay.arena_memory import get_arena_current_event
 from client.overlay.boot import resolve_arena_identity
+from client.overlay.card_art import CardArtCache
 from client.overlay.card_mapper import ArenaCardMapper
 
 logger = logging.getLogger("overlay")
@@ -255,3 +256,42 @@ class PredictionWorker(QThread):
         self.finished_ok.emit(
             list(results or []), self._pack_number, self._pick_number,
         )
+
+
+class ArtPrefetchWorker(QThread):
+    """Downloads card art thumbnails off the UI thread, one card at a time.
+
+    ``CardArtCache.get`` does a synchronous Scryfall request per uncached
+    card, paced at >=100 ms; running it for a whole pack (14 cards) or a
+    restored pool (~45) on the Qt main thread froze the overlay for
+    seconds at exactly the moment a new pack landed. The UI now renders
+    from ``get_cached`` and this worker fills the gaps, emitting
+    ``art_ready`` as each image arrives so rows can be patched
+    individually (``OverlayWindow.update_card_art``).
+
+    Signal-only, like every other worker here: it never touches a widget.
+    Late results are harmless — they warm the disk cache and the per-card
+    patch only applies to rows that still show that card.
+    """
+
+    art_ready = Signal(str, object)  # card_name, Path | None
+
+    def __init__(
+        self,
+        art_cache: CardArtCache,
+        names: list[str],
+        parent: QObject | None = None,
+    ) -> None:
+        super().__init__(parent)
+        self._art_cache = art_cache
+        self._names = list(names)
+
+    def run(self) -> None:  # noqa: D401
+        for name in self._names:
+            try:
+                path = self._art_cache.get(name)
+            except Exception:
+                # A single bad name must not kill the rest of the batch.
+                logger.debug("Art prefetch failed for %s", name, exc_info=True)
+                path = None
+            self.art_ready.emit(name, path)

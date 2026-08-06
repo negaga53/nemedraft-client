@@ -276,8 +276,12 @@ class PackTab(QWidget):
                     is_elite=False,
                 )
                 art = self._art_paths.get(name)
+                # Cache lookup only — a blocking fetch here stuttered the
+                # history render. The prediction path's prefetch worker
+                # covers these names (taken cards come from an earlier
+                # pick of the same pack).
                 if art is None and self._art_cache is not None:
-                    art = self._art_cache.get(name)
+                    art = self._art_cache.get_cached(name)
                     if art is not None:
                         self._art_paths[name] = art
                 row.set_data(taken_pick, max_score, art_path=art, dimmed=True)
@@ -505,9 +509,12 @@ class PackTab(QWidget):
     def _make_enter(self, card_name: str):
         def _enter(event):
             art = self._art_paths.get(card_name)
-            # Lazily fetch art from cache if not already known.
+            # Cache lookup only, never a network fetch: this runs inside
+            # enterEvent, where a Scryfall round-trip froze the overlay
+            # on hover. Uncached cards simply show no preview until the
+            # prefetch worker delivers their art.
             if art is None and self._art_cache is not None:
-                art = self._art_cache.get(card_name)
+                art = self._art_cache.get_cached(card_name)
                 if art is not None:
                     self._art_paths[card_name] = art
             if art and self._show_art:

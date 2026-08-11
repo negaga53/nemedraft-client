@@ -44,7 +44,7 @@ SCRYFALL_DIR = Path(__file__).resolve().parents[2] / "data" / "scryfall"
 # clobber the intersected files that scripts/filter_bonus_sheet.py writes.
 DEFAULT_SETS = [
     "ECL", "EOE", "FDN", "FIN", "SOS", "TLA", "TMT", "MKM", "BLB", "DSK", "MSH",
-    "OTJ", "OTP", "BIG",
+    "OTJ", "OTP", "BIG", "HOB",
 ]
 
 _FILTERED_FIELDS = [

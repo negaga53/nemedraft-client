@@ -31,6 +31,13 @@ USER_AGENT = f"NemeDraft/{_client_version} (Educational Tool)"
 # can't double-fire and trip the rate limiter.
 _MIN_REQUEST_INTERVAL = 0.10
 
+# A 429 still happens in bursts (e.g. a freshly-released set with no cached
+# art at all, 14+ uncached thumbnails wanted at once). Retry with a delay
+# instead of treating it as a permanent miss — honor Retry-After when
+# Scryfall sends one, otherwise fall back to a fixed backoff.
+_MAX_ART_RETRIES = 3
+_DEFAULT_RETRY_AFTER = 1.0
+
 # Persistent on-disk cache directory
 from client.overlay.env import _project_root
 DEFAULT_CACHE_DIR = _project_root() / "data" / "card_art_cache"
@@ -154,37 +161,57 @@ class CardArtCache:
             # waited on the lock — re-check before issuing a request.
             if dest.exists():
                 return dest
-            wait = _MIN_REQUEST_INTERVAL - (
-                time.monotonic() - CardArtCache._last_request_time
-            )
-            if wait > 0:
-                time.sleep(wait)
             try:
                 with httpx.Client(
                     timeout=10,
                     follow_redirects=True,
                     headers={"User-Agent": USER_AGENT},
                 ) as client:
-                    resp = client.get(
-                        _SCRYFALL_IMAGE_BASE,
-                        params={
-                            "exact": query_name,
-                            "format": "image",
-                            "version": "small",
-                        },
-                    )
-                    if resp.status_code != 200:
-                        logger.debug(
-                            "Scryfall image %d for %r",
-                            resp.status_code,
-                            card_name,
+                    for attempt in range(_MAX_ART_RETRIES + 1):
+                        wait = _MIN_REQUEST_INTERVAL - (
+                            time.monotonic() - CardArtCache._last_request_time
                         )
-                        return None
-                    dest.write_bytes(resp.content)
-                logger.debug("Cached art for %s → %s", card_name, dest)
-                return dest
+                        if wait > 0:
+                            time.sleep(wait)
+                        try:
+                            resp = client.get(
+                                _SCRYFALL_IMAGE_BASE,
+                                params={
+                                    "exact": query_name,
+                                    "format": "image",
+                                    "version": "small",
+                                },
+                            )
+                        finally:
+                            CardArtCache._last_request_time = time.monotonic()
+
+                        if resp.status_code == 429 and attempt < _MAX_ART_RETRIES:
+                            retry_after = _DEFAULT_RETRY_AFTER
+                            header = resp.headers.get("Retry-After")
+                            if header:
+                                try:
+                                    retry_after = float(header)
+                                except ValueError:
+                                    pass
+                            logger.debug(
+                                "Scryfall 429 for %r — retrying in %.1fs (attempt %d/%d)",
+                                card_name, retry_after, attempt + 1, _MAX_ART_RETRIES,
+                            )
+                            time.sleep(retry_after)
+                            continue
+
+                        if resp.status_code != 200:
+                            logger.debug(
+                                "Scryfall image %d for %r",
+                                resp.status_code,
+                                card_name,
+                            )
+                            return None
+
+                        dest.write_bytes(resp.content)
+                        logger.debug("Cached art for %s → %s", card_name, dest)
+                        return dest
+                return None
             except Exception:
                 logger.debug("Failed to fetch art for %s", card_name, exc_info=True)
                 return None
-            finally:
-                CardArtCache._last_request_time = time.monotonic()

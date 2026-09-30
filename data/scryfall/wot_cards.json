@@ -1,0 +1,2194 @@
+[
+  {
+    "name": "Aggravated Assault",
+    "oracle_id": "20129459-a386-41eb-899d-1aede3427300",
+    "mana_cost": "{2}{R}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "{3}{R}{R}: Untap all creatures you control. After this main phase, there is an additional combat phase followed by an additional main phase. Activate only as a sorcery.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87077,
+    "collector_number": "39"
+  },
+  {
+    "name": "Sneak Attack",
+    "oracle_id": "e7aee670-e6ac-4b3a-b3d1-7b7013db8f3d",
+    "mana_cost": "{3}{R}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "{R}: You may put a creature card from your hand onto the battlefield. That creature gains haste. Sacrifice the creature at the beginning of the next end step.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "99"
+  },
+  {
+    "name": "Stab Wound",
+    "oracle_id": "aad212b2-57ba-4e70-869b-636842eb7a88",
+    "mana_cost": "{2}{B}",
+    "cmc": 3.0,
+    "type_line": "Enchantment \u2014 Aura",
+    "oracle_text": "Enchant creature\nEnchanted creature gets -2/-2.\nAt the beginning of the upkeep of enchanted creature's controller, that player loses 2 life.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [
+      "Enchant"
+    ],
+    "rarity": "uncommon",
+    "set": "wot",
+    "arena_id": 87074,
+    "collector_number": "36"
+  },
+  {
+    "name": "Leyline of the Void",
+    "oracle_id": "f4e32fc1-1b8d-441e-8e76-71f19f98e925",
+    "mana_cost": "{2}{B}{B}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "If this card is in your opening hand, you may begin the game with it on the battlefield.\nIf a card would be put into an opponent's graveyard from anywhere, exile it instead.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87068,
+    "collector_number": "30"
+  },
+  {
+    "name": "Rhystic Study",
+    "oracle_id": "53236dd7-845a-444c-96d5-f41ed7325d8f",
+    "mana_cost": "{2}{U}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever an opponent casts a spell, you may draw a card unless that player pays {1}.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": 87063,
+    "collector_number": "25"
+  },
+  {
+    "name": "Bitterblossom",
+    "oracle_id": "fb868840-09fa-49b1-85cb-b08ad065e972",
+    "mana_cost": "{1}{B}",
+    "cmc": 2.0,
+    "type_line": "Kindred Enchantment \u2014 Faerie",
+    "oracle_text": "At the beginning of your upkeep, you lose 1 life and create a 1/1 black Faerie Rogue creature token with flying.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "92"
+  },
+  {
+    "name": "Sneak Attack",
+    "oracle_id": "e7aee670-e6ac-4b3a-b3d1-7b7013db8f3d",
+    "mana_cost": "{3}{R}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "{R}: You may put a creature card from your hand onto the battlefield. That creature gains haste. Sacrifice the creature at the beginning of the next end step.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": 87088,
+    "collector_number": "50"
+  },
+  {
+    "name": "Intruder Alarm",
+    "oracle_id": "1e943e04-e213-4781-b1a7-935aad8790e1",
+    "mana_cost": "{2}{U}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Creatures don't untap during their controllers' untap steps.\nWhenever a creature enters, untap all creatures.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87059,
+    "collector_number": "21"
+  },
+  {
+    "name": "Kindred Discovery",
+    "oracle_id": "005ee549-1bf5-478f-bc3f-3e791bd7eecf",
+    "mana_cost": "{3}{U}{U}",
+    "cmc": 5.0,
+    "type_line": "Enchantment",
+    "oracle_text": "As this enchantment enters, choose a creature type.\nWhenever a creature you control of the chosen type enters or attacks, draw a card.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": 87060,
+    "collector_number": "22"
+  },
+  {
+    "name": "Aggravated Assault",
+    "oracle_id": "20129459-a386-41eb-899d-1aede3427300",
+    "mana_cost": "{2}{R}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "{3}{R}{R}: Untap all creatures you control. After this main phase, there is an additional combat phase followed by an additional main phase. Activate only as a sorcery.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "96"
+  },
+  {
+    "name": "Raid Bombardment",
+    "oracle_id": "1734e777-d34a-4526-ae24-ef034f147cc5",
+    "mana_cost": "{2}{R}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever a creature you control with power 2 or less attacks, this enchantment deals 1 damage to the player or planeswalker that creature is attacking.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "uncommon",
+    "set": "wot",
+    "arena_id": 87085,
+    "collector_number": "47"
+  },
+  {
+    "name": "Blind Obedience",
+    "oracle_id": "5d998c09-7d89-4265-ada4-6d80cbf56dae",
+    "mana_cost": "{1}{W}",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Extort (Whenever you cast a spell, you may pay {W/B}. If you do, each opponent loses 1 life and you gain that much life.)\nArtifacts and creatures your opponents control enter tapped.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [
+      "Extort"
+    ],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87039,
+    "collector_number": "1"
+  },
+  {
+    "name": "Necropotence",
+    "oracle_id": "94a844d2-0574-45a7-b347-e0e329767c42",
+    "mana_cost": "{B}{B}{B}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Skip your draw step.\nWhenever you discard a card, exile that card from your graveyard.\nPay 1 life: Exile the top card of your library face down. Put that card into your hand at the beginning of your next end step.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "74"
+  },
+  {
+    "name": "Shared Animosity",
+    "oracle_id": "a27445db-33f2-4571-98b5-83206b797484",
+    "mana_cost": "{2}{R}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever a creature you control attacks, it gets +1/+0 until end of turn for each other attacking creature that shares a creature type with it.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87087,
+    "collector_number": "49"
+  },
+  {
+    "name": "Oppression",
+    "oracle_id": "f488f679-f5d5-4e61-b0c8-0b0eb622df0d",
+    "mana_cost": "{1}{B}{B}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever a player casts a spell, that player discards a card.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87070,
+    "collector_number": "32"
+  },
+  {
+    "name": "Fraying Sanity",
+    "oracle_id": "ab4e9284-7904-413e-97b0-69793be79cc5",
+    "mana_cost": "{2}{U}",
+    "cmc": 3.0,
+    "type_line": "Enchantment \u2014 Aura Curse",
+    "oracle_text": "Enchant player\nAt the beginning of each end step, enchanted player mills X cards, where X is the number of cards put into their graveyard from anywhere this turn.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [
+      "Enchant",
+      "Mill"
+    ],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87057,
+    "collector_number": "19"
+  },
+  {
+    "name": "As Foretold",
+    "oracle_id": "e4b3e0af-5caa-47c1-b5be-c56a875cbb15",
+    "mana_cost": "{2}{U}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "At the beginning of your upkeep, put a time counter on this enchantment.\nOnce each turn, you may pay {0} rather than pay the mana cost for a spell you cast with mana value X or less, where X is the number of time counters on this enchantment.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87052,
+    "collector_number": "14"
+  },
+  {
+    "name": "Copy Enchantment",
+    "oracle_id": "87bc0b1f-49ef-4c06-9049-2c148b467882",
+    "mana_cost": "{2}{U}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "You may have this enchantment enter as a copy of any enchantment on the battlefield.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87054,
+    "collector_number": "16"
+  },
+  {
+    "name": "Mana Flare",
+    "oracle_id": "97159138-c34b-416e-b079-5c952383a243",
+    "mana_cost": "{2}{R}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever a player taps a land for mana, that player adds one mana of any type that land produced.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87084,
+    "collector_number": "46"
+  },
+  {
+    "name": "Rest in Peace",
+    "oracle_id": "087f9ad7-e74f-40e2-8102-1ed2925d0418",
+    "mana_cost": "{1}{W}",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "oracle_text": "When this enchantment enters, exile all graveyards.\nIf a card or token would be put into a graveyard from anywhere, exile it instead.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87050,
+    "collector_number": "12"
+  },
+  {
+    "name": "Karmic Justice",
+    "oracle_id": "9ea58595-fcb9-455c-9558-b6a3fb2b83c5",
+    "mana_cost": "{2}{W}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever a spell or ability an opponent controls destroys a noncreature permanent you control, you may destroy target permanent that opponent controls.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87045,
+    "collector_number": "7"
+  },
+  {
+    "name": "Polluted Bonds",
+    "oracle_id": "13b33a41-c22b-4e7a-8323-abadf7f80961",
+    "mana_cost": "{3}{B}{B}",
+    "cmc": 5.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever a land an opponent controls enters, that player loses 2 life and you gain 2 life.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "75"
+  },
+  {
+    "name": "Oversold Cemetery",
+    "oracle_id": "ed4cd3a1-688b-4c05-948d-39d3336e00c0",
+    "mana_cost": "{1}{B}",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "oracle_text": "At the beginning of your upkeep, if you have four or more creature cards in your graveyard, you may return target creature card from your graveyard to your hand.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87071,
+    "collector_number": "33"
+  },
+  {
+    "name": "Bitterblossom",
+    "oracle_id": "fb868840-09fa-49b1-85cb-b08ad065e972",
+    "mana_cost": "{1}{B}",
+    "cmc": 2.0,
+    "type_line": "Kindred Enchantment \u2014 Faerie",
+    "oracle_text": "At the beginning of your upkeep, you lose 1 life and create a 1/1 black Faerie Rogue creature token with flying.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "72"
+  },
+  {
+    "name": "Repercussion",
+    "oracle_id": "f6069a4f-744e-43e8-9f8b-7c13b8b0187f",
+    "mana_cost": "{1}{R}{R}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever a creature is dealt damage, this enchantment deals that much damage to that creature's controller.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": 87086,
+    "collector_number": "48"
+  },
+  {
+    "name": "Omniscience",
+    "oracle_id": "730e39e6-c61d-48b5-8827-bfd952bf1be7",
+    "mana_cost": "{7}{U}{U}{U}",
+    "cmc": 10.0,
+    "type_line": "Enchantment",
+    "oracle_text": "You may cast spells from your hand without paying their mana costs.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "70"
+  },
+  {
+    "name": "Karmic Justice",
+    "oracle_id": "9ea58595-fcb9-455c-9558-b6a3fb2b83c5",
+    "mana_cost": "{2}{W}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever a spell or ability an opponent controls destroys a noncreature permanent you control, you may destroy target permanent that opponent controls.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "85"
+  },
+  {
+    "name": "Smothering Tithe",
+    "oracle_id": "153376c9-dffd-458c-8ce3-a4c8269bc4e9",
+    "mana_cost": "{3}{W}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever an opponent draws a card, that player may pay {2}. If the player doesn't, you create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [
+      "Treasure"
+    ],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "67"
+  },
+  {
+    "name": "Necropotence",
+    "oracle_id": "94a844d2-0574-45a7-b347-e0e329767c42",
+    "mana_cost": "{B}{B}{B}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Skip your draw step.\nWhenever you discard a card, exile that card from your graveyard.\nPay 1 life: Exile the top card of your library face down. Put that card into your hand at the beginning of your next end step.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "94"
+  },
+  {
+    "name": "Leyline of Abundance",
+    "oracle_id": "1197a595-3afc-4f18-b868-bbb096771922",
+    "mana_cost": "{2}{G}{G}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "If this card is in your opening hand, you may begin the game with it on the battlefield.\nWhenever you tap a creature for mana, add an additional {G}.\n{6}{G}{G}: Put a +1/+1 counter on each creature you control.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87094,
+    "collector_number": "56"
+  },
+  {
+    "name": "Defense of the Heart",
+    "oracle_id": "e7e1b166-9267-426d-897d-24903327b48d",
+    "mana_cost": "{3}{G}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "At the beginning of your upkeep, if an opponent controls three or more creatures, sacrifice this enchantment, search your library for up to two creature cards, put those cards onto the battlefield, then shuffle.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": 87089,
+    "collector_number": "51"
+  },
+  {
+    "name": "Greater Auramancy",
+    "oracle_id": "e6e888ea-9935-4df2-a344-c54637e55f43",
+    "mana_cost": "{1}{W}",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Other enchantments you control have shroud. (A permanent with shroud can't be the target of spells or abilities.)\nEnchanted creatures you control have shroud.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "84"
+  },
+  {
+    "name": "Karmic Justice",
+    "oracle_id": "9ea58595-fcb9-455c-9558-b6a3fb2b83c5",
+    "mana_cost": "{2}{W}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever a spell or ability an opponent controls destroys a noncreature permanent you control, you may destroy target permanent that opponent controls.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "65"
+  },
+  {
+    "name": "Vampiric Rites",
+    "oracle_id": "660de988-b6fb-4f36-8006-42af3e7f908d",
+    "mana_cost": "{B}",
+    "cmc": 1.0,
+    "type_line": "Enchantment",
+    "oracle_text": "{1}{B}, Sacrifice a creature: You gain 1 life and draw a card.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "uncommon",
+    "set": "wot",
+    "arena_id": 87075,
+    "collector_number": "37"
+  },
+  {
+    "name": "Doubling Season",
+    "oracle_id": "01546b7d-a233-4176-8843-d732074dc5b6",
+    "mana_cost": "{4}{G}",
+    "cmc": 5.0,
+    "type_line": "Enchantment",
+    "oracle_text": "If an effect would create one or more tokens under your control, it creates twice that many of those tokens instead.\nIf an effect would put one or more counters on a permanent you control, it puts twice that many of those counters on that permanent instead.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "81"
+  },
+  {
+    "name": "Unnatural Growth",
+    "oracle_id": "7324abaa-48da-439d-9339-b0ea5eea612e",
+    "mana_cost": "{1}{G}{G}{G}{G}",
+    "cmc": 5.0,
+    "type_line": "Enchantment",
+    "oracle_text": "At the beginning of each combat, double the power and toughness of each creature you control until end of turn.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [
+      "Double"
+    ],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87100,
+    "collector_number": "62"
+  },
+  {
+    "name": "Greater Auramancy",
+    "oracle_id": "e6e888ea-9935-4df2-a344-c54637e55f43",
+    "mana_cost": "{1}{W}",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Other enchantments you control have shroud. (A permanent with shroud can't be the target of spells or abilities.)\nEnchanted creatures you control have shroud.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": 87042,
+    "collector_number": "4"
+  },
+  {
+    "name": "Doubling Season",
+    "oracle_id": "01546b7d-a233-4176-8843-d732074dc5b6",
+    "mana_cost": "{4}{G}",
+    "cmc": 5.0,
+    "type_line": "Enchantment",
+    "oracle_text": "If an effect would create one or more tokens under your control, it creates twice that many of those tokens instead.\nIf an effect would put one or more counters on a permanent you control, it puts twice that many of those counters on that permanent instead.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "101"
+  },
+  {
+    "name": "Parallel Lives",
+    "oracle_id": "84dc94b2-95fb-4d53-aaa2-191cb645639f",
+    "mana_cost": "{3}{G}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "If an effect would create one or more tokens under your control, it creates twice that many of those tokens instead.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": 87096,
+    "collector_number": "58"
+  },
+  {
+    "name": "Season of Growth",
+    "oracle_id": "3f4e300a-ec5c-42f3-a97b-d58e62abe22b",
+    "mana_cost": "{1}{G}",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever a creature you control enters, scry 1. (Look at the top card of your library. You may put that card on the bottom.)\nWhenever you cast a spell that targets a creature you control, draw a card.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [
+      "Scry"
+    ],
+    "rarity": "uncommon",
+    "set": "wot",
+    "arena_id": 87099,
+    "collector_number": "61"
+  },
+  {
+    "name": "Defense of the Heart",
+    "oracle_id": "e7e1b166-9267-426d-897d-24903327b48d",
+    "mana_cost": "{3}{G}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "At the beginning of your upkeep, if an opponent controls three or more creatures, sacrifice this enchantment, search your library for up to two creature cards, put those cards onto the battlefield, then shuffle.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "80"
+  },
+  {
+    "name": "Garruk's Uprising",
+    "oracle_id": "3127ae9b-a7a7-43ec-89d7-688f8445b33d",
+    "mana_cost": "{2}{G}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "When this enchantment enters, if you control a creature with power 4 or greater, draw a card.\nCreatures you control have trample. (Each of those creatures can deal excess combat damage to the player or planeswalker it's attacking.)\nWhenever a creature you control with power 4 or greater enters, draw a card.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "uncommon",
+    "set": "wot",
+    "arena_id": 87091,
+    "collector_number": "53"
+  },
+  {
+    "name": "Kindred Discovery",
+    "oracle_id": "005ee549-1bf5-478f-bc3f-3e791bd7eecf",
+    "mana_cost": "{3}{U}{U}",
+    "cmc": 5.0,
+    "type_line": "Enchantment",
+    "oracle_text": "As this enchantment enters, choose a creature type.\nWhenever a creature you control of the chosen type enters or attacks, draw a card.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "69"
+  },
+  {
+    "name": "Knightly Valor",
+    "oracle_id": "9ba6cec6-97bf-4a83-9ffa-77e187d0945b",
+    "mana_cost": "{4}{W}",
+    "cmc": 5.0,
+    "type_line": "Enchantment \u2014 Aura",
+    "oracle_text": "Enchant creature\nWhen this Aura enters, create a 2/2 white Knight creature token with vigilance. (Attacking doesn't cause it to tap.)\nEnchanted creature gets +2/+2 and has vigilance.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [
+      "Enchant"
+    ],
+    "rarity": "uncommon",
+    "set": "wot",
+    "arena_id": 87046,
+    "collector_number": "8"
+  },
+  {
+    "name": "Primal Vigor",
+    "oracle_id": "c665544f-557b-4631-a1dc-39571470ca2e",
+    "mana_cost": "{4}{G}",
+    "cmc": 5.0,
+    "type_line": "Enchantment",
+    "oracle_text": "If one or more tokens would be created, twice that many of those tokens are created instead.\nIf one or more +1/+1 counters would be put on a creature, twice that many +1/+1 counters are put on that creature instead.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87097,
+    "collector_number": "59"
+  },
+  {
+    "name": "Kindred Discovery",
+    "oracle_id": "005ee549-1bf5-478f-bc3f-3e791bd7eecf",
+    "mana_cost": "{3}{U}{U}",
+    "cmc": 5.0,
+    "type_line": "Enchantment",
+    "oracle_text": "As this enchantment enters, choose a creature type.\nWhenever a creature you control of the chosen type enters or attacks, draw a card.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "89"
+  },
+  {
+    "name": "Fiery Emancipation",
+    "oracle_id": "52159875-354c-47f9-bb1c-cd65395fcc68",
+    "mana_cost": "{3}{R}{R}{R}",
+    "cmc": 6.0,
+    "type_line": "Enchantment",
+    "oracle_text": "If a source you control would deal damage to a permanent or player, it deals triple that damage to that permanent or player instead.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [
+      "Triple"
+    ],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87080,
+    "collector_number": "42"
+  },
+  {
+    "name": "Dragon Mantle",
+    "oracle_id": "0cc5aaa1-07bf-4872-ac72-303cef9fb143",
+    "mana_cost": "{R}",
+    "cmc": 1.0,
+    "type_line": "Enchantment \u2014 Aura",
+    "oracle_text": "Enchant creature\nWhen this Aura enters, draw a card.\nEnchanted creature has \"{R}: This creature gets +1/+0 until end of turn.\"",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [
+      "Enchant"
+    ],
+    "rarity": "uncommon",
+    "set": "wot",
+    "arena_id": 87079,
+    "collector_number": "41"
+  },
+  {
+    "name": "Utopia Sprawl",
+    "oracle_id": "00d8efa6-a2d9-4249-8da7-b45173675329",
+    "mana_cost": "{G}",
+    "cmc": 1.0,
+    "type_line": "Enchantment \u2014 Aura",
+    "oracle_text": "Enchant Forest\nAs this Aura enters, choose a color.\nWhenever enchanted Forest is tapped for mana, its controller adds an additional one mana of the chosen color.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [
+      "Enchant"
+    ],
+    "rarity": "uncommon",
+    "set": "wot",
+    "arena_id": 87101,
+    "collector_number": "63"
+  },
+  {
+    "name": "Rhystic Study",
+    "oracle_id": "53236dd7-845a-444c-96d5-f41ed7325d8f",
+    "mana_cost": "{2}{U}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever an opponent casts a spell, you may draw a card unless that player pays {1}.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "91"
+  },
+  {
+    "name": "Sneak Attack",
+    "oracle_id": "e7aee670-e6ac-4b3a-b3d1-7b7013db8f3d",
+    "mana_cost": "{3}{R}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "{R}: You may put a creature card from your hand onto the battlefield. That creature gains haste. Sacrifice the creature at the beginning of the next end step.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "79"
+  },
+  {
+    "name": "Parallel Lives",
+    "oracle_id": "84dc94b2-95fb-4d53-aaa2-191cb645639f",
+    "mana_cost": "{3}{G}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "If an effect would create one or more tokens under your control, it creates twice that many of those tokens instead.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "83"
+  },
+  {
+    "name": "Curiosity",
+    "oracle_id": "223fa044-d387-4884-bf4e-75f1b61c6a46",
+    "mana_cost": "{U}",
+    "cmc": 1.0,
+    "type_line": "Enchantment \u2014 Aura",
+    "oracle_text": "Enchant creature\nWhenever enchanted creature deals damage to an opponent, you may draw a card.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [
+      "Enchant"
+    ],
+    "rarity": "uncommon",
+    "set": "wot",
+    "arena_id": 87055,
+    "collector_number": "17"
+  },
+  {
+    "name": "Prismatic Omen",
+    "oracle_id": "d90882ae-6572-4214-8d9c-0bdfb75f9be2",
+    "mana_cost": "{1}{G}",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Lands you control are every basic land type in addition to their other types.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87098,
+    "collector_number": "60"
+  },
+  {
+    "name": "Blood Moon",
+    "oracle_id": "94fac5fe-97d5-4c12-a80c-8efff9d853ae",
+    "mana_cost": "{2}{R}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Nonbasic lands are Mountains.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "77"
+  },
+  {
+    "name": "Land Tax",
+    "oracle_id": "d2d9ecea-7925-420e-98b9-2f87f41f387c",
+    "mana_cost": "{W}",
+    "cmc": 1.0,
+    "type_line": "Enchantment",
+    "oracle_text": "At the beginning of your upkeep, if an opponent controls more lands than you, you may search your library for up to three basic land cards, reveal them, put them into your hand, then shuffle.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "66"
+  },
+  {
+    "name": "Grave Pact",
+    "oracle_id": "6f4ac4a4-53ec-4bc9-8f5c-d4b801d867b2",
+    "mana_cost": "{1}{B}{B}{B}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever a creature you control dies, each other player sacrifices a creature of their choice.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "93"
+  },
+  {
+    "name": "Spreading Seas",
+    "oracle_id": "af32757c-9d3c-4f6c-a6fa-d5729a440382",
+    "mana_cost": "{1}{U}",
+    "cmc": 2.0,
+    "type_line": "Enchantment \u2014 Aura",
+    "oracle_text": "Enchant land\nWhen this Aura enters, draw a card.\nEnchanted land is an Island.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [
+      "Enchant"
+    ],
+    "rarity": "uncommon",
+    "set": "wot",
+    "arena_id": 87064,
+    "collector_number": "26"
+  },
+  {
+    "name": "Ground Seal",
+    "oracle_id": "13f6f960-ef79-4f2c-8874-90fe9e77099e",
+    "mana_cost": "{1}{G}",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "oracle_text": "When this enchantment enters, draw a card.\nCards in graveyards can't be the targets of spells or abilities.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "uncommon",
+    "set": "wot",
+    "arena_id": 87092,
+    "collector_number": "54"
+  },
+  {
+    "name": "Smothering Tithe",
+    "oracle_id": "153376c9-dffd-458c-8ce3-a4c8269bc4e9",
+    "mana_cost": "{3}{W}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever an opponent draws a card, that player may pay {2}. If the player doesn't, you create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [
+      "Treasure"
+    ],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "87"
+  },
+  {
+    "name": "Dark Tutelage",
+    "oracle_id": "0c6ce7c9-316b-4171-a8fa-ca26af1eecb7",
+    "mana_cost": "{2}{B}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "At the beginning of your upkeep, reveal the top card of your library and put that card into your hand. You lose life equal to its mana value.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "uncommon",
+    "set": "wot",
+    "arena_id": 87066,
+    "collector_number": "28"
+  },
+  {
+    "name": "Omniscience",
+    "oracle_id": "730e39e6-c61d-48b5-8827-bfd952bf1be7",
+    "mana_cost": "{7}{U}{U}{U}",
+    "cmc": 10.0,
+    "type_line": "Enchantment",
+    "oracle_text": "You may cast spells from your hand without paying their mana costs.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": 87062,
+    "collector_number": "24"
+  },
+  {
+    "name": "Aggravated Assault",
+    "oracle_id": "20129459-a386-41eb-899d-1aede3427300",
+    "mana_cost": "{2}{R}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "{3}{R}{R}: Untap all creatures you control. After this main phase, there is an additional combat phase followed by an additional main phase. Activate only as a sorcery.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "76"
+  },
+  {
+    "name": "Griffin Aerie",
+    "oracle_id": "7cab62dc-a256-4da8-a3ea-b3903ec37077",
+    "mana_cost": "{1}{W}",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "oracle_text": "At the beginning of your end step, if you gained 3 or more life this turn, create a 2/2 white Griffin creature token with flying.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "uncommon",
+    "set": "wot",
+    "arena_id": 87043,
+    "collector_number": "5"
+  },
+  {
+    "name": "Blood Moon",
+    "oracle_id": "94fac5fe-97d5-4c12-a80c-8efff9d853ae",
+    "mana_cost": "{2}{R}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Nonbasic lands are Mountains.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": 87078,
+    "collector_number": "40"
+  },
+  {
+    "name": "Polluted Bonds",
+    "oracle_id": "13b33a41-c22b-4e7a-8323-abadf7f80961",
+    "mana_cost": "{3}{B}{B}",
+    "cmc": 5.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever a land an opponent controls enters, that player loses 2 life and you gain 2 life.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "95"
+  },
+  {
+    "name": "Grave Pact",
+    "oracle_id": "6f4ac4a4-53ec-4bc9-8f5c-d4b801d867b2",
+    "mana_cost": "{1}{B}{B}{B}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever a creature you control dies, each other player sacrifices a creature of their choice.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": 87067,
+    "collector_number": "29"
+  },
+  {
+    "name": "Forced Fruition",
+    "oracle_id": "448b27a5-7c0c-4ab6-bddf-bd62b920aacc",
+    "mana_cost": "{4}{U}{U}",
+    "cmc": 6.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever an opponent casts a spell, that player draws seven cards.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87056,
+    "collector_number": "18"
+  },
+  {
+    "name": "Land Tax",
+    "oracle_id": "d2d9ecea-7925-420e-98b9-2f87f41f387c",
+    "mana_cost": "{W}",
+    "cmc": 1.0,
+    "type_line": "Enchantment",
+    "oracle_text": "At the beginning of your upkeep, if an opponent controls more lands than you, you may search your library for up to three basic land cards, reveal them, put them into your hand, then shuffle.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "86"
+  },
+  {
+    "name": "Intangible Virtue",
+    "oracle_id": "d21c3c8f-d105-4ba9-bf69-e5f26f0f8ec5",
+    "mana_cost": "{1}{W}",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Creature tokens you control get +1/+1 and have vigilance.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "uncommon",
+    "set": "wot",
+    "arena_id": 87044,
+    "collector_number": "6"
+  },
+  {
+    "name": "Sanguine Bond",
+    "oracle_id": "73089a39-a2f6-4aa2-a058-e6551475153d",
+    "mana_cost": "{3}{B}{B}",
+    "cmc": 5.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever you gain life, target opponent loses that much life.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87073,
+    "collector_number": "35"
+  },
+  {
+    "name": "Bitterblossom",
+    "oracle_id": "fb868840-09fa-49b1-85cb-b08ad065e972",
+    "mana_cost": "{1}{B}",
+    "cmc": 2.0,
+    "type_line": "Kindred Enchantment \u2014 Faerie",
+    "oracle_text": "At the beginning of your upkeep, you lose 1 life and create a 1/1 black Faerie Rogue creature token with flying.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": 87065,
+    "collector_number": "27"
+  },
+  {
+    "name": "Compulsion",
+    "oracle_id": "3fafb6b2-5cae-45b6-8550-3ff8daa02802",
+    "mana_cost": "{1}{U}",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "oracle_text": "{1}{U}, Discard a card: Draw a card.\n{1}{U}, Sacrifice this enchantment: Draw a card.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "uncommon",
+    "set": "wot",
+    "arena_id": 87053,
+    "collector_number": "15"
+  },
+  {
+    "name": "As Foretold",
+    "oracle_id": "e4b3e0af-5caa-47c1-b5be-c56a875cbb15",
+    "mana_cost": "{2}{U}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "At the beginning of your upkeep, put a time counter on this enchantment.\nOnce each turn, you may pay {0} rather than pay the mana cost for a spell you cast with mana value X or less, where X is the number of time counters on this enchantment.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "88"
+  },
+  {
+    "name": "Doubling Season",
+    "oracle_id": "01546b7d-a233-4176-8843-d732074dc5b6",
+    "mana_cost": "{4}{G}",
+    "cmc": 5.0,
+    "type_line": "Enchantment",
+    "oracle_text": "If an effect would create one or more tokens under your control, it creates twice that many of those tokens instead.\nIf an effect would put one or more counters on a permanent you control, it puts twice that many of those counters on that permanent instead.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": 87090,
+    "collector_number": "52"
+  },
+  {
+    "name": "Land Tax",
+    "oracle_id": "d2d9ecea-7925-420e-98b9-2f87f41f387c",
+    "mana_cost": "{W}",
+    "cmc": 1.0,
+    "type_line": "Enchantment",
+    "oracle_text": "At the beginning of your upkeep, if an opponent controls more lands than you, you may search your library for up to three basic land cards, reveal them, put them into your hand, then shuffle.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": 87047,
+    "collector_number": "9"
+  },
+  {
+    "name": "Nature's Will",
+    "oracle_id": "9837287b-d821-4655-8f01-93fc6c7f0ecc",
+    "mana_cost": "{2}{G}{G}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever one or more creatures you control deal combat damage to a player, tap all lands that player controls and untap all lands you control.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87095,
+    "collector_number": "57"
+  },
+  {
+    "name": "Leyline of Lightning",
+    "oracle_id": "bb87ec08-bb1b-43d8-8809-92904cbba685",
+    "mana_cost": "{2}{R}{R}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "If this card is in your opening hand, you may begin the game with it on the battlefield.\nWhenever you cast a spell, you may pay {1}. If you do, this enchantment deals 1 damage to target player or planeswalker.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87083,
+    "collector_number": "45"
+  },
+  {
+    "name": "Hardened Scales",
+    "oracle_id": "a1f3da21-af6d-450e-bf0b-985d158418e6",
+    "mana_cost": "{G}",
+    "cmc": 1.0,
+    "type_line": "Enchantment",
+    "oracle_text": "If one or more +1/+1 counters would be put on a creature you control, that many plus one +1/+1 counters are put on it instead.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87093,
+    "collector_number": "55"
+  },
+  {
+    "name": "Leyline of Anticipation",
+    "oracle_id": "9dc65ffe-17fc-4280-b4bd-78073ac7e12b",
+    "mana_cost": "{2}{U}{U}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "If this card is in your opening hand, you may begin the game with it on the battlefield.\nYou may cast spells as though they had flash.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87061,
+    "collector_number": "23"
+  },
+  {
+    "name": "Grasp of Fate",
+    "oracle_id": "1b26a54f-6c27-4940-b77e-2a66175c5eff",
+    "mana_cost": "{1}{W}{W}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "When this enchantment enters, for each opponent, exile up to one target nonland permanent that player controls until this enchantment leaves the battlefield. (Those permanents return under their owners' control.)",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "uncommon",
+    "set": "wot",
+    "arena_id": 87041,
+    "collector_number": "3"
+  },
+  {
+    "name": "Omniscience",
+    "oracle_id": "730e39e6-c61d-48b5-8827-bfd952bf1be7",
+    "mana_cost": "{7}{U}{U}{U}",
+    "cmc": 10.0,
+    "type_line": "Enchantment",
+    "oracle_text": "You may cast spells from your hand without paying their mana costs.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "90"
+  },
+  {
+    "name": "Dawn of Hope",
+    "oracle_id": "d7a38484-2acc-49a6-b32d-d54dddb14d31",
+    "mana_cost": "{1}{W}",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever you gain life, you may pay {2}. If you do, draw a card.\n{3}{W}: Create a 1/1 white Soldier creature token with lifelink.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87040,
+    "collector_number": "2"
+  },
+  {
+    "name": "Leyline of Sanctity",
+    "oracle_id": "492e0e6c-8c27-4376-938b-f8a8b6205810",
+    "mana_cost": "{2}{W}{W}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "If this card is in your opening hand, you may begin the game with it on the battlefield.\nYou have hexproof. (You can't be the target of spells or abilities your opponents control.)",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87048,
+    "collector_number": "10"
+  },
+  {
+    "name": "Polluted Bonds",
+    "oracle_id": "13b33a41-c22b-4e7a-8323-abadf7f80961",
+    "mana_cost": "{3}{B}{B}",
+    "cmc": 5.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever a land an opponent controls enters, that player loses 2 life and you gain 2 life.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87072,
+    "collector_number": "34"
+  },
+  {
+    "name": "Nature's Will",
+    "oracle_id": "9837287b-d821-4655-8f01-93fc6c7f0ecc",
+    "mana_cost": "{2}{G}{G}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever one or more creatures you control deal combat damage to a player, tap all lands that player controls and untap all lands you control.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "82"
+  },
+  {
+    "name": "Nature's Will",
+    "oracle_id": "9837287b-d821-4655-8f01-93fc6c7f0ecc",
+    "mana_cost": "{2}{G}{G}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever one or more creatures you control deal combat damage to a player, tap all lands that player controls and untap all lands you control.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "102"
+  },
+  {
+    "name": "Impact Tremors",
+    "oracle_id": "9242cd3e-1a71-4700-8182-9c1005616033",
+    "mana_cost": "{1}{R}",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever a creature you control enters, this enchantment deals 1 damage to each opponent.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "uncommon",
+    "set": "wot",
+    "arena_id": 87082,
+    "collector_number": "44"
+  },
+  {
+    "name": "Rhystic Study",
+    "oracle_id": "53236dd7-845a-444c-96d5-f41ed7325d8f",
+    "mana_cost": "{2}{U}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever an opponent casts a spell, you may draw a card unless that player pays {1}.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "71"
+  },
+  {
+    "name": "Repercussion",
+    "oracle_id": "f6069a4f-744e-43e8-9f8b-7c13b8b0187f",
+    "mana_cost": "{1}{R}{R}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever a creature is dealt damage, this enchantment deals that much damage to that creature's controller.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "78"
+  },
+  {
+    "name": "Hatching Plans",
+    "oracle_id": "cebc9fcc-25ec-4366-a914-b95afbd134b0",
+    "mana_cost": "{1}{U}",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "oracle_text": "When this enchantment is put into a graveyard from the battlefield, draw three cards.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "uncommon",
+    "set": "wot",
+    "arena_id": 87058,
+    "collector_number": "20"
+  },
+  {
+    "name": "Goblin Bombardment",
+    "oracle_id": "edad60c6-80de-4033-af1b-a703ac332983",
+    "mana_cost": "{1}{R}",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Sacrifice a creature: This enchantment deals 1 damage to any target.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87081,
+    "collector_number": "43"
+  },
+  {
+    "name": "Blood Moon",
+    "oracle_id": "94fac5fe-97d5-4c12-a80c-8efff9d853ae",
+    "mana_cost": "{2}{R}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Nonbasic lands are Mountains.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "97"
+  },
+  {
+    "name": "Parallel Lives",
+    "oracle_id": "84dc94b2-95fb-4d53-aaa2-191cb645639f",
+    "mana_cost": "{3}{G}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "If an effect would create one or more tokens under your control, it creates twice that many of those tokens instead.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "103"
+  },
+  {
+    "name": "Grave Pact",
+    "oracle_id": "6f4ac4a4-53ec-4bc9-8f5c-d4b801d867b2",
+    "mana_cost": "{1}{B}{B}{B}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever a creature you control dies, each other player sacrifices a creature of their choice.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "73"
+  },
+  {
+    "name": "Defense of the Heart",
+    "oracle_id": "e7e1b166-9267-426d-897d-24903327b48d",
+    "mana_cost": "{3}{G}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "At the beginning of your upkeep, if an opponent controls three or more creatures, sacrifice this enchantment, search your library for up to two creature cards, put those cards onto the battlefield, then shuffle.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "100"
+  },
+  {
+    "name": "Waste Not",
+    "oracle_id": "00fdcc19-88ed-46c3-91f0-095806228105",
+    "mana_cost": "{1}{B}",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever an opponent discards a creature card, create a 2/2 black Zombie creature token.\nWhenever an opponent discards a land card, add {B}{B}.\nWhenever an opponent discards a noncreature, nonland card, draw a card.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87076,
+    "collector_number": "38"
+  },
+  {
+    "name": "Smothering Tithe",
+    "oracle_id": "153376c9-dffd-458c-8ce3-a4c8269bc4e9",
+    "mana_cost": "{3}{W}",
+    "cmc": 4.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever an opponent draws a card, that player may pay {2}. If the player doesn't, you create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [
+      "Treasure"
+    ],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": 87051,
+    "collector_number": "13"
+  },
+  {
+    "name": "Greater Auramancy",
+    "oracle_id": "e6e888ea-9935-4df2-a344-c54637e55f43",
+    "mana_cost": "{1}{W}",
+    "cmc": 2.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Other enchantments you control have shroud. (A permanent with shroud can't be the target of spells or abilities.)\nEnchanted creatures you control have shroud.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "64"
+  },
+  {
+    "name": "As Foretold",
+    "oracle_id": "e4b3e0af-5caa-47c1-b5be-c56a875cbb15",
+    "mana_cost": "{2}{U}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "At the beginning of your upkeep, put a time counter on this enchantment.\nOnce each turn, you may pay {0} rather than pay the mana cost for a spell you cast with mana value X or less, where X is the number of time counters on this enchantment.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "68"
+  },
+  {
+    "name": "Phyrexian Unlife",
+    "oracle_id": "6598d988-d60e-4441-88b6-8d0995c4675a",
+    "mana_cost": "{2}{W}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "You don't lose the game for having 0 or less life.\nAs long as you have 0 or less life, all damage is dealt to you as though its source had infect. (Damage is dealt to you in the form of poison counters.)",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "rare",
+    "set": "wot",
+    "arena_id": 87049,
+    "collector_number": "11"
+  },
+  {
+    "name": "Repercussion",
+    "oracle_id": "f6069a4f-744e-43e8-9f8b-7c13b8b0187f",
+    "mana_cost": "{1}{R}{R}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Whenever a creature is dealt damage, this enchantment deals that much damage to that creature's controller.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": null,
+    "collector_number": "98"
+  },
+  {
+    "name": "Necropotence",
+    "oracle_id": "94a844d2-0574-45a7-b347-e0e329767c42",
+    "mana_cost": "{B}{B}{B}",
+    "cmc": 3.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Skip your draw step.\nWhenever you discard a card, exile that card from your graveyard.\nPay 1 life: Exile the top card of your library face down. Put that card into your hand at the beginning of your next end step.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "wot",
+    "arena_id": 87069,
+    "collector_number": "31"
+  }
+]

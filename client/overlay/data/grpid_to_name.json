@@ -3,8 +3,8 @@
 "source":"mtgjson AllIdentifiers",
 "source_date":"2026-09-30",
 "generated_utc":"2026-09-30T17:16:24+00:00",
-"count":20532,
-"manual_merged":554
+"count":20542,
+"manual_merged":564
 },
 "grpid_to_name":{
 "6947":"Enlightened Tutor",
@@ -20306,6 +20306,16 @@
 "106548":"Forest",
 "106549":"Forest",
 "106550":"Forest",
+"106566":"Eye of Ugin",
+"106567":"Austere Command",
+"106568":"Flesh Duplicate",
+"106569":"Consign to Memory",
+"106570":"Sublime Epiphany",
+"106571":"Consider",
+"106572":"Necrodominance",
+"106573":"Mind Twist",
+"106574":"Splinter Twin",
+"106575":"Root Maze",
 "107197":"Captain America, Super-Soldier",
 "107198":"Jennifer Walters",
 "107199":"The Sensational She-Hulk",

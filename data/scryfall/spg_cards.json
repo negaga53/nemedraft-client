@@ -211,5 +211,217 @@
     "set": "spg",
     "arena_id": 90661,
     "collector_number": "38"
+  },
+  {
+    "name": "Eye of Ugin",
+    "oracle_id": "10d13ff6-c4d0-4753-8939-a8a90f0e92bb",
+    "mana_cost": "",
+    "cmc": 0.0,
+    "type_line": "Legendary Land",
+    "oracle_text": "Colorless Eldrazi spells you cast cost {2} less to cast.\n{7}, {T}: Search your library for a colorless creature card, reveal it, put it into your hand, then shuffle.",
+    "power": null,
+    "toughness": null,
+    "colors": [],
+    "color_identity": [],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "spg",
+    "arena_id": 106566,
+    "collector_number": "159"
+  },
+  {
+    "name": "Austere Command",
+    "oracle_id": "09cc8709-fe10-472a-b05c-e89f3523018d",
+    "mana_cost": "{4}{W}{W}",
+    "cmc": 6.0,
+    "type_line": "Sorcery",
+    "oracle_text": "Choose two \u2014\n\u2022 Destroy all artifacts.\n\u2022 Destroy all enchantments.\n\u2022 Destroy all creatures with mana value 3 or less.\n\u2022 Destroy all creatures with mana value 4 or greater.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "W"
+    ],
+    "color_identity": [
+      "W"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "spg",
+    "arena_id": 106567,
+    "collector_number": "160"
+  },
+  {
+    "name": "Flesh Duplicate",
+    "oracle_id": "1869eb1e-7786-4fea-8a92-2bd839de47df",
+    "mana_cost": "{U}{U}",
+    "cmc": 2.0,
+    "type_line": "Creature \u2014 Shapeshifter Rebel",
+    "oracle_text": "You may have this creature enter as a copy of any creature on the battlefield, except it has vanishing 3 if that creature doesn't have vanishing. (A permanent with vanishing 3 enters with three time counters on it. At the beginning of your upkeep, remove a time counter from it. When the last is removed, sacrifice it.)",
+    "power": "0",
+    "toughness": "0",
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "spg",
+    "arena_id": 106568,
+    "collector_number": "161"
+  },
+  {
+    "name": "Consign to Memory",
+    "oracle_id": "16c39265-72d9-4c86-a961-8dd38ff9adcd",
+    "mana_cost": "{U}",
+    "cmc": 1.0,
+    "type_line": "Instant",
+    "oracle_text": "Replicate {1} (When you cast this spell, copy it for each time you paid its replicate cost. You may choose new targets for the copies.)\nCounter target triggered ability or colorless spell.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [
+      "Replicate"
+    ],
+    "rarity": "mythic",
+    "set": "spg",
+    "arena_id": 106569,
+    "collector_number": "162"
+  },
+  {
+    "name": "Sublime Epiphany",
+    "oracle_id": "56148ae7-a9df-4771-8d53-d9ffb815c884",
+    "mana_cost": "{4}{U}{U}",
+    "cmc": 6.0,
+    "type_line": "Instant",
+    "oracle_text": "Choose one or more \u2014\n\u2022 Counter target spell.\n\u2022 Counter target activated or triggered ability.\n\u2022 Return target nonland permanent to its owner's hand.\n\u2022 Create a token that's a copy of target creature you control.\n\u2022 Target player draws a card.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "spg",
+    "arena_id": 106570,
+    "collector_number": "163"
+  },
+  {
+    "name": "Consider",
+    "oracle_id": "4c9bcba6-87b5-4fb3-97ee-6fe5b739337d",
+    "mana_cost": "{U}",
+    "cmc": 1.0,
+    "type_line": "Instant",
+    "oracle_text": "Surveil 1. (Look at the top card of your library. You may put it into your graveyard.)\nDraw a card.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "U"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "keywords": [
+      "Surveil"
+    ],
+    "rarity": "mythic",
+    "set": "spg",
+    "arena_id": 106571,
+    "collector_number": "164"
+  },
+  {
+    "name": "Necrodominance",
+    "oracle_id": "a10b3e35-8cc4-450e-9e30-0fce8df0fea4",
+    "mana_cost": "{B}{B}{B}",
+    "cmc": 3.0,
+    "type_line": "Legendary Enchantment",
+    "oracle_text": "Skip your draw step.\nAt the beginning of your end step, you may pay any amount of life. If you do, draw that many cards.\nYour maximum hand size is five.\nIf a card or token would be put into your graveyard from anywhere, exile it instead.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "spg",
+    "arena_id": 106572,
+    "collector_number": "165"
+  },
+  {
+    "name": "Mind Twist",
+    "oracle_id": "78f9c223-9982-4282-a496-a6f892f0a5bf",
+    "mana_cost": "{X}{B}",
+    "cmc": 1.0,
+    "type_line": "Sorcery",
+    "oracle_text": "Target player discards X cards at random.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "spg",
+    "arena_id": 106573,
+    "collector_number": "166"
+  },
+  {
+    "name": "Splinter Twin",
+    "oracle_id": "2df3187b-4b91-4de9-9b26-d48a30700cec",
+    "mana_cost": "{2}{R}{R}",
+    "cmc": 4.0,
+    "type_line": "Enchantment \u2014 Aura",
+    "oracle_text": "Enchant creature\nEnchanted creature has \"{T}: Create a token that's a copy of this creature, except it has haste. Exile that token at the beginning of the next end step.\"",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "R"
+    ],
+    "color_identity": [
+      "R"
+    ],
+    "keywords": [
+      "Enchant"
+    ],
+    "rarity": "mythic",
+    "set": "spg",
+    "arena_id": 106574,
+    "collector_number": "167"
+  },
+  {
+    "name": "Root Maze",
+    "oracle_id": "2f4abc5e-5aad-455e-b1ec-137d7ac4a10c",
+    "mana_cost": "{G}",
+    "cmc": 1.0,
+    "type_line": "Enchantment",
+    "oracle_text": "Artifacts and lands enter tapped.",
+    "power": null,
+    "toughness": null,
+    "colors": [
+      "G"
+    ],
+    "color_identity": [
+      "G"
+    ],
+    "keywords": [],
+    "rarity": "mythic",
+    "set": "spg",
+    "arena_id": 106575,
+    "collector_number": "168"
   }
 ]

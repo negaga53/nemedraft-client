@@ -1,9 +1,9 @@
 {
 "_meta":{
-"source":"MTGA client DB (Raw_CardDatabase, ExpansionCode=MSH, FRA)",
-"reason":"mtgjson/Scryfall have not published MSH/FRA Arena IDs yet; these canonical grpIds are merged by refresh_grpid_map.py and can be deleted once upstream covers them.",
-"generated_utc":"2026-09-30T17:43:30+00:00",
-"count":850
+"source":"MTGA client DB (Raw_CardDatabase, ExpansionCode=MSH, FRA; SPG DigitalReleaseSet=SPG-FRA)",
+"reason":"mtgjson/Scryfall have not published MSH/FRA (+ FRA's Special Guests wave) Arena IDs yet; these canonical grpIds are merged by refresh_grpid_map.py and can be deleted once upstream covers them.",
+"generated_utc":"2026-10-17T08:50:03+00:00",
+"count":860
 },
 "grpid_to_name":{
 "104892":"Agent 13, Sharon Carter",
@@ -731,6 +731,16 @@
 "106548":"Forest",
 "106549":"Forest",
 "106550":"Forest",
+"106566":"Eye of Ugin",
+"106567":"Austere Command",
+"106568":"Flesh Duplicate",
+"106569":"Consign to Memory",
+"106570":"Sublime Epiphany",
+"106571":"Consider",
+"106572":"Necrodominance",
+"106573":"Mind Twist",
+"106574":"Splinter Twin",
+"106575":"Root Maze",
 "107197":"Captain America, Super-Soldier",
 "107198":"Jennifer Walters",
 "107199":"The Sensational She-Hulk",
